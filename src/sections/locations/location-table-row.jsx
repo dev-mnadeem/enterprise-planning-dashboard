@@ -32,9 +32,11 @@ export default function LocationTableRow({
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
-  const handleDelte = (id) => {
-    onDeleteLocation(id);
+  const handleDelete = () => {
     handleCloseMenu();
+    if (window.confirm(`Delete location "${name}"?`)) {
+      onDeleteLocation(id);
+    }
   };
 
   const handleEdit = () => {
@@ -88,7 +90,7 @@ export default function LocationTableRow({
           <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
           Edit
         </MenuItem>
-        <MenuItem onClick={() => handleDelte(id)} sx={{ color: 'error.main' }}>
+        <MenuItem onClick={() => handleDelete()} sx={{ color: 'error.main' }}>
           <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
           Delete
         </MenuItem>
