@@ -17,7 +17,7 @@ import Iconify from 'src/components/iconify';
 import { useFormik } from 'formik';
 import { useMutation } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
-import { useAppDispatch, useAppSelector } from 'src/state/hooks';
+import { useAppDispatch } from 'src/state/hooks';
 import { persistor } from 'src/state/store';
 import { storeUser, storeUserSession } from 'src/state/reducers/userReducer';
 import { useEffect } from 'react';
@@ -31,8 +31,29 @@ export default function LoginView() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = useState(false);
-  const { userSession } = useAppSelector((state) => state.userReducer);
-  const [mutate, { data, loading, error }] = useMutation(ENDPOINTS.LOGIN);
+  const [mutate, { loading, error }] = useMutation(ENDPOINTS.LOGIN);
+
+  const startSession = async (response) => {
+    if (!response?.token || !response?.permissions || !response?.locations) return;
+    try {
+      const decoded = jwtDecode(response.token);
+      const user = {
+        ...JSON.parse(decoded.id),
+        permissions: response.permissions,
+        locations: response.locations,
+      };
+      dispatch(storeUserSession({ token: response.token }));
+      dispatch(storeUser(user));
+      // Write the session to storage before routing on, so a reload straight
+      // after sign-in still finds it. The route tree swaps to the protected
+      // routes as soon as the session is in the store.
+      await persistor.flush();
+      router.replace('/');
+    } catch {
+      dispatch(logoutUser());
+      toast.error('The server returned a session this console could not read.');
+    }
+  };
 
   const { values, errors, handleChange, handleSubmit } = useFormik({
     initialValues: {
@@ -43,47 +64,16 @@ export default function LoginView() {
       if (!values.email || !values.password) {
         return;
       }
-      mutate({
+      const response = await mutate({
         email: values.email,
         password: values.password,
       });
+      await startSession(response);
     },
   });
 
   useEffect(() => {
-    if (userSession) {
-      router.replace('/');
-    }
-
-    if (data?.token && data?.permissions && data?.locations) {
-      try {
-        const decoded = jwtDecode(data?.token);
-        const user = {
-          ...JSON.parse(decoded.id),
-          permissions: data?.permissions,
-          locations: data?.locations,
-        };
-
-        dispatch(
-          storeUserSession({
-            token: data?.token,
-          })
-        );
-        dispatch(storeUser(user));
-        // redux-persist writes asynchronously. Reloading the page immediately
-        // after dispatching threw the session away before it reached storage,
-        // which sent the user straight back here. Flush, then navigate.
-        persistor.flush().then(() => {
-          window.location.replace('/');
-        });
-      } catch (error) {
-        dispatch(logoutUser());
-      }
-    }
-  }, [data?.token]);
-
-  useEffect(() => {
-    if (error) toast.error(error || 'Something went wrong');
+    if (error) toast.error(error);
   }, [error]);
 
   const renderForm = (
