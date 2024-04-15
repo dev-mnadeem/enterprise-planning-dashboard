@@ -3,7 +3,8 @@ import { TableHeadData } from '../utils';
 import Iconify from 'src/components/iconify';
 import { useNavigate } from 'react-router-dom';
 import Scrollbar from 'src/components/scrollbar';
-import { applyFilter, emptyRows, getComparator } from 'src/utils/table';
+import { applyFilter, getComparator } from 'src/utils/table';
+import { useDebouncedValue } from 'src/hooks/use-debounced-value';
 import {
   Card,
   Stack,
@@ -15,15 +16,10 @@ import {
   TableContainer,
   TablePagination,
 } from '@mui/material';
-import {
-  TableEmptyRows,
-  TableNoData,
-  TableSearchHead,
-  TableSortToolbar,
-} from 'src/components/common';
+import { TableNoData, TableSearchHead, TableSortToolbar } from 'src/components/common';
 import UsersTableRow from '../users-table-row';
 import { ENDPOINTS } from 'src/api/Endpoints';
-import { useMutation, useQuery } from 'src/api';
+import { useMutation, usePagedQuery } from 'src/api';
 import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
 import { useAppSelector } from 'src/state/hooks';
 import { checkCurrentUserPermission } from 'src/utils';
@@ -37,12 +33,14 @@ const UsersListPage = () => {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const search = useDebouncedValue(filterName.trim());
   const {
-    data: { results: users = [] } = {},
-    loading,
+    rows: users,
+    total,
+    initialLoading,
     error,
     refetch: refetchUsers,
-  } = useQuery(ENDPOINTS.USERS);
+  } = usePagedQuery(ENDPOINTS.USERS, { page, rowsPerPage, search });
   const [deleteUserMutate, { error: deleteUserError }] = useMutation(ENDPOINTS.USERS);
   const { user } = useAppSelector((state) => state.userReducer);
   const { ADD } = PERMISSION_TYPE;
@@ -57,7 +55,7 @@ const UsersListPage = () => {
     if (deleteUserError) toast.error(deleteUserError);
   }, [deleteUserError]);
 
-  if (loading) return <div>Loading...</div>;
+  if (initialLoading) return <div>Loading...</div>;
   if (error) return <div>Something went wrong!</div>;
 
   const handleFilterByName = (event) => {
@@ -73,11 +71,10 @@ const UsersListPage = () => {
     }
   };
 
+  // The API filters and pages; sorting applies to the page on screen.
   const dataFiltered = applyFilter({
-    fieldToSearch: 'name',
     inputData: users,
     comparator: getComparator(order, orderBy),
-    filterName,
   });
 
   const handleChangePage = (event, newPage) => {
@@ -134,25 +131,18 @@ const UsersListPage = () => {
                 rowCount={users?.length}
               />
               <TableBody>
-                {dataFiltered
-                  ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <UsersTableRow
-                      id={row.id}
-                      key={row.id}
-                      username={row.name}
-                      user_role={row.user_role}
-                      email={row.email}
-                      mobile_number={row.phone_number}
-                      status={row.status}
-                      onDeleteUser={(userId) => deleteUser(userId)}
-                    />
-                  ))}
-
-                <TableEmptyRows
-                  height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, users?.length)}
-                />
+                {dataFiltered?.map((row) => (
+                  <UsersTableRow
+                    id={row.id}
+                    key={row.id}
+                    username={row.name}
+                    user_role={row.user_role}
+                    email={row.email}
+                    mobile_number={row.phone_number}
+                    status={row.status}
+                    onDeleteUser={(userId) => deleteUser(userId)}
+                  />
+                ))}
 
                 {notFound && <TableNoData query={filterName} />}
               </TableBody>
@@ -162,7 +152,7 @@ const UsersListPage = () => {
         <TablePagination
           page={page}
           component="div"
-          count={users?.length || 0}
+          count={total}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}

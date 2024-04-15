@@ -11,7 +11,7 @@ import { ENDPOINTS } from 'src/api/Endpoints';
 
 export default function VehicleForm({ onSubmit, initials, viewOnly, buttonText }) {
   const [initialValues] = useState({ ...initials });
-  const { data: drivers } = useQuery(`${ENDPOINTS.USERS}?role=driver`);
+  const { data: drivers } = useQuery(`${ENDPOINTS.USERS}?role=driver&pageSize=100`);
   const { data: vehicleTypes } = useQuery(ENDPOINTS.VEHICLE_TYPES);
 
   const driversOptions = drivers?.results?.map((driver) => ({

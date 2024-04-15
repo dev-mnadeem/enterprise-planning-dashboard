@@ -43,6 +43,23 @@ export const usersFixture = [
   },
 ];
 
+// Mirrors the API's paging: 1-based pageNumber, pageSize, and a name search.
+export const pageOf = (records, searchParams) => {
+  const search = (searchParams.get('search') || '').toLowerCase();
+  const pageNumber = Number(searchParams.get('pageNumber') || 1);
+  const pageSize = Number(searchParams.get('pageSize') || 10);
+  const matching = records.filter((r) => !search || r.name.toLowerCase().includes(search));
+  return {
+    pageInfo: {
+      pageNumber,
+      pageSize,
+      totalPages: Math.ceil(matching.length / pageSize),
+      totalResults: matching.length,
+    },
+    results: matching.slice((pageNumber - 1) * pageSize, pageNumber * pageSize),
+  };
+};
+
 export const handlers = [
   // Iconify loads icon sets from its CDN at runtime; tests don't need the glyphs.
   rest.get(/^https:\/\/api\.(iconify\.design|unisvg\.com|simplesvg\.com)\//, (req, res, ctx) =>
@@ -61,7 +78,9 @@ export const handlers = [
     }
     return res(ctx.status(401), ctx.json({ message: 'Invalid email or password' }));
   }),
-  rest.get(/\/users\/?$/, (req, res, ctx) => res(ctx.json({ results: usersFixture }))),
+  rest.get(/\/users\/?$/, (req, res, ctx) =>
+    res(ctx.json(pageOf(usersFixture, req.url.searchParams)))
+  ),
 ];
 
 export const server = setupServer(...handlers);

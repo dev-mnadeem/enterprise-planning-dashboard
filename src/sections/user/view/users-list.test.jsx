@@ -1,7 +1,7 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders, signIn } from 'src/test/render';
-import { rest, server } from 'src/test/server';
+import { pageOf, rest, server, usersFixture } from 'src/test/server';
 import UsersListPage from './users-list';
 
 beforeEach(() => signIn());
@@ -15,15 +15,40 @@ it('lists users from the API with their role and status', async () => {
   expect(screen.getByText('Efua Owusu').closest('tr')).toHaveTextContent('Inactive');
 });
 
-it('filters the table by name', async () => {
+it('searches on the server and keeps the search box usable', async () => {
   const user = userEvent.setup();
   renderWithProviders(<UsersListPage />);
   await screen.findByText('Kofi Boateng');
 
-  await user.type(screen.getByPlaceholderText(/search/i), 'efua');
+  const searchBox = screen.getByPlaceholderText(/search/i);
+  await user.type(searchBox, 'efua');
 
-  expect(screen.queryByText('Kofi Boateng')).not.toBeInTheDocument();
+  await waitFor(() => expect(screen.queryByText('Kofi Boateng')).not.toBeInTheDocument());
   expect(screen.getByText('Efua Owusu')).toBeInTheDocument();
+  expect(searchBox).toHaveFocus();
+});
+
+it('pages through every user, not just the first page the API returns', async () => {
+  const many = Array.from({ length: 12 }, (_, i) => ({
+    ...usersFixture[0],
+    id: `bulk-${i + 1}`,
+    name: `Courier ${String(i + 1).padStart(2, '0')}`,
+  }));
+  const requestedPages = [];
+  server.use(
+    rest.get(/\/users\/?$/, (req, res, ctx) => {
+      requestedPages.push(req.url.searchParams.get('pageNumber'));
+      return res(ctx.json(pageOf(many, req.url.searchParams)));
+    })
+  );
+  const user = userEvent.setup();
+  renderWithProviders(<UsersListPage />);
+
+  expect(await screen.findByText('1–5 of 12')).toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: /next page/i }));
+
+  expect(await screen.findByText('Courier 06')).toBeInTheDocument();
+  expect(requestedPages).toEqual(['1', '2']);
 });
 
 it('says so when the request fails', async () => {

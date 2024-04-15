@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { applyFilter, emptyRows, getComparator } from 'src/utils';
+import { applyFilter, getComparator } from 'src/utils';
+import { useDebouncedValue } from 'src/hooks/use-debounced-value';
 import { OrderTableHeadData } from '../utils';
 import {
   Button,
@@ -21,8 +22,8 @@ import Iconify from 'src/components/iconify';
 import { ROUTES } from 'src/constants';
 import { useNavigate } from 'react-router-dom';
 import { ENDPOINTS } from 'src/api/Endpoints';
-import { useMutation, useQuery } from 'src/api';
-import { TableEmptyRows, TableNoData } from 'src/components/common';
+import { useMutation, usePagedQuery } from 'src/api';
+import { TableNoData } from 'src/components/common';
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -31,12 +32,14 @@ export default function OrdersPage() {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const search = useDebouncedValue(filterName.trim());
   const {
-    data: { results: orders = [] } = {},
-    loading,
+    rows: orders,
+    total,
+    initialLoading,
     error,
     refetch: refetchOrders,
-  } = useQuery(ENDPOINTS.ORDERS);
+  } = usePagedQuery(ENDPOINTS.ORDERS, { page, rowsPerPage, search });
   const [cancelOrderMutate, { error: cancelOrderError }] = useMutation(ENDPOINTS.ORDERS);
 
   // Toasting during render fired again on every re-render; fire once per new error.
@@ -48,7 +51,7 @@ export default function OrdersPage() {
     if (cancelOrderError) toast.error(cancelOrderError);
   }, [cancelOrderError]);
 
-  if (loading) return <div>Loading...</div>;
+  if (initialLoading) return <div>Loading...</div>;
   if (error) return <div>Something went wrong!</div>;
 
   const handleFilterByName = (event) => {
@@ -64,11 +67,10 @@ export default function OrdersPage() {
     }
   };
 
+  // The API searches order numbers and pages; sorting applies to the page on screen.
   const dataFiltered = applyFilter({
-    fieldToSearch: 'order_number',
     inputData: orders,
     comparator: getComparator(order, orderBy),
-    filterName,
   });
 
   const handleChangePage = (event, newPage) => {
@@ -122,24 +124,18 @@ export default function OrdersPage() {
                 headLabel={OrderTableHeadData}
               />
               <TableBody>
-                {dataFiltered
-                  ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <OrderTableRow
-                      id={row?.id}
-                      key={row.id}
-                      source={row?.sender_city?.name}
-                      destination={row?.receiver_city?.name}
-                      customer={row.sender_name}
-                      history={row?.history?.[0]}
-                      orderNumber={row?.order_number}
-                      onCancelOrder={(orderId) => cancelOrder(orderId)}
-                    />
-                  ))}
-                <TableEmptyRows
-                  height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, orders?.length)}
-                />
+                {dataFiltered?.map((row) => (
+                  <OrderTableRow
+                    id={row?.id}
+                    key={row.id}
+                    source={row?.sender_city?.name}
+                    destination={row?.receiver_city?.name}
+                    customer={row.sender_name}
+                    history={row?.history?.[0]}
+                    orderNumber={row?.order_number}
+                    onCancelOrder={(orderId) => cancelOrder(orderId)}
+                  />
+                ))}
 
                 {notFound && <TableNoData query={filterName} />}
               </TableBody>
@@ -149,7 +145,7 @@ export default function OrdersPage() {
         <TablePagination
           page={page}
           component="div"
-          count={orders?.length || 0}
+          count={total}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}

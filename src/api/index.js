@@ -98,6 +98,24 @@ export const useQuery = (endpoint, params, options = { headers: {} }) => {
   return { data, loading, error, refetch: query };
 };
 
+// For endpoints that page on the server and answer { pageInfo, results }.
+// `page` is zero-based to match MUI's TablePagination; the API counts from 1.
+export const usePagedQuery = (endpoint, { page, rowsPerPage, search }) => {
+  const params = new URLSearchParams({ pageNumber: page + 1, pageSize: rowsPerPage });
+  if (search) params.set('search', search);
+  const { data, loading, error, refetch } = useQuery(`${endpoint}?${params}`);
+
+  return {
+    rows: data?.results || [],
+    total: data?.pageInfo?.totalResults || 0,
+    // Only the first load blanks the screen; later pages keep the table mounted
+    // so the search box doesn't lose focus while a request is in flight.
+    initialLoading: loading && !data,
+    error,
+    refetch,
+  };
+};
+
 export const useLazyQuery = (endpoint, options) => {
   const dispatch = useAppDispatch();
   const headers = options?.headers || {};
