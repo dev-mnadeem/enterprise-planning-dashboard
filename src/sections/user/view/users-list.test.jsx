@@ -6,6 +6,15 @@ import UsersListPage from './users-list';
 
 beforeEach(() => signIn());
 
+it('tells an empty system apart from an empty search', async () => {
+  server.use(
+    rest.get(/\/users\/?$/, (req, res, ctx) => res(ctx.json(pageOf([], req.url.searchParams))))
+  );
+  renderWithProviders(<UsersListPage />);
+
+  expect(await screen.findByText('No users yet')).toBeInTheDocument();
+});
+
 it('lists users from the API with their role and status', async () => {
   renderWithProviders(<UsersListPage />);
 
@@ -59,5 +68,7 @@ it('says so when the request fails', async () => {
   );
   renderWithProviders(<UsersListPage />);
 
-  expect(await screen.findByText(/something went wrong/i)).toBeInTheDocument();
+  expect(await screen.findByText(/couldn't load users/i)).toBeInTheDocument();
+  expect(screen.getByText('Database unavailable')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
 });

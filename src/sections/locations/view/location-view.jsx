@@ -3,9 +3,14 @@ import { TableHeadData } from '../utils';
 import Iconify from 'src/components/iconify';
 import { useNavigate } from 'react-router-dom';
 import Scrollbar from 'src/components/scrollbar';
+import { ListError, ListLoading, TableEmptyState } from 'src/components/list-state';
 import LocationTableRow from '../location-table-row';
-import LocationTableToolbar from '../location-table-toolbar';
-import { TableEmptyRows, TableNoData, TableSearchHead } from 'src/components/common';
+import {
+  TableEmptyRows,
+  TableNoData,
+  TableSearchHead,
+  TableSortToolbar,
+} from 'src/components/common';
 import { applyFilter, emptyRows, getComparator } from 'src/utils/table';
 import {
   Card,
@@ -28,7 +33,7 @@ const LocationPage = () => {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [deleteLocationMutate, { loading: deleteLoading }] = useMutation(ENDPOINTS.LOCATIONS);
+  const [deleteLocationMutate] = useMutation(ENDPOINTS.LOCATIONS);
   const {
     error,
     loading,
@@ -76,8 +81,8 @@ const LocationPage = () => {
     }
   };
 
-  if (loading || deleteLoading) return <div>Loading...</div>;
-  if (error) return <div>Error</div>;
+  if (loading && !locations) return <ListLoading label="locations" />;
+  if (error) return <ListError label="locations" message={error} onRetry={refetchlocations} />;
 
   return (
     <Container>
@@ -93,8 +98,8 @@ const LocationPage = () => {
         </Button>
       </Stack>
       <Card>
-        <LocationTableToolbar
-          numSelected={0}
+        <TableSortToolbar
+          placeholder="Search locations..."
           filterName={filterName}
           onFilterName={handleFilterByName}
         />
@@ -131,6 +136,13 @@ const LocationPage = () => {
                 />
 
                 {notFound && <TableNoData query={filterName} />}
+
+                {!dataFiltered?.length && !filterName && (
+                  <TableEmptyState
+                    title="No locations yet"
+                    hint="Add warehouses and branches to route shipments through."
+                  />
+                )}
               </TableBody>
             </Table>
           </TableContainer>

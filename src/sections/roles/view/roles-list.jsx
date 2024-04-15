@@ -3,6 +3,7 @@ import { TableHeadData } from '../utils';
 import Iconify from 'src/components/iconify';
 import { useNavigate } from 'react-router-dom';
 import Scrollbar from 'src/components/scrollbar';
+import { ListError, ListLoading, TableEmptyState } from 'src/components/list-state';
 import { applyFilter, emptyRows, getComparator } from 'src/utils/table';
 import {
   Card,
@@ -32,7 +33,6 @@ const RolesListPage = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
-  const [selected] = useState([]);
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -42,8 +42,8 @@ const RolesListPage = () => {
   const { ADD } = PERMISSION_TYPE;
   const { USER_ROLE } = PERMISSION_ENTITIES;
 
-  if (loading) return;
-  if (error) return <div>Error</div>;
+  if (loading && !userRoles) return <ListLoading label="roles" />;
+  if (error) return <ListError label="roles" message={error} onRetry={refetchRoles} />;
 
   const handleFilterByName = (event) => {
     setPage(0);
@@ -102,11 +102,7 @@ const RolesListPage = () => {
         )}
       </Stack>
       <Card>
-        <TableSortToolbar
-          numSelected={selected.length}
-          filterName={filterName}
-          onFilterName={handleFilterByName}
-        />
+        <TableSortToolbar filterName={filterName} onFilterName={handleFilterByName} />
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
@@ -136,6 +132,13 @@ const RolesListPage = () => {
                 />
 
                 {notFound && <TableNoData query={filterName} />}
+
+                {!dataFiltered?.length && !filterName && (
+                  <TableEmptyState
+                    title="No roles yet"
+                    hint="Create a role to group permissions."
+                  />
+                )}
               </TableBody>
             </Table>
           </TableContainer>

@@ -3,6 +3,7 @@ import { TableHeadData } from '../utils';
 import Iconify from 'src/components/iconify';
 import { useNavigate } from 'react-router-dom';
 import Scrollbar from 'src/components/scrollbar';
+import { ListError, ListLoading, TableEmptyState } from 'src/components/list-state';
 import { applyFilter, emptyRows, getComparator } from 'src/utils/table';
 import {
   Card,
@@ -33,7 +34,6 @@ const PricingListPage = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
-  const [selected] = useState([]);
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -52,8 +52,8 @@ const PricingListPage = () => {
     if (deletePricingError) toast.error(deletePricingError);
   }, [deletePricingError]);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Something went wrong!</div>;
+  if (loading && !pricings) return <ListLoading label="pricing rules" />;
+  if (error) return <ListError label="pricing rules" message={error} onRetry={refetchPricings} />;
 
   const handleFilterByName = (event) => {
     setPage(0);
@@ -113,11 +113,7 @@ const PricingListPage = () => {
         )}
       </Stack>
       <Card>
-        <TableSortToolbar
-          numSelected={selected.length}
-          filterName={filterName}
-          onFilterName={handleFilterByName}
-        />
+        <TableSortToolbar filterName={filterName} onFilterName={handleFilterByName} />
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
@@ -150,6 +146,13 @@ const PricingListPage = () => {
                 />
 
                 {notFound && <TableNoData query={filterName} />}
+
+                {!dataFiltered?.length && !filterName && (
+                  <TableEmptyState
+                    title="No pricing rules yet"
+                    hint="Add a route price before booking shipments on it."
+                  />
+                )}
               </TableBody>
             </Table>
           </TableContainer>

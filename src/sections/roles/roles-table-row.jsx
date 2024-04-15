@@ -48,7 +48,7 @@ export default function RolesTableRow({ id, index, name, onDeleteRole }) {
           <Link to={`${ROUTES.USER_ROLES}/${id}?action=view`}>View Permissions</Link>
         </TableCell>
         <TableCell align="right">
-          <IconButton onClick={handleOpenMenu}>
+          <IconButton aria-label="Row actions" aria-haspopup="menu" onClick={handleOpenMenu}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>

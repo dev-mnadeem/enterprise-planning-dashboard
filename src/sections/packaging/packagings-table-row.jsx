@@ -62,7 +62,7 @@ export default function PackagingsTableRow({
         <TableCell>{height}</TableCell>
         <TableCell>{depth || ' -- '}</TableCell>
         <TableCell align="right">
-          <IconButton onClick={handleOpenMenu}>
+          <IconButton aria-label="Row actions" aria-haspopup="menu" onClick={handleOpenMenu}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>

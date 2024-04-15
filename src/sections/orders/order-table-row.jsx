@@ -53,11 +53,13 @@ export default function OrderTableRow({
             color="success"
           />
         </TableCell>
-        <Button className="mt-4" onClick={() => navigate(`${ROUTES.ORDERS}/${id}`)}>
-          View
-        </Button>
+        <TableCell>
+          <Button size="small" onClick={() => navigate(`${ROUTES.ORDERS}/${id}`)}>
+            View
+          </Button>
+        </TableCell>
         <TableCell align="right">
-          <IconButton onClick={handleOpenMenu}>
+          <IconButton aria-label="Row actions" aria-haspopup="menu" onClick={handleOpenMenu}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>

@@ -63,7 +63,7 @@ export default function PricingTableRow({
         <TableCell>{shipmentRoute?.toUpperCase()}</TableCell>
         <TableCell>{new Date(updatedAt).toLocaleString()}</TableCell>
         <TableCell align="right">
-          <IconButton onClick={handleOpenMenu}>
+          <IconButton aria-label="Row actions" aria-haspopup="menu" onClick={handleOpenMenu}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>

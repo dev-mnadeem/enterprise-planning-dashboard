@@ -64,7 +64,7 @@ export default function UsersTableRow({
           <Label color={!status ? 'error' : 'success'}>{status ? 'Active' : 'Inactive'}</Label>
         </TableCell>
         <TableCell align="right">
-          <IconButton onClick={handleOpenMenu}>
+          <IconButton aria-label="Row actions" aria-haspopup="menu" onClick={handleOpenMenu}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>

@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 export function TableNoData({ query }) {
   return (
     <TableRow>
-      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+      <TableCell align="center" colSpan={12} sx={{ py: 3 }}>
         <Paper
           sx={{
             textAlign: 'center',

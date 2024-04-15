@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import toast from 'react-hot-toast';
 import Scrollbar from 'src/components/scrollbar';
-import LocationTableToolbar from 'src/sections/locations/location-table-toolbar';
+import { ListError, ListLoading, TableEmptyState } from 'src/components/list-state';
 import OrderTableRow from '../order-table-row';
 import TableHeader from 'src/components/table-header';
 import Iconify from 'src/components/iconify';
@@ -23,7 +23,7 @@ import { ROUTES } from 'src/constants';
 import { useNavigate } from 'react-router-dom';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useMutation, usePagedQuery } from 'src/api';
-import { TableNoData } from 'src/components/common';
+import { TableNoData, TableSortToolbar } from 'src/components/common';
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -51,8 +51,8 @@ export default function OrdersPage() {
     if (cancelOrderError) toast.error(cancelOrderError);
   }, [cancelOrderError]);
 
-  if (initialLoading) return <div>Loading...</div>;
-  if (error) return <div>Something went wrong!</div>;
+  if (initialLoading) return <ListLoading label="shipments" />;
+  if (error) return <ListError label="shipments" message={error} onRetry={refetchOrders} />;
 
   const handleFilterByName = (event) => {
     setPage(0);
@@ -108,9 +108,8 @@ export default function OrdersPage() {
         </Button>
       </Stack>
       <Card>
-        <LocationTableToolbar
-          numSelected={0}
-          placeholder="Search Shipment..."
+        <TableSortToolbar
+          placeholder="Search shipment number..."
           filterName={filterName}
           onFilterName={handleFilterByName}
         />
@@ -138,6 +137,13 @@ export default function OrdersPage() {
                 ))}
 
                 {notFound && <TableNoData query={filterName} />}
+
+                {!dataFiltered?.length && !filterName && (
+                  <TableEmptyState
+                    title="No shipments yet"
+                    hint="Shipments booked at your locations will appear here."
+                  />
+                )}
               </TableBody>
             </Table>
           </TableContainer>

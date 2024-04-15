@@ -3,6 +3,7 @@ import { TableHeadData } from '../utils';
 import Iconify from 'src/components/iconify';
 import { useNavigate } from 'react-router-dom';
 import Scrollbar from 'src/components/scrollbar';
+import { ListError, ListLoading, TableEmptyState } from 'src/components/list-state';
 import { applyFilter, getComparator } from 'src/utils/table';
 import { useDebouncedValue } from 'src/hooks/use-debounced-value';
 import {
@@ -29,7 +30,6 @@ const UsersListPage = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
-  const [selected] = useState([]);
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -55,8 +55,8 @@ const UsersListPage = () => {
     if (deleteUserError) toast.error(deleteUserError);
   }, [deleteUserError]);
 
-  if (initialLoading) return <div>Loading...</div>;
-  if (error) return <div>Something went wrong!</div>;
+  if (initialLoading) return <ListLoading label="users" />;
+  if (error) return <ListError label="users" message={error} onRetry={refetchUsers} />;
 
   const handleFilterByName = (event) => {
     setPage(0);
@@ -115,11 +115,7 @@ const UsersListPage = () => {
         )}
       </Stack>
       <Card>
-        <TableSortToolbar
-          numSelected={selected.length}
-          filterName={filterName}
-          onFilterName={handleFilterByName}
-        />
+        <TableSortToolbar filterName={filterName} onFilterName={handleFilterByName} />
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
@@ -145,6 +141,13 @@ const UsersListPage = () => {
                 ))}
 
                 {notFound && <TableNoData query={filterName} />}
+
+                {!dataFiltered?.length && !filterName && (
+                  <TableEmptyState
+                    title="No users yet"
+                    hint="Invite staff and assign them a role."
+                  />
+                )}
               </TableBody>
             </Table>
           </TableContainer>
