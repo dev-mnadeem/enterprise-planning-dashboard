@@ -44,7 +44,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
   const { DOMESTIC, INTERNATIONAL } = SHIPMENT_TYPE;
 
   const [searchUser] = useLazyQuery(ENDPOINTS.USERS);
-  const { data: countries, cntLoading, cntError } = useQuery(ENDPOINTS.COUNTRIES);
+  const { data: countries, loading: cntLoading, error: cntError } = useQuery(ENDPOINTS.COUNTRIES);
   const [senderCountryStates, { data: senderStates }] = useLazyQuery(ENDPOINTS.COUNTRIES);
   const [receiverCountryStates, { data: receiverStates }] = useLazyQuery(ENDPOINTS.COUNTRIES);
   const [senderStateCities, { data: senderCities }] = useLazyQuery(ENDPOINTS.STATES);

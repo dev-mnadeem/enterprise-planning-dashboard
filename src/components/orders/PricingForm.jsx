@@ -17,7 +17,7 @@ export default function PricingForm({ onSubmit, initials, viewOnly, buttonText }
   const [initialValues, setInitialValues] = useState({ ...initials });
   const { AIR, SEA, ROAD } = SHIPMENT_ROUTE;
 
-  const { data: countries, cntLoading, cntError } = useQuery(ENDPOINTS.COUNTRIES);
+  const { data: countries, loading: cntLoading, error: cntError } = useQuery(ENDPOINTS.COUNTRIES);
   const [senderCountryStates, { data: senderStates }] = useLazyQuery(ENDPOINTS.COUNTRIES);
   const [receiverCountryStates, { data: receiverStates }] = useLazyQuery(ENDPOINTS.COUNTRIES);
   const [senderStateCities, { data: senderCities }] = useLazyQuery(ENDPOINTS.STATES);

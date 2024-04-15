@@ -22,7 +22,7 @@ export default function UserForm({ onSubmit, initials, viewOnly, buttonText }) {
   const [initialValues, setInitialValues] = useState({ ...initials });
   const [checkedPermissions, setCheckedPermissions] = useState({});
   const { data: userRoles, loading, error } = useQuery(ENDPOINTS.USER_ROLES);
-  const { data: countries, cntLoading, cntError } = useQuery(ENDPOINTS.COUNTRIES);
+  const { data: countries, loading: cntLoading, error: cntError } = useQuery(ENDPOINTS.COUNTRIES);
   const [getRolePermissions, { data: role, loading: rpLoading, error: rpError }] = useLazyQuery(
     ENDPOINTS.USER_ROLES
   );

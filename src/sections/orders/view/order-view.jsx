@@ -131,7 +131,7 @@ export default function OrdersPage() {
                       source={row?.sender_city?.name}
                       destination={row?.receiver_city?.name}
                       customer={row.sender_name}
-                      history={row?.history[0]}
+                      history={row?.history?.[0]}
                       orderNumber={row?.order_number}
                       onCancelOrder={(orderId) => cancelOrder(orderId)}
                     />

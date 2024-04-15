@@ -50,8 +50,8 @@ export default function OrdersDetailPage({ id }) {
         </Box>
         <Box className="flex flex-row gap-3 my-3 bg-transparent">
           <CustomChip
-            label={`${order?.history[0]?.status?.toUpperCase() || '--'}, (${
-              order?.history[0]?.name || '--'
+            label={`${order?.history?.[0]?.status?.toUpperCase() || '--'}, (${
+              order?.history?.[0]?.name || '--'
             })`}
           />
           <CustomChip

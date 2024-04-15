@@ -16,7 +16,7 @@ import { ADD_CONTAINER_INITIALS } from 'src/sections/containers/utils';
 
 export default function ContainerForm({ onSubmit, initials, viewOnly, buttonText }) {
   const [initialValues, setInitialValues] = useState({ ...initials });
-  const { data: countries, cntLoading, cntError } = useQuery(ENDPOINTS.COUNTRIES);
+  const { data: countries, loading: cntLoading, error: cntError } = useQuery(ENDPOINTS.COUNTRIES);
 
   const countriesOptions = useMemoized(
     countries?.map((country) => ({ value: country.id, label: country.name })),
