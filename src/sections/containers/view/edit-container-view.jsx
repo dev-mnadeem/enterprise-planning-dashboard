@@ -1,67 +1,68 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Typography } from '@mui/material';
 import { ROUTES } from 'src/constants';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useMutation, useQuery } from 'src/api';
 import toast from 'react-hot-toast';
-import PricingForm from 'src/components/orders/PricingForm';
+import ContainerForm from 'src/components/orders/ContainerForm';
 
 const EditContainerPage = ({ id }) => {
   const navigate = useNavigate();
-  const pricingEndPoint = `${ENDPOINTS.PRICING}/${id}`;
+  const containerEndPoint = `${ENDPOINTS.CONTAINERS}/${id}`;
   const { search } = useLocation();
   const viewOnly = new URLSearchParams(search).get('action') === 'view';
-  const { data: pricing, loading: queryLoading, error: pricingError } = useQuery(pricingEndPoint);
-  const [mutate, { data: updatedPricing, loading, error }] = useMutation(pricingEndPoint);
+  const {
+    data: container,
+    loading: queryLoading,
+    error: containerError,
+  } = useQuery(containerEndPoint);
+  const [mutate, { data: updatedContainer, loading, error }] = useMutation(containerEndPoint);
 
   useEffect(() => {
-    if (updatedPricing) {
+    if (updatedContainer) {
       toast.success('Container updated successfully!');
-      navigate(ROUTES.PRICING);
+      navigate(ROUTES.CONTAINERS);
     }
-  }, [updatedPricing]);
+  }, [updatedContainer]);
 
   useEffect(() => {
-    if (error) {
-      toast.error(error || 'Something went wrong!');
-      navigate(ROUTES.PRICING);
-    }
+    if (error) toast.error(error);
   }, [error]);
 
   useEffect(() => {
-    if (!pricing && pricingError) {
-      toast.error(pricingError || 'Something went wrong!');
-      navigate(ROUTES.PRICING);
+    if (!container && containerError) {
+      toast.error(containerError);
+      navigate(ROUTES.CONTAINERS);
     }
-  }, [pricing, queryLoading]);
+  }, [container, containerError]);
 
-  if (queryLoading) return;
+  if (queryLoading || loading) return null;
 
-  const onEditPricing = (values) => {
+  const onEditContainer = (values) => {
     mutate(
       {
-        from_city_id: values?.from_city_id,
-        to_city_id: values?.to_city_id,
-        price: Number(values?.price || 0),
-        package_id: values?.package_id,
-        route: values?.shipment_route?.toLowerCase(),
-        is_fixed: values?.is_fixed || false,
+        from_country_id: values?.from_country_id,
+        to_country_id: values?.to_country_id,
+        width: Number(values?.width || 0),
+        height: Number(values?.height || 0),
+        depth: Number(values?.depth || 0),
+        volume: Number(values?.volume || 0),
       },
       'patch'
     );
   };
 
-  if (loading) return;
+  const title = container?.tracking_number || 'Container';
 
   return (
     <Container>
-      <Typography variant="h4">{viewOnly ? pricing?.name : 'Edit Pricing'}</Typography>
-      <PricingForm
-        initials={pricing}
-        onSubmit={onEditPricing}
+      <Typography variant="h4">{viewOnly ? title : 'Edit Container'}</Typography>
+      <ContainerForm
+        initials={container}
+        onSubmit={onEditContainer}
         viewOnly={viewOnly}
-        buttonText={viewOnly ? 'Pricing Details' : 'Update Pricing'}
+        buttonText={viewOnly ? 'Container Details' : 'Update Container'}
       />
     </Container>
   );

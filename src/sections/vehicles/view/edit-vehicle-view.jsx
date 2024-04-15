@@ -1,72 +1,62 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Typography } from '@mui/material';
 import { ROUTES } from 'src/constants';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useMutation, useQuery } from 'src/api';
 import toast from 'react-hot-toast';
-import PackagingForm from 'src/components/orders/PackagingForm';
+import VehicleForm from 'src/components/orders/VehicleForm';
 
 const EditVehiclePage = ({ id }) => {
   const navigate = useNavigate();
-  const packagingEndPoint = `${ENDPOINTS.PACKAGINGS}/${id}`;
+  const vehicleEndPoint = `${ENDPOINTS.VEHICLES}/${id}`;
   const { search } = useLocation();
   const viewOnly = new URLSearchParams(search).get('action') === 'view';
-  const {
-    data: packaging,
-    loading: queryLoading,
-    error: packageError,
-  } = useQuery(packagingEndPoint);
-  const [mutate, { data: updatedPackage, loading, error }] = useMutation(packagingEndPoint);
+  const { data: vehicle, loading: queryLoading, error: vehicleError } = useQuery(vehicleEndPoint);
+  const [mutate, { data: updatedVehicle, loading, error }] = useMutation(vehicleEndPoint);
 
   useEffect(() => {
-    if (updatedPackage) {
+    if (updatedVehicle) {
       toast.success('Vehicle updated successfully!');
-      navigate(ROUTES.PACKAGINGS);
+      navigate(ROUTES.VEHICLES);
     }
-  }, [updatedPackage]);
+  }, [updatedVehicle]);
 
   useEffect(() => {
-    if (error) {
-      toast.error(error || 'Something went wrong!');
-      navigate(ROUTES.PACKAGINGS);
-    }
+    if (error) toast.error(error);
   }, [error]);
 
   useEffect(() => {
-    if (!packaging && packageError) {
-      toast.error(packageError || 'Something went wrong!');
-      navigate(ROUTES.PACKAGINGS);
+    if (!vehicle && vehicleError) {
+      toast.error(vehicleError);
+      navigate(ROUTES.VEHICLES);
     }
-  }, [packaging, queryLoading]);
+  }, [vehicle, vehicleError]);
 
-  if (queryLoading) return;
+  if (queryLoading || loading) return null;
 
-  const onEditPackaging = (values) => {
+  const onEditVehicle = (values) => {
     mutate(
       {
         name: values?.name,
-        depth: Number(values?.depth),
-        width: Number(values?.width),
-        height: Number(values?.height),
-        price: Number(values?.price),
-        weight_limit: Number(values?.weight_limit),
-        weight_type: values?.weight_type || 'kg',
+        model: values?.model,
+        registration_number: values?.registration_number,
+        driver_id: values?.driver_id || undefined,
+        vehicle_type_id: values?.vehicle_type_id,
+        status: values?.status,
       },
       'patch'
     );
   };
 
-  if (loading) return;
-
   return (
     <Container>
-      <Typography variant="h4">{viewOnly ? packaging?.name : 'Edit Packaging'}</Typography>
-      <PackagingForm
-        initials={packaging}
-        onSubmit={onEditPackaging}
+      <Typography variant="h4">{viewOnly ? vehicle?.name : 'Edit Vehicle'}</Typography>
+      <VehicleForm
+        initials={vehicle}
+        onSubmit={onEditVehicle}
         viewOnly={viewOnly}
-        buttonText={viewOnly ? 'Packaging Details' : 'Update Packaging'}
+        buttonText={viewOnly ? 'Vehicle Details' : 'Update Vehicle'}
       />
     </Container>
   );

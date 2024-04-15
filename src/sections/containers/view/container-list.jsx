@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TableHeadData } from '../utils';
 import Iconify from 'src/components/iconify';
 import { useNavigate } from 'react-router-dom';
@@ -33,7 +33,7 @@ const ContainerListPage = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
-  const [selected, setSelected] = useState([]);
+  const [selected] = useState([]);
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -142,12 +142,14 @@ const ContainerListPage = () => {
                     <ContainerTableRow
                       id={row.id}
                       key={row.id}
-                      fromCity={row.from_city}
-                      toCity={row.to_city}
-                      price={row.price}
-                      updatedAt={row.updated_at}
-                      shipmentRoute={row.route}
-                      onDeleteContainer={(pricingId) => deleteContainer(pricingId)}
+                      trackingNumber={row.tracking_number}
+                      fromCountry={row.from_country}
+                      toCountry={row.to_country}
+                      volume={row.volume}
+                      width={row.width}
+                      height={row.height}
+                      depth={row.depth}
+                      onDeleteContainer={deleteContainer}
                     />
                   ))}
 

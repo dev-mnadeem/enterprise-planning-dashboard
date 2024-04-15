@@ -2,13 +2,13 @@ import { useState } from 'react';
 import Popover from '@mui/material/Popover';
 import Iconify from 'src/components/iconify';
 import TableRow from '@mui/material/TableRow';
-import MenuItem from '@mui/material/MenuItem';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
+import MenuItem from '@mui/material/MenuItem';
+import { checkCurrentUserPermission } from 'src/utils';
 import { useAppSelector } from 'src/state/hooks';
 import { useNavigate } from 'react-router-dom';
 import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
-import { checkCurrentUserPermission } from 'src/utils';
 
 export default function VehiclesTableRow({
   id,
@@ -27,7 +27,7 @@ export default function VehiclesTableRow({
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
-  const handleDelete = (name) => {
+  const handleDelete = () => {
     if (!id) return;
 
     handleCloseMenu();
@@ -59,7 +59,7 @@ export default function VehiclesTableRow({
         <TableCell>{driver}</TableCell>
         <TableCell>{category || ' -- '}</TableCell>
         <TableCell align="right">
-          <IconButton onClick={handleOpenMenu}>
+          <IconButton aria-label={`Actions for ${registration_number}`} onClick={handleOpenMenu}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>
@@ -74,7 +74,7 @@ export default function VehiclesTableRow({
           sx: { width: 140 },
         }}
       >
-        {/* {checkCurrentUserPermission(user?.permissions, VEHICLE, VIEW) && (
+        {checkCurrentUserPermission(user?.permissions, VEHICLE, VIEW) && (
           <MenuItem onClick={handleView}>
             <Iconify icon="eva:eye-outline" sx={{ mr: 2 }} />
             View
@@ -89,11 +89,11 @@ export default function VehiclesTableRow({
         )}
 
         {checkCurrentUserPermission(user?.permissions, VEHICLE, REMOVE) && (
-          <MenuItem onClick={() => handleDelete(name)} sx={{ color: 'error.main' }}>
+          <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
             <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
             Delete
           </MenuItem>
-        )} */}
+        )}
       </Popover>
     </>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TableHeadData } from '../utils';
 import Iconify from 'src/components/iconify';
 import { useNavigate } from 'react-router-dom';
@@ -21,7 +21,7 @@ import {
   TableSearchHead,
   TableSortToolbar,
 } from 'src/components/common';
-import PackagingsTableRow from '../vehicles-table-row';
+import VehiclesTableRow from '../vehicles-table-row';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useMutation, useQuery } from 'src/api';
 import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
@@ -33,7 +33,7 @@ const VehiclesListPage = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
-  const [selected, setSelected] = useState([]);
+  const [selected] = useState([]);
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -132,7 +132,7 @@ const VehiclesListPage = () => {
                 {dataFiltered
                   ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
-                    <PackagingsTableRow
+                    <VehiclesTableRow
                       id={row.id}
                       key={row.id}
                       name={row?.name}

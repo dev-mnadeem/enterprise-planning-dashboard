@@ -10,60 +10,55 @@ import { useNavigate } from 'react-router-dom';
 import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
 import { checkCurrentUserPermission } from 'src/utils';
 
+const formatDimension = (value) => (value == null ? '--' : Number(value).toFixed(2));
+
 export default function ContainerTableRow({
   id,
-  fromCity,
-  toCity,
-  price,
-  updatedAt,
-  shipmentRoute,
-  onDeletePricing,
+  trackingNumber,
+  fromCountry,
+  toCountry,
+  volume,
+  width,
+  height,
+  depth,
+  onDeleteContainer,
 }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(null);
   const { user } = useAppSelector((state) => state.userReducer);
   const { REMOVE, UPDATE, VIEW } = PERMISSION_TYPE;
-  const { PRICING } = PERMISSION_ENTITIES;
-
-  const handleOpenMenu = (event) => {
-    setOpen(event.currentTarget);
-  };
-  const handleDelete = () => {
-    if (!id) return;
-
-    handleCloseMenu();
-    const confirmed = window.confirm(
-      `Are you sure to Delete "${fromCity?.name}" to "${toCity?.name}" Pricing?`
-    );
-    if (confirmed) {
-      onDeletePricing(id);
-    }
-  };
-
-  const handleView = () => {
-    handleCloseMenu();
-    navigate(`${ROUTES.PRICING}/${id}?action=view`);
-  };
-
-  const handleEdit = () => {
-    handleCloseMenu();
-    navigate(`${ROUTES.PRICING}/${id}`);
-  };
+  const { CONTAINER } = PERMISSION_ENTITIES;
+  const label = trackingNumber || `${fromCountry?.name} to ${toCountry?.name}`;
 
   const handleCloseMenu = () => {
     setOpen(null);
   };
 
+  const handleDelete = () => {
+    if (!id) return;
+
+    handleCloseMenu();
+    if (window.confirm(`Delete container "${label}"?`)) {
+      onDeleteContainer(id);
+    }
+  };
+
+  const goTo = (suffix = '') => {
+    handleCloseMenu();
+    navigate(`${ROUTES.CONTAINERS}/${id}${suffix}`);
+  };
+
   return (
     <>
       <TableRow hover tabIndex={-1}>
-        <TableCell>{`${fromCity?.name}, ${fromCity?.state?.country?.name}`}</TableCell>
-        <TableCell>{`${toCity?.name}, ${toCity?.state?.country?.name}`}</TableCell>
-        <TableCell>${price}</TableCell>
-        <TableCell>{shipmentRoute?.toUpperCase()}</TableCell>
-        <TableCell>{new Date(updatedAt).toLocaleString()}</TableCell>
+        <TableCell>{fromCountry?.name || '--'}</TableCell>
+        <TableCell>{toCountry?.name || '--'}</TableCell>
+        <TableCell>{volume == null ? '--' : `${formatDimension(volume)} cbm`}</TableCell>
+        <TableCell>{formatDimension(width)}</TableCell>
+        <TableCell>{formatDimension(height)}</TableCell>
+        <TableCell>{formatDimension(depth)}</TableCell>
         <TableCell align="right">
-          <IconButton onClick={handleOpenMenu}>
+          <IconButton aria-label={`Actions for ${label}`} onClick={(e) => setOpen(e.currentTarget)}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>
@@ -78,22 +73,22 @@ export default function ContainerTableRow({
           sx: { width: 140 },
         }}
       >
-        {checkCurrentUserPermission(user?.permissions, PRICING, VIEW) && (
-          <MenuItem onClick={handleView}>
+        {checkCurrentUserPermission(user?.permissions, CONTAINER, VIEW) && (
+          <MenuItem onClick={() => goTo('?action=view')}>
             <Iconify icon="eva:eye-outline" sx={{ mr: 2 }} />
             View
           </MenuItem>
         )}
 
-        {checkCurrentUserPermission(user?.permissions, PRICING, UPDATE) && (
-          <MenuItem onClick={handleEdit}>
+        {checkCurrentUserPermission(user?.permissions, CONTAINER, UPDATE) && (
+          <MenuItem onClick={() => goTo()}>
             <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
             Edit
           </MenuItem>
         )}
 
-        {checkCurrentUserPermission(user?.permissions, PRICING, REMOVE) && (
-          <MenuItem onClick={() => handleDelete()} sx={{ color: 'error.main' }}>
+        {checkCurrentUserPermission(user?.permissions, CONTAINER, REMOVE) && (
+          <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
             <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
             Delete
           </MenuItem>
