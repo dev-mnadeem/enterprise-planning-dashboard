@@ -43,12 +43,17 @@ const VehiclesListPage = () => {
   const { ADD } = PERMISSION_TYPE;
   const { VEHICLE } = PERMISSION_ENTITIES;
 
+  // Toasting during render fired again on every re-render; fire once per new error.
+  useEffect(() => {
+    if (error) toast.error(error);
+  }, [error]);
+
+  useEffect(() => {
+    if (deleteVehicleError) toast.error(deleteVehicleError);
+  }, [deleteVehicleError]);
+
   if (loading) return <div>Loading...</div>;
-  if (error) {
-    toast.error(error || 'Something went wrong!');
-    return <div>Something went wrong!</div>;
-  }
-  if (deleteVehicleError) toast.error(deleteVehicleError || 'Something went wrong!');
+  if (error) return <div>Something went wrong!</div>;
 
   const handleFilterByName = (event) => {
     setPage(0);

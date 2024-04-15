@@ -33,7 +33,6 @@ export default function VehiclesTableRow({
     handleCloseMenu();
     const confirmed = window.confirm(`Are you sure to Delete "${registration_number}" Vehicle?`);
     if (confirmed) {
-      toast.success('Vehicle deleted successfully!');
       onDeleteVehicle(id);
     }
   };

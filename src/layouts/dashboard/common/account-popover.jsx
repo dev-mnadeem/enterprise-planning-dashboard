@@ -9,32 +9,16 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
-import { account } from 'src/_mock/account';
-import { useAppDispatch } from 'src/state/hooks';
+import { useAppDispatch, useAppSelector } from 'src/state/hooks';
 import { logoutUser } from 'src/state/reducers';
-
-// ----------------------------------------------------------------------
-
-const MENU_OPTIONS = [
-  {
-    label: 'Home',
-    icon: 'eva:home-fill',
-  },
-  {
-    label: 'Profile',
-    icon: 'eva:person-fill',
-  },
-  {
-    label: 'Settings',
-    icon: 'eva:settings-2-fill',
-  },
-];
 
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(null);
+  const { user } = useAppSelector((state) => state.userReducer);
+  const displayName = user?.name || user?.email || 'Signed in';
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -52,6 +36,8 @@ export default function AccountPopover() {
   return (
     <>
       <IconButton
+        aria-label="Account menu"
+        aria-haspopup="true"
         onClick={handleOpen}
         sx={{
           width: 40,
@@ -64,15 +50,14 @@ export default function AccountPopover() {
         }}
       >
         <Avatar
-          src={account.photoURL}
-          alt={account.displayName}
+          alt={displayName}
           sx={{
             width: 36,
             height: 36,
             border: (theme) => `solid 2px ${theme.palette.background.default}`,
           }}
         >
-          {account.displayName.charAt(0).toUpperCase()}
+          {displayName.charAt(0).toUpperCase()}
         </Avatar>
       </IconButton>
 
@@ -93,22 +78,14 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+            {displayName}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+            {user?.email}
           </Typography>
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
-
-        {MENU_OPTIONS.map((option) => (
-          <MenuItem key={option.label} onClick={handleClose}>
-            {option.label}
-          </MenuItem>
-        ))}
-
-        <Divider sx={{ borderStyle: 'dashed', m: 0 }} />
 
         <MenuItem
           disableRipple

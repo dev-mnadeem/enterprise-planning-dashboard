@@ -26,13 +26,12 @@ export const InputField = (props) => {
 
   useEffect(() => {
     if (props.isAutoComplete) {
-      async function loadGoogleMaps() {
-        autoComplete = await googlePlaceAutoComplete().initAutoComplete(
-          ref.current,
-          handleAddressSelect
-        );
-      }
-      loadGoogleMaps();
+      googlePlaceAutoComplete()
+        .initAutoComplete(ref.current, handleAddressSelect)
+        .then((instance) => {
+          autoComplete = instance;
+        })
+        .catch((e) => console.error('Google Maps could not be loaded', e));
     }
   }, []);
 

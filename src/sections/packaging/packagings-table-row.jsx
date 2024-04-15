@@ -35,7 +35,6 @@ export default function PackagingsTableRow({
     handleCloseMenu();
     const confirmed = window.confirm(`Are you sure to Delete "${name}" Packaging?`);
     if (confirmed) {
-      toast.success('Packaging deleted successfully!');
       onDeletePackaging(id);
     }
   };

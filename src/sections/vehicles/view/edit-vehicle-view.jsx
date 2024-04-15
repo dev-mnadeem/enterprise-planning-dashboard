@@ -21,7 +21,7 @@ const EditVehiclePage = ({ id }) => {
 
   useEffect(() => {
     if (updatedPackage) {
-      toast.success('Packaging added successfully!');
+      toast.success('Vehicle updated successfully!');
       navigate(ROUTES.PACKAGINGS);
     }
   }, [updatedPackage]);

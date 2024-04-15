@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { applyFilter, emptyRows, getComparator } from 'src/utils';
 import { OrderTableHeadData } from '../utils';
 import {
@@ -39,13 +39,17 @@ export default function OrdersPage() {
   } = useQuery(ENDPOINTS.ORDERS);
   const [cancelOrderMutate, { error: cancelOrderError }] = useMutation(ENDPOINTS.ORDERS);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) {
-    toast.error(error || 'Something went wrong!');
-    return <div>Something went wrong!</div>;
-  }
+  // Toasting during render fired again on every re-render; fire once per new error.
+  useEffect(() => {
+    if (error) toast.error(error);
+  }, [error]);
 
-  if (cancelOrderError) toast.error(cancelOrderError || 'Something went wrong!');
+  useEffect(() => {
+    if (cancelOrderError) toast.error(cancelOrderError);
+  }, [cancelOrderError]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Something went wrong!</div>;
 
   const handleFilterByName = (event) => {
     setPage(0);

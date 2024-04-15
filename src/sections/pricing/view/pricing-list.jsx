@@ -43,12 +43,17 @@ const PricingListPage = () => {
   const { ADD } = PERMISSION_TYPE;
   const { PRICING } = PERMISSION_ENTITIES;
 
+  // Toasting during render fired again on every re-render; fire once per new error.
+  useEffect(() => {
+    if (error) toast.error(error);
+  }, [error]);
+
+  useEffect(() => {
+    if (deletePricingError) toast.error(deletePricingError);
+  }, [deletePricingError]);
+
   if (loading) return <div>Loading...</div>;
-  if (error) {
-    toast.error(error || 'Something went wrong!');
-    return <div>Something went wrong!</div>;
-  }
-  if (deletePricingError) toast.error(deletePricingError || 'Something went wrong!');
+  if (error) return <div>Something went wrong!</div>;
 
   const handleFilterByName = (event) => {
     setPage(0);

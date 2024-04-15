@@ -17,7 +17,7 @@ const EditContainerPage = ({ id }) => {
 
   useEffect(() => {
     if (updatedPricing) {
-      toast.success('Pricing updated successfully!');
+      toast.success('Container updated successfully!');
       navigate(ROUTES.PRICING);
     }
   }, [updatedPricing]);

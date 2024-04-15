@@ -36,7 +36,6 @@ export default function ContainerTableRow({
       `Are you sure to Delete "${fromCity?.name}" to "${toCity?.name}" Pricing?`
     );
     if (confirmed) {
-      toast.success('Pricing deleted successfully!');
       onDeletePricing(id);
     }
   };

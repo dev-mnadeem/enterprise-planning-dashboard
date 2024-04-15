@@ -50,12 +50,17 @@ const PackagingListPage = () => {
   const { ADD } = PERMISSION_TYPE;
   const { ORDER } = PERMISSION_ENTITIES;
 
+  // Toasting during render fired again on every re-render; fire once per new error.
+  useEffect(() => {
+    if (error) toast.error(error);
+  }, [error]);
+
+  useEffect(() => {
+    if (deletePackagingError) toast.error(deletePackagingError);
+  }, [deletePackagingError]);
+
   if (loading) return <div>Loading...</div>;
-  if (error) {
-    toast.error(error || 'Something went wrong!');
-    return <div>Something went wrong!</div>;
-  }
-  if (deletePackagingError) toast.error(deletePackagingError || 'Something went wrong!');
+  if (error) return <div>Something went wrong!</div>;
 
   const handleFilterByName = (event) => {
     setPage(0);

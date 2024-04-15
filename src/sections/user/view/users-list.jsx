@@ -48,12 +48,17 @@ const UsersListPage = () => {
   const { ADD } = PERMISSION_TYPE;
   const { USER } = PERMISSION_ENTITIES;
 
+  // Toasting during render fired again on every re-render; fire once per new error.
+  useEffect(() => {
+    if (error) toast.error(error);
+  }, [error]);
+
+  useEffect(() => {
+    if (deleteUserError) toast.error(deleteUserError);
+  }, [deleteUserError]);
+
   if (loading) return <div>Loading...</div>;
-  if (error) {
-    toast.error(error || 'Something went wrong!');
-    return <div>Something went wrong!</div>;
-  }
-  if (deleteUserError) toast.error(deleteUserError || 'Something went wrong!');
+  if (error) return <div>Something went wrong!</div>;
 
   const handleFilterByName = (event) => {
     setPage(0);

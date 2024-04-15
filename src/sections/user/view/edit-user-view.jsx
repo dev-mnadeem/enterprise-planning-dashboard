@@ -22,7 +22,7 @@ const EditUserPage = ({ id }) => {
 
   useEffect(() => {
     if (updatedUser) {
-      toast.success('User added successfully!');
+      toast.success('User updated successfully!');
       navigate(ROUTES.USERS);
     }
   }, [updatedUser]);
@@ -66,7 +66,7 @@ const EditUserPage = ({ id }) => {
 
   return (
     <Container>
-      <Typography variant="h4">{viewOnly ? user?.name : 'Edit User Role'}</Typography>
+      <Typography variant="h4">{viewOnly ? user?.name : 'Edit User'}</Typography>
       <UserForm
         initials={user}
         onSubmit={onEditUser}

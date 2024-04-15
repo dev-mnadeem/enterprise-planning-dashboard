@@ -1,6 +1,35 @@
-const googlePlaceAutoComplete = (type) => {
+let placesLibrary;
+
+// Loads the Maps JS API once, on first use, and only when a key is configured.
+// It used to be a static <script> in index.html that loaded even with an empty
+// key and named a callback (initMap) that did not exist.
+export const loadPlacesLibrary = () => {
+  const key = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+  if (!key) return Promise.resolve(null);
+  if (window.google?.maps?.places) return Promise.resolve(window.google);
+  if (!placesLibrary) {
+    placesLibrary = new Promise((resolve, reject) => {
+      window.__onGoogleMapsReady = () => resolve(window.google);
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(
+        key
+      )}&loading=async&libraries=places&callback=__onGoogleMapsReady`;
+      script.async = true;
+      script.onerror = () => {
+        placesLibrary = undefined;
+        reject(new Error('Google Maps failed to load'));
+      };
+      document.head.appendChild(script);
+    });
+  }
+  return placesLibrary;
+};
+
+const googlePlaceAutoComplete = () => {
   const initAutoComplete = async (input, callback) => {
-    let autoComplete = new window.google.maps.places.Autocomplete(input, {
+    const google = await loadPlacesLibrary();
+    if (!google || !input) return undefined;
+    const autoComplete = new google.maps.places.Autocomplete(input, {
       fields: ['address_components', 'name', 'formatted_address', 'place_id', 'geometry'],
       libraries: ['places', 'city'],
       language: 'en',
