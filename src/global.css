@@ -1,0 +1,21 @@
+/* scrollbar */
+@import 'simplebar-react/dist/simplebar.min.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.pac-container:after {
+  /* Disclaimer: not needed to show 'powered by Google' if also a Google Map is shown */
+
+  background-image: none !important;
+  height: 0px;
+}
+
+.required:after {
+  content: "*";
+  position: relative;
+  font-size: inherit;
+  color: #f1416c;
+  padding-left: .25rem;
+  font-weight: 700;
+}

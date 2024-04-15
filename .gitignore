@@ -1,0 +1,50 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+.yarn/cache
+.yarn/install-state.gz
+
+# local Python virtualenv, not part of this frontend
+project_venv/
+
+# testing
+coverage/
+
+# production
+.next
+.swc
+_static
+out
+dist
+build/
+
+# caches, logs, scratch
+.cache/
+.eslintcache
+*.log
+logs/
+tmp/
+
+# environment variables
+.env
+.env.*
+!.env.example
+
+# AWS CodeBuild spec: kept on disk, not tracked
+buildspec.yml
+.github/
+
+# misc
+.DS_Store
+.vercel
+.netlify
+.unimportedrc.json
+tsconfig.tsbuildinfo
+.vscode
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
