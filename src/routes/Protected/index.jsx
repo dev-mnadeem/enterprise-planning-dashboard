@@ -1,20 +1,17 @@
 import { lazy, Suspense } from 'react';
-import { Outlet, Navigate, useRoutes, Route } from 'react-router-dom';
+import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 
 import DashboardLayout from 'src/layouts/dashboard';
 import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
-import _ from 'lodash';
 import PrivateRoute from './PrivateRoute';
 
 export const IndexPage = lazy(() => import('src/pages/app'));
 export const UsersListPage = lazy(() => import('src/pages/users'));
 export const AddUserPage = lazy(() => import('src/pages/users/add-user'));
 export const EditUserPage = lazy(() => import('src/pages/users/edit-user'));
-export const LoginPage = lazy(() => import('src/pages/login'));
 export const LocationPage = lazy(() => import('src/pages/locations'));
 export const AddLocationPage = lazy(() => import('src/pages/add-location'));
 export const EditLocationPage = lazy(() => import('src/pages/edit-location'));
-export const PermissionsPage = lazy(() => import('src/pages/permissions'));
 export const UserRolesPage = lazy(() => import('src/pages/roles'));
 export const AddUserRolePage = lazy(() => import('src/pages/roles/add-role'));
 export const EditUserRolePage = lazy(() => import('src/pages/roles/edit-role'));
@@ -43,8 +40,8 @@ export const Page404 = lazy(() => import('src/pages/page-not-found'));
 // ----------------------------------------------------------------------
 
 const ProtectedRoutes = (props) => {
-  const { ADD, VIEW, UPDATE, REMOVE } = PERMISSION_TYPE;
-  const { USER, LOCATION, USER_ROLE, PERMISSION, ORDER, PACKAGING, PRICING, VEHICLE, CONTAINER } =
+  const { ADD, VIEW, UPDATE } = PERMISSION_TYPE;
+  const { USER, LOCATION, USER_ROLE, ORDER, PACKAGING, PRICING, VEHICLE, CONTAINER } =
     PERMISSION_ENTITIES;
 
   return useRoutes([
@@ -87,12 +84,6 @@ const ProtectedRoutes = (props) => {
         {
           path: `${ROUTES.USERS}/:id`,
           element: <PrivateRoute element={EditUserPage} requiredPermission={USER} type={UPDATE} />,
-        },
-        {
-          path: ROUTES.PERMISSIONS,
-          element: (
-            <PrivateRoute element={PermissionsPage} requiredPermission={PERMISSION} type={VIEW} />
-          ),
         },
         {
           path: ROUTES.USER_ROLES,
@@ -220,7 +211,7 @@ const ProtectedRoutes = (props) => {
     },
     {
       path: 'login',
-      element: <LoginPage />,
+      element: <Navigate to="/" replace />,
     },
     {
       path: '404',

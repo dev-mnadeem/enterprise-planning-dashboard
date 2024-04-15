@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { TableHeadData } from '../utils';
 import Iconify from 'src/components/iconify';
 import { useNavigate } from 'react-router-dom';
@@ -32,13 +32,13 @@ const RolesListPage = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
-  const [selected, setSelected] = useState([]);
+  const [selected] = useState([]);
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const { user } = useAppSelector((state) => state.userReducer);
   const { data: userRoles, loading, error, refetch: refetchRoles } = useQuery(ENDPOINTS.USER_ROLES);
-  const [deleteUserRoleMutate, { data: deletedRole }] = useMutation(ENDPOINTS.USER_ROLES);
+  const [deleteUserRoleMutate] = useMutation(ENDPOINTS.USER_ROLES);
   const { ADD } = PERMISSION_TYPE;
   const { USER_ROLE } = PERMISSION_ENTITIES;
 

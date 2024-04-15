@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { TableHeadData } from '../utils';
 import Iconify from 'src/components/iconify';
 import { useNavigate } from 'react-router-dom';
 import Scrollbar from 'src/components/scrollbar';
 import LocationTableRow from '../location-table-row';
-import LocationTableHead from '../location-table-head';
 import LocationTableToolbar from '../location-table-toolbar';
-import { TableEmptyRows, TableNoData } from 'src/components/common';
+import { TableEmptyRows, TableNoData, TableSearchHead } from 'src/components/common';
 import { applyFilter, emptyRows, getComparator } from 'src/utils/table';
 import {
   Card,
@@ -29,10 +28,7 @@ const LocationPage = () => {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [selectedCity, setSelectedCity] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
   const [deleteLocationMutate, { loading: deleteLoading }] = useMutation(ENDPOINTS.LOCATIONS);
-  const [selectedLocationType, setSelectedLocationType] = useState('');
   const {
     error,
     loading,
@@ -71,17 +67,6 @@ const LocationPage = () => {
 
   const notFound = !dataFiltered?.length && !!filterName;
 
-  const handleLocationTypeChange = (event) => {
-    setSelectedLocationType(event.target.value);
-  };
-  const handleStatusChange = (event) => {
-    setSelectedStatus(event.target.value);
-  };
-
-  const handleCityChange = (event) => {
-    setSelectedCity(event.target.value);
-  };
-
   const deleteLocation = async (locationId) => {
     if (!locationId) return;
 
@@ -116,19 +101,12 @@ const LocationPage = () => {
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
-              <LocationTableHead
+              <TableSearchHead
                 order={order}
                 orderBy={orderBy}
                 headLabel={TableHeadData}
                 onRequestSort={handleSort}
                 rowCount={locations?.length}
-                selectedCity={selectedCity}
-                numSelected={0}
-                selectedStatus={selectedStatus}
-                onCityChange={handleCityChange}
-                onStatusChange={handleStatusChange}
-                selectedLocationType={selectedLocationType}
-                onLocationTypeChange={handleLocationTypeChange}
               />
               <TableBody>
                 {dataFiltered

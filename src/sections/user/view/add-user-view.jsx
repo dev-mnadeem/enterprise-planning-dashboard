@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Typography } from '@mui/material';
-import { useAppDispatch, useAppSelector } from 'src/state/hooks';
 import UserForm from 'src/components/users/userForm';
 import { ROUTES } from 'src/constants';
 import { useMutation } from 'src/api';

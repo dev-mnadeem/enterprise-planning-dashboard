@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Typography } from '@mui/material';
-import { useAppDispatch } from 'src/state/hooks';
 import { ROUTES } from 'src/constants';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useMutation, useQuery } from 'src/api';
@@ -9,11 +8,10 @@ import UserRoleForm from 'src/components/users/UserRoleForm';
 
 const EditRolePage = ({ id }) => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   const { search } = useLocation();
   const viewOnly = new URLSearchParams(search).get('action') === 'view';
   const userRolePoint = `${ENDPOINTS.USER_ROLES}/${id}`;
-  const { data: role, loading: queryLoading, error: queryError } = useQuery(userRolePoint);
+  const { data: role, loading: queryLoading } = useQuery(userRolePoint);
   const [mutate, { data: updatedUserRole, loading, error }] = useMutation(userRolePoint);
 
   if (queryLoading) return;

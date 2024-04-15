@@ -3,7 +3,7 @@ import { useMutation } from 'src/api';
 import { ROUTES } from 'src/constants';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useNavigate } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Container, Typography } from '@mui/material';
 import LocationForm from 'src/components/location-form';
 

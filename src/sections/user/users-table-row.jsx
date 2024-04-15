@@ -1,15 +1,12 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import Label from 'src/components/label';
 import Popover from '@mui/material/Popover';
 import Iconify from 'src/components/iconify';
 import TableRow from '@mui/material/TableRow';
-import Checkbox from '@mui/material/Checkbox';
 import MenuItem from '@mui/material/MenuItem';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
-import { useAppDispatch, useAppSelector } from 'src/state/hooks';
-import { deleteLocation } from 'src/state/reducers/locationReducer';
+import { useAppSelector } from 'src/state/hooks';
 import { useNavigate } from 'react-router-dom';
 import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
 import { checkCurrentUserPermission } from 'src/utils';
@@ -24,7 +21,6 @@ export default function UsersTableRow({
   onDeleteUser,
 }) {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   const [open, setOpen] = useState(null);
   const { user } = useAppSelector((state) => state.userReducer);
   const { REMOVE, UPDATE, VIEW } = PERMISSION_TYPE;

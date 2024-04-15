@@ -9,7 +9,7 @@ import OrderForm from 'src/components/orders/OrderForm';
 
 const AddOrderPage = () => {
   const navigation = useNavigate();
-  const [createOrder, { data, loading, error }] = useMutation(ENDPOINTS.ORDERS);
+  const [createOrder, { data, error }] = useMutation(ENDPOINTS.ORDERS);
 
   useEffect(() => {
     if (data) {

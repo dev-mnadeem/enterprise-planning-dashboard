@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useMutation, useQuery } from 'src/api';
 import toast from 'react-hot-toast';
 import { ROUTES } from 'src/constants';
@@ -8,7 +8,7 @@ import { Container, Typography } from '@mui/material';
 import LocationForm from 'src/components/location-form';
 
 const EditLocationPage = ({ id }) => {
-  const navigation = useNavigate();
+  const navigate = useNavigate();
   const locationEndPoint = `${ENDPOINTS.LOCATIONS}/${id}`;
   const {
     data: location,
@@ -20,14 +20,14 @@ const EditLocationPage = ({ id }) => {
   useEffect(() => {
     if (updatedLocation) {
       toast.success('Location updated successfully!');
-      navigation(ROUTES.LOCATIONS);
+      navigate(ROUTES.LOCATIONS);
     }
   }, [updatedLocation]);
 
   useEffect(() => {
     if (error) {
       toast.error(error || 'Something went wrong!');
-      navigation(ROUTES.LOCATIONS);
+      navigate(ROUTES.LOCATIONS);
     }
   }, [error]);
 

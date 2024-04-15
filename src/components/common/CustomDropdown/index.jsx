@@ -1,10 +1,7 @@
-import React, { useState } from 'react';
 import { Box, Typography, colors } from '@mui/material';
 import Select from 'react-select';
 
 export const CustomDropdown = (props) => {
-  const [isFocused, setIsFocused] = useState(false);
-
   return (
     <Box>
       <Box className="flex justify-between items-center">
@@ -15,8 +12,6 @@ export const CustomDropdown = (props) => {
         {...props}
         isSearchable
         onChange={props.onValueChange}
-        onMenuOpen={() => setIsFocused(true)}
-        onMenuClose={() => setIsFocused(false)}
         isMulti={props.isMulti || false}
         styles={{
           control: (provided) => ({

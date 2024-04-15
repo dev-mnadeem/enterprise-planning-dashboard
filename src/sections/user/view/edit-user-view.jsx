@@ -1,19 +1,14 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Typography } from '@mui/material';
-import LocationForm from 'src/components/location-form';
-import { useAppDispatch, useAppSelector } from 'src/state/hooks';
-import { updateLocation } from 'src/state/reducers/locationReducer';
 import { ROUTES } from 'src/constants';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useMutation, useQuery } from 'src/api';
 import UserForm from 'src/components/users/userForm';
-import { method } from 'lodash';
 import toast from 'react-hot-toast';
 
 const EditUserPage = ({ id }) => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   const userEndPoint = `${ENDPOINTS.USERS}/${id}`;
   const { search } = useLocation();
   const viewOnly = new URLSearchParams(search).get('action') === 'view';

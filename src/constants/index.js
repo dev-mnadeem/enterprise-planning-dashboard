@@ -5,7 +5,6 @@ export const ROUTES = {
   ADD_USER: '/users/add',
   ADD_LOCATION: '/locations/add',
   LOCATION_DETIAL: '/locations/:id',
-  PERMISSIONS: '/permissions',
   USER_ROLES: '/user-roles',
   ADD_USER_ROLE: '/user-roles/add',
   PACKAGINGS: '/packagings',

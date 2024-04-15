@@ -2,7 +2,6 @@ import * as Yup from 'yup';
 
 export const TableHeadData = [
   { id: 'name', label: 'Name' },
-  // { id: 'country', label: 'Country' },
   { id: 'city', label: 'City' },
   { id: 'location_type', label: 'Location Type', align: 'center' },
   { id: 'address', label: 'Address' },
@@ -21,59 +20,6 @@ export const visuallyHidden = {
   whiteSpace: 'nowrap',
   clip: 'rect(0 0 0 0)',
 };
-
-export const LocationDummy = [
-  {
-    id: 1,
-    name: 'Test Location',
-    city: 'Lahore',
-    geoLocation: '10321,123123',
-    status: 'active',
-    address: 'Abc Steet, Kalma chowk, Lahore',
-    country: 'Pakistan',
-    locationType: 'Warehouse',
-  },
-  {
-    id: 2,
-    name: 'Test Location 2',
-    city: 'Lahore',
-    geoLocation: '10321,123123',
-    status: 'active',
-    address: 'Abcd Steet, Kalma chowk, Lahore',
-    country: 'Pakistan',
-    locationType: 'Branch',
-  },
-  {
-    id: 3,
-    name: 'Test Location 3',
-    city: 'Lahore',
-    geoLocation: '10321123.123,123123123',
-    status: 'banned',
-    address: 'Abc Steet, Kalma chowk, Lahore',
-    country: 'Pakistan',
-    locationType: 'Franchise',
-  },
-  {
-    id: 4,
-    name: 'Test Location 4',
-    city: 'Lahore',
-    geoLocation: '10321,123123',
-    status: 'active',
-    address: 'Abc Steet4, Kalma chowk, Lahore',
-    country: 'Pakistan',
-    locationType: 'Franchise',
-  },
-  {
-    id: 5,
-    name: 'Test Location 5',
-    city: 'Lahore',
-    geoLocation: '10321,123123',
-    status: 'banned',
-    address: 'Abc Steet, Kalma chowk, Lahore',
-    country: 'Pakistan',
-    locationType: 'Warehouse',
-  },
-];
 
 export const locationValidationSchema = Yup.object().shape({
   city: Yup.string().required('City is required'),

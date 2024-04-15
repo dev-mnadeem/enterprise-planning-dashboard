@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import Iconify from 'src/components/iconify';
 import { Button, Chip, IconButton, MenuItem, Popover, TableCell, TableRow } from '@mui/material';
 import { useNavigate } from 'react-router-dom';

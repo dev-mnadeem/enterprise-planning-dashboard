@@ -1,12 +1,10 @@
-import userReducer from './userReducer';
-import locationReducer from './locationReducer';
 import { combineReducers, createAction } from '@reduxjs/toolkit';
+import userReducer from './userReducer';
 import loadingReducer from './loadingReducer';
 
 const applicationReducer = combineReducers({
-  userReducer: userReducer,
-  locationReducer: locationReducer,
-  loadingReducer: loadingReducer,
+  userReducer,
+  loadingReducer,
 });
 
 export const logoutUser = createAction('LOGOUT');
