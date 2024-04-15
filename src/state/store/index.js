@@ -2,7 +2,7 @@ import rootReducer from '../reducers';
 import { persistReducer } from 'redux-persist';
 import { configureStore } from '@reduxjs/toolkit';
 import { persistStore } from 'redux-persist';
-import localStorage from 'redux-persist/es/storage';
+import localStorage from 'redux-persist/lib/storage';
 
 // Only the session survives a reload. Persisting the loading counter meant a
 // reload in the middle of a request could bring back a permanent overlay.
