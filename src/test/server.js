@@ -43,6 +43,36 @@ export const usersFixture = [
   },
 ];
 
+export const ordersFixture = [
+  {
+    id: 'o1',
+    order_number: 'ACM-240311-0042',
+    sender_name: 'Abena Asante',
+    created_at: '2026-03-11T09:30:00Z',
+    sender_city: { name: 'Kumasi' },
+    receiver_city: { name: 'Rotterdam' },
+    history: [{ status: 'out', name: 'Tema Port Warehouse' }],
+  },
+  {
+    id: 'o2',
+    order_number: 'ACM-240311-0043',
+    sender_name: 'Yaw Darko',
+    created_at: '2026-03-11T10:05:00Z',
+    sender_city: { name: 'Accra' },
+    receiver_city: { name: 'London' },
+    history: [{ status: 'in', name: 'Accra Branch' }],
+  },
+  {
+    id: 'o3',
+    order_number: 'ACM-240312-0001',
+    sender_name: 'Akosua Frimpong',
+    created_at: '2026-03-12T08:00:00Z',
+    sender_city: { name: 'Takoradi' },
+    receiver_city: { name: 'Hamburg' },
+    history: [],
+  },
+];
+
 // Mirrors the API's paging: 1-based pageNumber, pageSize, and a name search.
 export const pageOf = (records, searchParams) => {
   const search = (searchParams.get('search') || '').toLowerCase();
@@ -78,6 +108,29 @@ export const handlers = [
     }
     return res(ctx.status(401), ctx.json({ message: 'Invalid email or password' }));
   }),
+  rest.get(/\/orders\/?$/, (req, res, ctx) =>
+    res(
+      ctx.json({
+        ...pageOf(
+          ordersFixture.map((o) => ({ ...o, name: o.order_number })),
+          req.url.searchParams
+        ),
+      })
+    )
+  ),
+  rest.get(/\/vehicles\/?$/, (req, res, ctx) =>
+    res(
+      ctx.json([
+        { id: 'v1', name: 'Hino 500', status: true },
+        { id: 'v2', name: 'Isuzu NPR', status: true },
+        { id: 'v3', name: 'Tata LPT', status: false },
+      ])
+    )
+  ),
+  rest.get(/\/locations\/?$/, (req, res, ctx) =>
+    res(ctx.json([{ id: 'loc-1', name: 'Tema Port Warehouse' }]))
+  ),
+  rest.get(/\/containers\/?$/, (req, res, ctx) => res(ctx.json([]))),
   rest.get(/\/users\/?$/, (req, res, ctx) =>
     res(ctx.json(pageOf(usersFixture, req.url.searchParams)))
   ),

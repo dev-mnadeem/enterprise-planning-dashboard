@@ -8,7 +8,7 @@ export default function AppPage() {
   return (
     <>
       <Helmet>
-        <title> Dashboard | Adinkra UI </title>
+        <title> Overview | Adinkra Console </title>
       </Helmet>
 
       <AppView />
