@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import ThemeProvider from 'src/theme';
 import { store } from 'src/state/store';
 import { storeUser, storeUserSession } from 'src/state/reducers/userReducer';
+import { ROUTER_FUTURE } from 'src/layouts/AppWrapper';
 import { adminUser, makeToken } from './server';
 
 export function signIn(user = adminUser) {
@@ -15,7 +16,9 @@ export function renderWithProviders(ui, { route = '/' } = {}) {
   return render(
     <Provider store={store}>
       <ThemeProvider>
-        <MemoryRouter initialEntries={[route]}>{ui}</MemoryRouter>
+        <MemoryRouter initialEntries={[route]} future={ROUTER_FUTURE}>
+          {ui}
+        </MemoryRouter>
       </ThemeProvider>
     </Provider>
   );

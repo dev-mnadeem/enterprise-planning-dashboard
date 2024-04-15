@@ -10,13 +10,16 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useAppSelector } from 'src/state/hooks';
 import { selectIsLoading } from 'src/state/reducers/loadingReducer';
 
+// Opt in to React Router v7 behaviour now; all app links are absolute.
+export const ROUTER_FUTURE = { v7_startTransition: true, v7_relativeSplatPath: true };
+
 const AppWrapper = ({ children }) => {
   const theme = useTheme();
   const active = useAppSelector(selectIsLoading);
 
   return (
     <HelmetProvider>
-      <BrowserRouter>
+      <BrowserRouter future={ROUTER_FUTURE}>
         <Suspense>
           <Toaster />
           {/* Blocks input while a request is in flight, as the old overlay did,
