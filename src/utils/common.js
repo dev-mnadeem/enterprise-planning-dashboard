@@ -9,7 +9,7 @@ export const checkCurrentUserPermission = (
       ? true
       : permissions?.some(
           (permission) =>
-            permission.name === requiredPermission && _.get(permission.properties, type)
+            permission.name === requiredPermission && Boolean(permission.properties?.[type])
         );
 
   return hasPermission ?? false;

@@ -1,11 +1,9 @@
-import moment from 'moment';
 import { useEffect, useState } from 'react';
 import axios, { isAxiosError } from 'axios';
 import { networkErrorHandler } from 'src/utils/networkErrorHandler';
 import { store } from 'src/state/store';
-import { useAppDispatch, useAppSelector } from 'src/state/hooks';
-import { setLoadingActive } from 'src/state/reducers/loadingReducer';
-import { sleepForTesting } from 'src/utils';
+import { useAppDispatch } from 'src/state/hooks';
+import { requestFinished, requestStarted } from 'src/state/reducers/loadingReducer';
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
@@ -15,64 +13,49 @@ const _headers = {
   'Content-Type': 'application/json',
 };
 
+// Access tokens expire on the API side; there is no refresh call yet, so an
+// expired token surfaces as a 401 and the user signs in again.
 interceptedAxios.interceptors.request.use(
-  async (config) => {
-    const state = store.getState();
-    const userSession = state.userReducer.userSession;
-    const accessToken = userSession?.token;
-    // change the token format if it is changed and also get refreshToken from redux
-
-    if (accessToken?.length) {
-      if (moment(new Date()).isBefore(moment().add(1, 'minute'))) {
-        // Get updated Token here and add the updated token to the headers
-        // waiting for the backend service
-
-        config.headers.Authorization = `Bearer ${accessToken}`;
-      } else {
-        config.headers.Authorization = `Bearer ${accessToken}`;
-      }
-    } else {
-      config.headers.Authorization = 'Bearer token';
+  (config) => {
+    const accessToken = store.getState().userReducer.userSession?.token;
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
-
     return config;
   },
-  (error) => {
-    Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-export const useMutation = (endpoint, intercepted = true, headers = {}, params = {}) => {
+export const useMutation = (endpoint, intercepted = true, headers = {}) => {
   const dispatch = useAppDispatch();
   const [error, setError] = useState();
   const [data, setData] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const mutate = async (variables, method = 'post', requestParams = '') => {
     try {
-      dispatch(setLoadingActive({ active: true }));
+      dispatch(requestStarted());
       setLoading(true);
       setError(undefined);
-      // await sleepForTesting(6000);
       const requestMethod = method.toLowerCase();
-      const response = await (intercepted ? interceptedAxios : nonIntercepted)[requestMethod](
-        `/${endpoint}/${requestParams}`,
-        variables,
-        {
-          headers: { ..._headers, ...headers },
-        }
-      );
+      const client = intercepted ? interceptedAxios : nonIntercepted;
+      const url = `/${endpoint}/${requestParams}`;
+      const config = { headers: { ..._headers, ...headers } };
+      // axios.delete takes (url, config); passing the body first silently dropped the headers.
+      const response =
+        requestMethod === 'delete' || requestMethod === 'get'
+          ? await client[requestMethod](url, { ...config, data: variables })
+          : await client[requestMethod](url, variables, config);
       setData(response?.data);
       return response?.data;
     } catch (err) {
-      let formattedErr = err;
-      const errorMessage = networkErrorHandler(err);
+      let formattedErr;
       if (isAxiosError(err)) {
         formattedErr = err.response?.data?.Message || err.response?.data?.errors?.[0]?.message;
       }
-      setError(formattedErr || errorMessage || 'Something went wrong!');
-      // throw errorMessage || formattedErr;
+      setError(formattedErr || networkErrorHandler(err) || 'Something went wrong!');
+      return undefined;
     } finally {
-      dispatch(setLoadingActive({ active: false }));
+      dispatch(requestFinished());
       setLoading(false);
     }
   };
@@ -84,11 +67,11 @@ export const useQuery = (endpoint, params, options = { headers: {} }) => {
   const { headers } = options;
   const [data, setData] = useState(undefined);
   const [error, setError] = useState();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const query = async () => {
     try {
-      dispatch(setLoadingActive({ active: true }));
+      dispatch(requestStarted());
       setLoading(true);
       setError(undefined);
       const response = await interceptedAxios.get(`/${endpoint}`, {
@@ -99,22 +82,20 @@ export const useQuery = (endpoint, params, options = { headers: {} }) => {
       setData(response?.data);
       return response?.data;
     } catch (err) {
-      const errorMessage = networkErrorHandler(err);
-      setError(errorMessage);
+      setError(networkErrorHandler(err));
+      return undefined;
     } finally {
-      dispatch(setLoadingActive({ active: false }));
+      dispatch(requestFinished());
       setLoading(false);
     }
   };
+
   useEffect(() => {
     query();
-  }, []);
+    // Fetch once per endpoint; callers use refetch() after a write.
+  }, [endpoint]);
 
-  const refetch = () => {
-    query();
-  };
-
-  return { data, loading, error, refetch };
+  return { data, loading, error, refetch: query };
 };
 
 export const useLazyQuery = (endpoint, options) => {
@@ -126,10 +107,9 @@ export const useLazyQuery = (endpoint, options) => {
 
   const lazyQuery = async (params = {}, requestParams = '') => {
     try {
-      dispatch(setLoadingActive({ active: true }));
+      dispatch(requestStarted());
       setLoading(true);
       setError(undefined);
-      // await sleepForTesting(3000);
       const response = await interceptedAxios.get(`/${endpoint}/${requestParams}`, {
         params,
         headers: { ..._headers, ...headers },
@@ -138,10 +118,10 @@ export const useLazyQuery = (endpoint, options) => {
       setData(response?.data);
       return response?.data;
     } catch (err) {
-      const errorMessage = networkErrorHandler(err);
-      setError(errorMessage);
+      setError(networkErrorHandler(err));
+      return undefined;
     } finally {
-      dispatch(setLoadingActive({ active: false }));
+      dispatch(requestFinished());
       setLoading(false);
     }
   };

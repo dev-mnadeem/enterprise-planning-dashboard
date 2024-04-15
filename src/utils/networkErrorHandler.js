@@ -40,18 +40,16 @@ const handle4xxResponse = (response) => {
 };
 
 const handleNetworkResponse = (response) => {
-  if (response) {
-    if (response?.status === 400 || 401) {
-      return handle4xxResponse(response);
-    } else if (response?.status === 500) {
-      return response?.data?.message;
-    }
+  if (!response) return undefined;
+  if (response.status >= 400 && response.status < 500) {
+    return handle4xxResponse(response);
   }
+  return response.data?.message;
 };
 
 export const networkErrorHandler = (error) => {
   const response = error?.response;
-  let message = error.message || ' Something went wrong';
+  let message = error?.message || 'Something went wrong';
   try {
     const mess = handleNetworkResponse(response);
     if (mess) {

@@ -5,13 +5,14 @@ import { Toaster } from 'react-hot-toast';
 import LoadingOverlay from 'react-loading-overlay';
 LoadingOverlay.propTypes = undefined;
 import { useAppSelector } from 'src/state/hooks';
+import { selectIsLoading } from 'src/state/reducers/loadingReducer';
 import { useTheme } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 const AppWrapper = ({ children }) => {
   const theme = useTheme();
-  const { active } = useAppSelector((state) => state.loadingReducer.active);
+  const active = useAppSelector(selectIsLoading);
 
   return (
     <HelmetProvider>

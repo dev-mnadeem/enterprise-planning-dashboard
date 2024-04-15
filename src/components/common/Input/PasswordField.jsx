@@ -1,9 +1,9 @@
-import { ChangeEvent, Fragment, useState } from 'react';
+import { Fragment, useState } from 'react';
 import { VisibilityRounded, VisibilityOffRounded } from '@mui/icons-material';
 import { Box, Typography, IconButton, TextField } from '@mui/material';
 
 const PasswordField = (props) => {
-  const [showPassword, setShowPassword] = useState < Boolean > false;
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <Fragment>
@@ -12,11 +12,14 @@ const PasswordField = (props) => {
           <Typography>{props.title}</Typography>
 
           <Box className="flex items-center">
-            <IconButton onClick={() => setShowPassword((prev) => !prev)}>
+            <IconButton
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
               {showPassword ? <VisibilityRounded /> : <VisibilityOffRounded />}
             </IconButton>
 
-            <Typography className="text-lg">{showPassword ? 'show' : 'Hide'}</Typography>
+            <Typography className="text-lg">{showPassword ? 'Hide' : 'Show'}</Typography>
           </Box>
         </Box>
 
