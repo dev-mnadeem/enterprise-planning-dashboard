@@ -76,7 +76,7 @@ const ContainerListPage = () => {
   };
 
   const dataFiltered = applyFilter({
-    fieldToSearch: 'name',
+    fieldToSearch: 'tracking_number',
     inputData: containers,
     comparator: getComparator(order, orderBy),
     filterName,
