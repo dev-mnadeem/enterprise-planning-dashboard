@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Iconify from 'src/components/iconify';
-import { Button, Chip, IconButton, MenuItem, Popover, TableCell, TableRow } from '@mui/material';
+import ShipmentStageChip from 'src/components/shipment-stage';
+import { Button, IconButton, MenuItem, Popover, TableCell, TableRow } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
 import { checkCurrentUserPermission } from 'src/utils';
@@ -48,10 +49,7 @@ export default function OrderTableRow({
         <TableCell>{destination}</TableCell>
         <TableCell>{customer}</TableCell>
         <TableCell>
-          <Chip
-            label={`${history?.status?.toUpperCase() || '--'}, (${history?.name || '--'})`}
-            color="success"
-          />
+          <ShipmentStageChip scan={history} />
         </TableCell>
         <TableCell>
           <Button size="small" onClick={() => navigate(`${ROUTES.ORDERS}/${id}`)}>

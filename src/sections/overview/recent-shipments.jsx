@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import Chip from '@mui/material/Chip';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import Skeleton from '@mui/material/Skeleton';
@@ -12,14 +11,9 @@ import { ENDPOINTS } from 'src/api/Endpoints';
 import { ROUTES } from 'src/constants';
 import { useQuery } from 'src/api';
 import { fDate } from 'src/utils/format-time';
+import ShipmentStageChip, { STAGES } from 'src/components/shipment-stage';
 
 const SAMPLE_SIZE = 100;
-
-// The API returns each shipment's history newest first; [0] is where it is now.
-const STAGES = {
-  in: { label: 'Received at a location', color: 'primary' },
-  out: { label: 'Dispatched', color: 'secondary' },
-};
 
 export const summariseStages = (orders = []) => {
   const counts = orders.reduce((acc, order) => {
@@ -29,8 +23,8 @@ export const summariseStages = (orders = []) => {
   }, {});
   return [
     { key: 'booked', label: 'Booked, not yet received', count: counts.booked || 0 },
-    { key: 'in', label: STAGES.in.label, count: counts.in || 0 },
-    { key: 'out', label: STAGES.out.label, count: counts.out || 0 },
+    { key: 'in', label: STAGES.in.long, count: counts.in || 0 },
+    { key: 'out', label: STAGES.out.long, count: counts.out || 0 },
   ];
 };
 
@@ -83,61 +77,45 @@ export default function RecentShipments() {
           </Typography>
         ) : (
           <Stack component="ol" sx={{ listStyle: 'none', m: 0, p: 0 }}>
-            {orders.slice(0, 6).map((order) => {
-              const latest = order?.history?.[0];
-              const stage = STAGES[latest?.status];
-              return (
-                <Box
-                  component="li"
-                  key={order.id}
-                  sx={{
-                    px: 3,
-                    py: 1.5,
-                    display: 'grid',
-                    gap: 1,
-                    gridTemplateColumns: { xs: '1fr auto', sm: '9rem 1fr auto' },
-                    alignItems: 'center',
-                    borderTop: (theme) => `1px solid ${theme.palette.divider}`,
-                  }}
+            {orders.slice(0, 6).map((order) => (
+              <Box
+                component="li"
+                key={order.id}
+                sx={{
+                  px: 3,
+                  py: 1.5,
+                  display: 'grid',
+                  gap: 1,
+                  gridTemplateColumns: { xs: '1fr', sm: '10rem 1fr auto' },
+                  alignItems: 'center',
+                  justifyItems: { xs: 'start', sm: 'stretch' },
+                  borderTop: (theme) => `1px solid ${theme.palette.divider}`,
+                }}
+              >
+                <Link
+                  component={RouterLink}
+                  href={`${ROUTES.ORDERS}/${order.id}`}
+                  variant="subtitle2"
+                  sx={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}
                 >
-                  <Link
-                    component={RouterLink}
-                    href={`${ROUTES.ORDERS}/${order.id}`}
-                    variant="subtitle2"
-                    sx={{ fontVariantNumeric: 'tabular-nums' }}
-                  >
-                    {order.order_number}
-                  </Link>
-                  <Box
-                    sx={{
-                      minWidth: 0,
-                      gridColumn: { xs: '1 / -1', sm: 'auto' },
-                      order: { xs: 3, sm: 0 },
-                    }}
-                  >
-                    <Typography variant="body2" noWrap>
-                      {route(order)}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                      {`${order.sender_name || 'Unknown sender'} · ${fDate(
-                        order.created_at,
-                        'dd MMM yyyy'
-                      )}`}
-                    </Typography>
-                  </Box>
-                  <Chip
-                    size="small"
-                    variant={stage ? 'filled' : 'outlined'}
-                    color={stage?.color || 'default'}
-                    label={
-                      stage
-                        ? `${stage.label.split(' ')[0]}${latest?.name ? ` · ${latest.name}` : ''}`
-                        : 'Booked'
-                    }
-                  />
+                  {order.order_number}
+                </Link>
+                <Box sx={{ minWidth: 0, maxWidth: 1 }}>
+                  <Typography variant="body2" noWrap>
+                    {route(order)}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                    {`${order.sender_name || 'Unknown sender'} · ${fDate(
+                      order.created_at,
+                      'dd MMM yyyy'
+                    )}`}
+                  </Typography>
                 </Box>
-              );
-            })}
+                <Box sx={{ justifySelf: { sm: 'end' } }}>
+                  <ShipmentStageChip scan={order?.history?.[0]} />
+                </Box>
+              </Box>
+            ))}
           </Stack>
         )}
       </Card>

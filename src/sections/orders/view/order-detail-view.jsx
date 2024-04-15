@@ -10,6 +10,8 @@ import toast from 'react-hot-toast';
 import { Print } from '@mui/icons-material';
 import OrderHistory from 'src/components/orders/OrderHistory';
 import Barcode from 'react-barcode';
+import ShipmentStageChip from 'src/components/shipment-stage';
+import { fDateTime } from 'src/utils/format-time';
 
 export default function OrdersDetailPage({ id }) {
   const navigate = useNavigate();
@@ -49,13 +51,9 @@ export default function OrdersDetailPage({ id }) {
           </Button>
         </Box>
         <Box className="flex flex-row gap-3 my-3 bg-transparent">
+          <ShipmentStageChip scan={order?.history?.[0]} />
           <CustomChip
-            label={`${order?.history?.[0]?.status?.toUpperCase() || '--'}, (${
-              order?.history?.[0]?.name || '--'
-            })`}
-          />
-          <CustomChip
-            label={`Placed On: ${new Date(order?.createdAt || new Date()).toLocaleString()}`}
+            label={`Placed on: ${fDateTime(order?.created_at)}`}
             background="#e6eaed"
             color="#374356"
           />
