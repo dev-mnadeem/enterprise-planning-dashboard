@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
@@ -103,7 +102,11 @@ export default function LoginView() {
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                <IconButton
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  onClick={() => setShowPassword(!showPassword)}
+                  edge="end"
+                >
                   <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
                 </IconButton>
               </InputAdornment>
@@ -112,13 +115,8 @@ export default function LoginView() {
         />
       </Stack>
 
-      <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
-        <Link variant="subtitle2" underline="hover">
-          Forgot password?
-        </Link>
-      </Stack>
-
       <LoadingButton
+        sx={{ mt: 4 }}
         fullWidth
         size="large"
         type="submit"
@@ -126,51 +124,39 @@ export default function LoginView() {
         color="inherit"
         loading={loading}
       >
-        Login
+        Sign in
       </LoadingButton>
     </Box>
   );
 
   return (
     <Box
+      component="main"
       sx={{
-        backgroundImage: 'url(/assets/background/adinkra-cover.png)',
-        boxShadow: 'inset 0 0 0 2000px rgb(0 0 0 / 20%)',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: '0% 0%',
-        backgroundSize: '100% 100%',
-        height: 1,
+        minHeight: '100vh',
+        backgroundColor: 'primary.darker',
+        // Cover, not stretch: the artwork used to be squashed to the viewport.
+        backgroundImage:
+          'linear-gradient(rgb(6 28 54 / 45%), rgb(6 28 54 / 45%)), url(/assets/background/adinkra-cover.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        px: 2,
       }}
     >
-      <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
-        <Card
-          sx={{
-            p: 5,
-            width: 1,
-            maxWidth: 420,
-          }}
-        >
-          <Typography variant="h4">
-            <Logo
-              sx={{
-                display: 'block',
-                marginLeft: 'auto',
-                marginRight: 'auto',
-              }}
-            />
-          </Typography>
+      <Stack alignItems="center" justifyContent="center" sx={{ minHeight: '100vh', py: 4 }}>
+        <Card sx={{ p: { xs: 3, sm: 5 }, width: 1, maxWidth: 420 }}>
+          <Logo sx={{ display: 'block', mx: 'auto' }} />
 
-          <Divider sx={{ my: 3 }}>
-            <Typography variant="h6" sx={{ mt: 2, mb: 4, color: 'text.primary' }}>
-              Login to Your Account
-            </Typography>
-          </Divider>
+          <Divider sx={{ my: 3 }} />
+
+          <Typography variant="h4" component="h1">
+            Sign in
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
+            Adinkra Cargo Movers operations console
+          </Typography>
 
           {renderForm}
-
-          <Typography variant="body2" sx={{ mt: 2, mb: 0, textAlign: 'center' }}>
-            <Link variant="subtitle2">Register as a Customer</Link>
-          </Typography>
         </Card>
       </Stack>
     </Box>

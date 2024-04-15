@@ -19,3 +19,8 @@
   padding-left: .25rem;
   font-weight: 700;
 }
+/* Keyboard focus stays visible on every control, including MUI's. */
+:focus-visible {
+  outline: 2px solid #b84f17;
+  outline-offset: 2px;
+}

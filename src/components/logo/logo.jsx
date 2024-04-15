@@ -9,11 +9,10 @@ import { RouterLink } from 'src/routes/components';
 // ----------------------------------------------------------------------
 
 const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
-  // OR using local (public folder)
-  // -------------------------------------------------------
   const logo = (
     <Box
       component="img"
+      alt="Adinkra Cargo Movers"
       src="/assets/adinkra-logo.png"
       sx={{ width: 180, height: 60, cursor: 'pointer', ...sx }}
     />

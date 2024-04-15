@@ -64,7 +64,7 @@ export default function Nav({ openNav, onCloseNav }) {
   );
 
   const renderMenu = (
-    <Stack component="nav" spacing={0.5} sx={{ px: 2 }}>
+    <Stack component="nav" aria-label="Main" spacing={0.5} sx={{ px: 2 }}>
       {navConfig(permissions)?.map((item) => (
         <NavItem key={item.title} item={item} />
       ))}
@@ -136,7 +136,10 @@ Nav.propTypes = {
 
 function NavItem({ item }) {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  // Groups start expanded when the current page is one of their children.
+  const [open, setOpen] = useState(() =>
+    Boolean(item.menuItems?.some((child) => child?.path === pathname))
+  );
 
   const active = item.path === pathname;
 
@@ -146,8 +149,7 @@ function NavItem({ item }) {
         <>
           <ListItemButton
             onClick={() => setOpen(!open)}
-            component={RouterLink}
-            href={item.path}
+            aria-expanded={open}
             sx={{
               minHeight: 44,
               borderRadius: 0.75,
@@ -172,7 +174,7 @@ function NavItem({ item }) {
           <Collapse in={open} timeout="auto">
             <List sx={{ pl: 4 }}>
               {item.menuItems?.map((route, index) =>
-                route ? <NavItem item={route} key={index} /> : <></>
+                route ? <NavItem item={route} key={route.path || index} /> : null
               )}
             </List>
           </Collapse>
@@ -181,6 +183,7 @@ function NavItem({ item }) {
         <ListItemButton
           component={RouterLink}
           href={item.path}
+          aria-current={active ? 'page' : undefined}
           sx={{
             minHeight: 44,
             borderRadius: 0.75,

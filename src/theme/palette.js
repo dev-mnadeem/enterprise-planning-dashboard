@@ -17,21 +17,23 @@ export const grey = {
   900: '#161C24',
 };
 
+// Harbour navy, matched to the ACM logo.
 export const primary = {
-  lighter: '#D0ECFE',
-  light: '#73BAFB',
-  main: '#1877F2',
-  dark: '#0C44AE',
-  darker: '#042174',
+  lighter: '#D6E4F2',
+  light: '#5A8BC0',
+  main: '#14508C',
+  dark: '#0C355F',
+  darker: '#061C36',
   contrastText: '#FFFFFF',
 };
 
+// Container orange, for dispatch and accents. #B84F17 keeps 5:1 against white.
 export const secondary = {
-  lighter: '#EFD6FF',
-  light: '#C684FF',
-  main: '#8E33FF',
-  dark: '#5119B7',
-  darker: '#27097A',
+  lighter: '#FBE3D2',
+  light: '#E8915A',
+  main: '#B84F17',
+  dark: '#8A3A10',
+  darker: '#5A2408',
   contrastText: '#FFFFFF',
 };
 
@@ -112,7 +114,7 @@ export function palette() {
     },
     background: {
       paper: '#FFFFFF',
-      default: grey[100],
+      default: '#F4F5F2',
       neutral: grey[200],
     },
     action: {

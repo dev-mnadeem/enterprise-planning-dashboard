@@ -25,7 +25,7 @@ it('signs in, stores the decoded user and moves to the dashboard', async () => {
 
   await user.type(screen.getByLabelText(/email address/i), adminUser.email);
   await user.type(screen.getByLabelText(/^password/i), 'correct-horse');
-  await user.click(screen.getByRole('button', { name: /^login$/i }));
+  await user.click(screen.getByRole('button', { name: /sign in/i }));
 
   expect(await screen.findByText('Operations overview')).toBeInTheDocument();
   const { user: stored, userSession } = store.getState().userReducer;
@@ -39,7 +39,7 @@ it('shows the API message and stays put on bad credentials', async () => {
 
   await user.type(screen.getByLabelText(/email address/i), adminUser.email);
   await user.type(screen.getByLabelText(/^password/i), 'wrong');
-  await user.click(screen.getByRole('button', { name: /^login$/i }));
+  await user.click(screen.getByRole('button', { name: /sign in/i }));
 
   expect(await screen.findByText('Invalid email or password')).toBeInTheDocument();
   await waitFor(() => expect(store.getState().userReducer.userSession).toBeUndefined());

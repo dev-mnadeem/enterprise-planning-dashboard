@@ -1,6 +1,6 @@
 {
-  "short_name": "Adinkra App",
-  "name": "React Material Adinkra ERP",
+  "short_name": "Adinkra",
+  "name": "Adinkra Console",
   "icons": [
     {
       "src": "favicon/android-chrome-192x192.png",
@@ -15,6 +15,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
+  "theme_color": "#14508C",
   "background_color": "#ffffff"
 }

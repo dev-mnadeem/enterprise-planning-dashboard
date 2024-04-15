@@ -55,6 +55,7 @@ export default function NotFoundView() {
 
           <Box
             component="img"
+            alt=""
             src="/assets/illustrations/illustration_404.svg"
             sx={{
               mx: 'auto',

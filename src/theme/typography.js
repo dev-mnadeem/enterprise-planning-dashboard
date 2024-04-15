@@ -22,8 +22,10 @@ export function responsiveFontSizes({ sm, md, lg }) {
   };
 }
 
-export const primaryFont = 'Montserrat';
-export const secondaryFont = 'Montserrat';
+// Plex Sans for reading tables and forms; Barlow, with its signage-like
+// proportions, for headings and figures.
+export const primaryFont = "'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif";
+export const secondaryFont = "'Barlow', 'IBM Plex Sans', system-ui, sans-serif";
 
 // ----------------------------------------------------------------------
 
@@ -35,36 +37,42 @@ export const typography = {
   fontWeightSemiBold: 600,
   fontWeightBold: 700,
   h1: {
-    fontWeight: 800,
+    fontFamily: secondaryFont,
+    fontWeight: 700,
     lineHeight: 80 / 64,
     fontSize: pxToRem(40),
     ...responsiveFontSizes({ sm: 52, md: 58, lg: 64 }),
   },
   h2: {
-    fontWeight: 800,
+    fontFamily: secondaryFont,
+    fontWeight: 700,
     lineHeight: 64 / 48,
     fontSize: pxToRem(32),
     ...responsiveFontSizes({ sm: 40, md: 44, lg: 48 }),
   },
   h3: {
-    fontWeight: 700,
-    lineHeight: 1.5,
+    fontFamily: secondaryFont,
+    fontWeight: 600,
+    lineHeight: 1.2,
     fontSize: pxToRem(24),
     ...responsiveFontSizes({ sm: 26, md: 30, lg: 32 }),
   },
   h4: {
-    fontWeight: 700,
-    lineHeight: 1.5,
+    fontFamily: secondaryFont,
+    fontWeight: 600,
+    lineHeight: 1.3,
     fontSize: pxToRem(20),
     ...responsiveFontSizes({ sm: 20, md: 24, lg: 24 }),
   },
   h5: {
+    fontFamily: secondaryFont,
     fontWeight: 700,
     lineHeight: 1.5,
     fontSize: pxToRem(18),
     ...responsiveFontSizes({ sm: 19, md: 20, lg: 20 }),
   },
   h6: {
+    fontFamily: secondaryFont,
     fontWeight: 700,
     lineHeight: 28 / 18,
     fontSize: pxToRem(17),
@@ -93,7 +101,8 @@ export const typography = {
     fontSize: pxToRem(12),
   },
   overline: {
-    fontWeight: 700,
+    fontFamily: secondaryFont,
+    fontWeight: 600,
     lineHeight: 1.5,
     fontSize: pxToRem(12),
     textTransform: 'uppercase',
