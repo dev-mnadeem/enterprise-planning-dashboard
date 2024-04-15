@@ -1,4 +1,4 @@
-FROM node:20-bookworm-slim AS build
+FROM node:22-bookworm-slim AS build
 WORKDIR /app
 # The repo ships yarn.lock, not package-lock.json.
 COPY package.json yarn.lock ./
@@ -11,10 +11,10 @@ ARG REACT_APP_GOOGLE_MAPS_API_KEY=""
 ENV REACT_APP_API_URL=$REACT_APP_API_URL \
     REACT_APP_GOOGLE_MAPS_API_KEY=$REACT_APP_GOOGLE_MAPS_API_KEY \
     GENERATE_SOURCEMAP=false \
-    CI=false
+    NODE_OPTIONS=--max-old-space-size=1536
 RUN yarn build
 
-FROM nginx:alpine AS runtime
+FROM nginx:1.27-alpine AS runtime
 COPY --from=build /app/build /usr/share/nginx/html
 # The app is a single-page router: unknown paths must return index.html, not 404.
 RUN printf 'server {\n  listen 80;\n  root /usr/share/nginx/html;\n  location / {\n    try_files $uri $uri/ /index.html;\n  }\n}\n' > /etc/nginx/conf.d/default.conf
