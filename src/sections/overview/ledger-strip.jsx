@@ -30,7 +30,7 @@ export function LedgerCell({ label, endpoint, select, caption, to }) {
         </Typography>
       )}
       <Typography variant="body2" sx={{ color: 'text.secondary', minHeight: 22 }}>
-        {error ? 'Unavailable right now' : figure?.caption ?? caption}
+        {error ? 'Unavailable right now' : (figure?.caption ?? caption)}
       </Typography>
       <Link
         component={RouterLink}

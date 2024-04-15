@@ -59,8 +59,8 @@ export default function LocationTableRow({
               locationType?.name === 'warehouse'
                 ? 'success'
                 : locationType?.name === 'branch'
-                ? 'error'
-                : 'info'
+                  ? 'error'
+                  : 'info'
             }
           >
             {locationType?.name}
