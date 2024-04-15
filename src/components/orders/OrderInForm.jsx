@@ -15,9 +15,7 @@ import {
 } from '@mui/material';
 import { CustomDropdown, InputField } from '../common';
 import { SHIPMENT_DISPATCH } from 'src/constants';
-import _ from 'lodash';
 import Iconify from '../iconify/iconify';
-import useMemoized from 'src/hooks/useMemoized';
 import { useLazyQuery, useMutation } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useLocation } from 'react-router-dom';
@@ -38,8 +36,7 @@ export default function OrderInForm({ onSubmit, initials, viewOnly, buttonText }
   const orderEndPoint = ENDPOINTS.ORDERS;
   const [validateOrder] = useLazyQuery(orderEndPoint);
   const [inOrderMutate, { data: updatedOrder, error: orderInError }] = useMutation(orderEndPoint);
-  const [getOrderById, { data: order, loading: queryLoading, error: orderError }] =
-    useLazyQuery(orderEndPoint);
+  const [getOrderById, { data: order, error: orderError }] = useLazyQuery(orderEndPoint);
 
   useEffect(() => {
     if (user?.locations?.length) {
@@ -72,10 +69,10 @@ export default function OrderInForm({ onSubmit, initials, viewOnly, buttonText }
     }
   }, [orderInError]);
 
-  const branchesOptions = useMemoized(
-    user?.locations?.map((location) => ({ value: location.id, label: location.name })),
-    [user?.locations]
-  );
+  const branchesOptions = user?.locations?.map((location) => ({
+    value: location.id,
+    label: location.name,
+  }));
 
   useEffect(() => {
     if (updatedOrder?.success?.length) {
@@ -174,10 +171,9 @@ export default function OrderInForm({ onSubmit, initials, viewOnly, buttonText }
                     required
                     placeholder="Select Branch"
                     options={branchesOptions}
-                    value={useMemoized(
-                      branchesOptions?.find((item) => item.value === values.location_id) || null,
-                      [branchesOptions, values.location_id]
-                    )}
+                    value={
+                      branchesOptions?.find((item) => item.value === values.location_id) || null
+                    }
                     onValueChange={async (value) => {
                       setFieldTouched('location_id', true);
                       setFieldValue('location_id', value.value);

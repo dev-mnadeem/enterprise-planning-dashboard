@@ -49,21 +49,6 @@ const styles = StyleSheet.create({
   rightAlign: {
     textAlign: 'right',
   },
-  table: {
-    display: 'table',
-    width: 'auto',
-    margin: '10px 0',
-  },
-  tableRow: {
-    flexDirection: 'row',
-  },
-  tableCol: {
-    width: '25%',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#000',
-    padding: 5,
-  },
   tableCell: {
     fontSize: 10,
   },
@@ -155,7 +140,7 @@ const ShipmentReceipt = ({ order, barcodeImageUrl }) => (
       <View>
         <View style={styles.table}>
           <View style={styles.tableRow}>
-            <Text style={[styles.tableColHeader, , { width: '10%' }]}>#</Text>
+            <Text style={[styles.tableColHeader, { width: '10%' }]}>#</Text>
             <Text style={styles.tableColHeader}>Name</Text>
             <Text style={styles.tableColHeader}>DESCRIPTION</Text>
             <Text style={[styles.tableColHeader, { textAlign: 'center' }]}>WEIGHT</Text>

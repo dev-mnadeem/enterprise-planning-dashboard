@@ -14,10 +14,8 @@ import {
   Typography,
 } from '@mui/material';
 import { CustomDropdown, InputField } from '../common';
-import { SHIPMENT_DISPATCH, shipmentOutSchema } from 'src/constants';
-import _ from 'lodash';
+import { SHIPMENT_DISPATCH } from 'src/constants';
 import Iconify from '../iconify/iconify';
-import useMemoized from 'src/hooks/useMemoized';
 import { useLazyQuery, useMutation, useQuery } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useLocation } from 'react-router-dom';
@@ -36,10 +34,9 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
   const { OUT } = SHIPMENT_DISPATCH;
   const orderEndPoint = ENDPOINTS.ORDERS;
   const [outOrderMutate, { data: updatedOrder, error: orderOutError }] = useMutation(orderEndPoint);
-  const [getOrderById, { data: order, loading: queryLoading, error: orderError }] =
-    useLazyQuery(orderEndPoint);
-  const { error: locationError, data: locations } = useQuery(ENDPOINTS.LOCATIONS);
-  const { error: vehiclesError, data: vehicles } = useQuery(ENDPOINTS.VEHICLES);
+  const [getOrderById, { data: order, error: orderError }] = useLazyQuery(orderEndPoint);
+  const { data: locations } = useQuery(ENDPOINTS.LOCATIONS);
+  const { data: vehicles } = useQuery(ENDPOINTS.VEHICLES);
   const [validateOrder] = useLazyQuery(orderEndPoint);
 
   useEffect(() => {
@@ -73,28 +70,25 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
     }
   }, [orderOutError]);
 
-  const fromLocationOptions = useMemoized(
-    user?.locations?.map((location) => ({ value: location.id, label: location.name })),
-    [user?.locations]
-  );
+  const fromLocationOptions = user?.locations?.map((location) => ({
+    value: location.id,
+    label: location.name,
+  }));
 
-  const toLocationsOptions = useMemoized(
-    locations?.map((location) => ({ value: location.id, label: location.name })),
-    [locations]
-  );
+  const toLocationsOptions = locations?.map((location) => ({
+    value: location.id,
+    label: location.name,
+  }));
 
-  const vehiclesOptions = useMemoized(
-    vehicles?.map((vehicle) => ({
-      value: vehicle.id,
-      label: `${vehicle?.name} (${vehicle?.registration_number})`,
-    })),
-    [vehicles]
-  );
+  const vehiclesOptions = vehicles?.map((vehicle) => ({
+    value: vehicle.id,
+    label: `${vehicle?.name} (${vehicle?.registration_number})`,
+  }));
 
-  const conveyanceByOptions = useMemoized(
-    ['Container', 'Vehicle'].map((type) => ({ value: type, label: type })),
-    []
-  );
+  const conveyanceByOptions = ['Container', 'Vehicle'].map((type) => ({
+    value: type,
+    label: type,
+  }));
 
   useEffect(() => {
     if (updatedOrder?.success?.length) {
@@ -198,11 +192,10 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
                     required
                     placeholder="Select Location"
                     options={fromLocationOptions}
-                    value={useMemoized(
+                    value={
                       fromLocationOptions?.find((item) => item.value === values.from_location_id) ||
-                        null,
-                      [fromLocationOptions, values.from_location_id]
-                    )}
+                      null
+                    }
                     onValueChange={async (value) => {
                       setFieldTouched('from_location_id', true);
                       setFieldValue('from_location_id', value.value);
@@ -219,11 +212,10 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
                     name="to_location_id"
                     placeholder="Select Location"
                     options={toLocationsOptions}
-                    value={useMemoized(
+                    value={
                       toLocationsOptions?.find((item) => item.value === values.to_location_id) ||
-                        null,
-                      [toLocationsOptions, values.to_location_id]
-                    )}
+                      null
+                    }
                     onValueChange={async (value) => {
                       setFieldTouched('to_location_id', true);
                       setFieldValue('to_location_id', value.value);
@@ -239,9 +231,8 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
                     name="conveyanceType"
                     title="Conveyance Type"
                     options={conveyanceByOptions}
-                    value={useMemoized(
-                      conveyanceByOptions?.find((item) => item.value === values.conveyanceType),
-                      [conveyanceByOptions, values.conveyanceType]
+                    value={conveyanceByOptions?.find(
+                      (item) => item.value === values.conveyanceType
                     )}
                     required
                     placeholder="Select Conveyance through"

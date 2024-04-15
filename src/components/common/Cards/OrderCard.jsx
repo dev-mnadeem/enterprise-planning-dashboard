@@ -8,9 +8,9 @@ export const OrderCard = ({ data, label }) => {
         {label}
       </Typography>
 
-      {data.map((item) => {
+      {data.map((item, index) => {
         return (
-          <Container className="flex flex-row gap-12 p-0">
+          <Container key={item.label || index} className="flex flex-row gap-12 p-0">
             {item.label && (
               <Typography className="body1 w-full max-w-40 font-bold">{item.label}:</Typography>
             )}

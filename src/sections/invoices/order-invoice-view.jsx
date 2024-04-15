@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { PDFViewer } from '@react-pdf/renderer';
+import JsBarcode from 'jsbarcode';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useQuery } from 'src/api';

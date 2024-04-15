@@ -1,27 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Formik } from 'formik';
 import ErrorMsg from '../error-msg';
 import { Box, Button, Card, Divider } from '@mui/material';
 import { CustomDropdown } from '../common';
-import { SHIPMENT_ROUTE, createContainerSchema, createPricingSchema } from 'src/constants';
-import _ from 'lodash';
+import { createContainerSchema } from 'src/constants';
 import NumberField from '../common/Input/NumberField';
 import Iconify from '../iconify/iconify';
-import { ADD_PRICING_INITIALS } from 'src/sections/pricing/utils';
-import useMemoized from 'src/hooks/useMemoized';
-import { useLazyQuery, useQuery } from 'src/api';
+import { useQuery } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
-import toast from 'react-hot-toast';
 import { ADD_CONTAINER_INITIALS } from 'src/sections/containers/utils';
 
 export default function ContainerForm({ onSubmit, initials, viewOnly, buttonText }) {
-  const [initialValues, setInitialValues] = useState({ ...initials });
-  const { data: countries, loading: cntLoading, error: cntError } = useQuery(ENDPOINTS.COUNTRIES);
+  const [initialValues] = useState({ ...initials });
+  const { data: countries } = useQuery(ENDPOINTS.COUNTRIES);
 
-  const countriesOptions = useMemoized(
-    countries?.map((country) => ({ value: country.id, label: country.name })),
-    [countries]
-  );
+  const countriesOptions = countries?.map((country) => ({
+    value: country.id,
+    label: country.name,
+  }));
 
   const onSubmitForm = (values) => {
     onSubmit({ ...values });
@@ -43,54 +39,6 @@ export default function ContainerForm({ onSubmit, initials, viewOnly, buttonText
         setFieldTouched,
         values,
       }) => {
-        useEffect(() => {
-          /** PREFILL COUNTRY, STATE, CITY In EDIT CASE */
-          const prefillLocationData = async () => {
-            try {
-              if (initialValues?.from_city_id) {
-                const _fromLocation = initialValues?.from_city;
-                const {
-                  id: _fromCityId,
-                  state: { id: _fromStateId, country_id: _fromCountryId },
-                } = _fromLocation;
-
-                await setFieldValue('from_country_id', _fromCountryId);
-                await setFieldValue('sender_state', _fromStateId);
-
-                await setFieldValue('from_city_id', _fromCityId);
-              }
-              if (initialValues?.to_city_id) {
-                const _toLocation = initialValues?.to_city;
-                const {
-                  id: _toCityId,
-                  state: { id: _toStateId, country_id: _toCountryId },
-                } = _toLocation;
-
-                await setFieldValue('to_country_id', _toCountryId);
-                await setFieldValue('receiver_state', _toStateId);
-
-                await setFieldValue('to_city_id', _toCityId);
-              }
-            } catch (error) {
-              toast.error('Issue occurred while prefilling data.');
-            }
-          };
-
-          // prefillLocationData();
-        }, [initialValues?.from_city_id]);
-
-        useEffect(() => {
-          // if (initialValues?.route) {
-          //   setFieldValue('shipment_route', initialValues?.route);
-          //   getRoutePackagings({
-          //     route: initialValues?.route === SEA ? 'sea' : 'air',
-          //   }).then(() => {
-          //     setFieldValue('package_id', initialValues?.package_id);
-          //   });
-          // }
-        }, [initialValues?.route]);
-
-        //..........................
         const onChangeDimensions = (dimension) => {
           if (dimension?.width && dimension?.height && dimension?.depth) {
             setFieldValue(
@@ -109,13 +57,11 @@ export default function ContainerForm({ onSubmit, initials, viewOnly, buttonText
           }
         };
 
-        const receiverCountryOptions = useMemoized(
-          countriesOptions?.filter((option) => option.value !== values?.from_country_id),
-          [countriesOptions, values?.from_country_id]
+        const receiverCountryOptions = countriesOptions?.filter(
+          (option) => option.value !== values?.from_country_id
         );
-        const senderCountryOptions = useMemoized(
-          countriesOptions?.filter((option) => option.value !== values?.to_country_id),
-          [countriesOptions, values?.to_country_id]
+        const senderCountryOptions = countriesOptions?.filter(
+          (option) => option.value !== values?.to_country_id
         );
 
         return (
@@ -130,9 +76,8 @@ export default function ContainerForm({ onSubmit, initials, viewOnly, buttonText
                       required
                       placeholder="Select Country"
                       options={senderCountryOptions}
-                      value={useMemoized(
-                        countriesOptions?.find((item) => item.value === values.from_country_id),
-                        [countriesOptions, values.from_country_id]
+                      value={countriesOptions?.find(
+                        (item) => item.value === values.from_country_id
                       )}
                       onValueChange={async (value) => {
                         setFieldTouched('from_country_id', true);
@@ -151,10 +96,7 @@ export default function ContainerForm({ onSubmit, initials, viewOnly, buttonText
                       required
                       placeholder="Select Country"
                       options={receiverCountryOptions}
-                      value={useMemoized(
-                        countriesOptions?.find((item) => item.value === values.to_country_id),
-                        [countriesOptions, values.to_country_id]
-                      )}
+                      value={countriesOptions?.find((item) => item.value === values.to_country_id)}
                       onValueChange={async (value) => {
                         setFieldTouched('to_country_id', true);
                         setFieldValue('to_country_id', value.value);

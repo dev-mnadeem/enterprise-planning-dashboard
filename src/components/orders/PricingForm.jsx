@@ -4,64 +4,47 @@ import ErrorMsg from '../error-msg';
 import { Box, Button, Card, Divider } from '@mui/material';
 import { CustomDropdown } from '../common';
 import { SHIPMENT_ROUTE, createPricingSchema } from 'src/constants';
-import _ from 'lodash';
 import NumberField from '../common/Input/NumberField';
 import Iconify from '../iconify/iconify';
 import { ADD_PRICING_INITIALS } from 'src/sections/pricing/utils';
-import useMemoized from 'src/hooks/useMemoized';
 import { useLazyQuery, useQuery } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import toast from 'react-hot-toast';
 
 export default function PricingForm({ onSubmit, initials, viewOnly, buttonText }) {
-  const [initialValues, setInitialValues] = useState({ ...initials });
+  const [initialValues] = useState({ ...initials });
   const { AIR, SEA, ROAD } = SHIPMENT_ROUTE;
 
-  const { data: countries, loading: cntLoading, error: cntError } = useQuery(ENDPOINTS.COUNTRIES);
+  const { data: countries } = useQuery(ENDPOINTS.COUNTRIES);
   const [senderCountryStates, { data: senderStates }] = useLazyQuery(ENDPOINTS.COUNTRIES);
   const [receiverCountryStates, { data: receiverStates }] = useLazyQuery(ENDPOINTS.COUNTRIES);
   const [senderStateCities, { data: senderCities }] = useLazyQuery(ENDPOINTS.STATES);
   const [receiverStateCities, { data: receiverCities }] = useLazyQuery(ENDPOINTS.STATES);
   const [getRoutePackagings, { data: packagings }] = useLazyQuery(ENDPOINTS.PACKAGINGS);
 
-  const countriesOptions = useMemoized(
-    countries?.map((country) => ({ value: country.id, label: country.name })),
-    [countries]
-  );
-  const senderStateOptions = useMemoized(
-    senderStates?.map((state) => ({ value: state.id, label: state.name })),
-    [senderStates]
-  );
-  const receiverStateOptions = useMemoized(
-    receiverStates?.map((state) => ({ value: state.id, label: state.name })),
-    [receiverStates]
-  );
-  const senderCityOptions = useMemoized(
-    senderCities?.map((city) => ({ value: city.id, label: city.name })),
-    [senderCities]
-  );
-  const receiverCityOptions = useMemoized(
-    receiverCities?.map((city) => ({ value: city.id, label: city.name })),
-    [receiverCities]
-  );
+  const countriesOptions = countries?.map((country) => ({
+    value: country.id,
+    label: country.name,
+  }));
+  const senderStateOptions = senderStates?.map((state) => ({ value: state.id, label: state.name }));
+  const receiverStateOptions = receiverStates?.map((state) => ({
+    value: state.id,
+    label: state.name,
+  }));
+  const senderCityOptions = senderCities?.map((city) => ({ value: city.id, label: city.name }));
+  const receiverCityOptions = receiverCities?.map((city) => ({ value: city.id, label: city.name }));
 
-  const shipmentRouteOptions = useMemoized(
-    [AIR, SEA, ROAD].map((type) => ({ value: type, label: type })),
-    []
-  );
+  const shipmentRouteOptions = [AIR, SEA, ROAD].map((type) => ({ value: type, label: type }));
 
-  const priceVariationOptions = useMemoized(
-    [
-      { value: true, label: 'Fixed' },
-      { value: false, label: 'Per Kg/Volume' },
-    ].map((type) => ({ value: type.value, label: type.label })),
-    []
-  );
+  const priceVariationOptions = [
+    { value: true, label: 'Fixed' },
+    { value: false, label: 'Per Kg/Volume' },
+  ].map((type) => ({ value: type.value, label: type.label }));
 
-  const packagingOptions = useMemoized(
-    packagings?.map((packaging) => ({ value: packaging.id, label: packaging.name })),
-    [packagings]
-  );
+  const packagingOptions = packagings?.map((packaging) => ({
+    value: packaging.id,
+    label: packaging.name,
+  }));
 
   const onSubmitForm = (values) => {
     onSubmit({ ...values });
@@ -144,9 +127,8 @@ export default function PricingForm({ onSubmit, initials, viewOnly, buttonText }
                       name="shipment_route"
                       title="Shipment Route"
                       options={shipmentRouteOptions}
-                      value={useMemoized(
-                        shipmentRouteOptions?.find((item) => item.value === values.shipment_route),
-                        [shipmentRouteOptions, values.shipment_route]
+                      value={shipmentRouteOptions?.find(
+                        (item) => item.value === values.shipment_route
                       )}
                       required
                       placeholder="Select Shipment By"
@@ -169,10 +151,7 @@ export default function PricingForm({ onSubmit, initials, viewOnly, buttonText }
                       name="package_id "
                       title="Shipment Packaging"
                       options={packagingOptions}
-                      value={useMemoized(
-                        packagingOptions?.find((item) => item.value === values.package_id),
-                        [packagingOptions, values.package_id]
-                      )}
+                      value={packagingOptions?.find((item) => item.value === values.package_id)}
                       required
                       placeholder="Select Shipment Packaging"
                       onValueChange={(package_id) => {
@@ -192,10 +171,7 @@ export default function PricingForm({ onSubmit, initials, viewOnly, buttonText }
                       required
                       placeholder="Select Country"
                       options={countriesOptions}
-                      value={useMemoized(
-                        countriesOptions?.find((item) => item.value === values.sender_country),
-                        [countriesOptions, values.sender_country]
-                      )}
+                      value={countriesOptions?.find((item) => item.value === values.sender_country)}
                       onValueChange={async (value) => {
                         setFieldTouched('sender_country', true);
                         setFieldValue('sender_country', value.value);
@@ -216,9 +192,8 @@ export default function PricingForm({ onSubmit, initials, viewOnly, buttonText }
                       required
                       placeholder="Select Country"
                       options={countriesOptions}
-                      value={useMemoized(
-                        countriesOptions?.find((item) => item.value === values.receiver_country),
-                        [countriesOptions, values.receiver_country]
+                      value={countriesOptions?.find(
+                        (item) => item.value === values.receiver_country
                       )}
                       onValueChange={async (value) => {
                         setFieldTouched('receiver_country', true);
@@ -241,10 +216,7 @@ export default function PricingForm({ onSubmit, initials, viewOnly, buttonText }
                       placeholder="Select State"
                       options={senderStateOptions}
                       value={
-                        useMemoized(
-                          senderStateOptions?.find((item) => item.value === values.sender_state),
-                          [senderStateOptions, values.sender_state]
-                        ) || ''
+                        senderStateOptions?.find((item) => item.value === values.sender_state) || ''
                       }
                       onValueChange={async (value) => {
                         setFieldTouched('sender_state', true);
@@ -265,11 +237,8 @@ export default function PricingForm({ onSubmit, initials, viewOnly, buttonText }
                       placeholder="Select State"
                       options={receiverStateOptions}
                       value={
-                        useMemoized(
-                          receiverStateOptions?.find(
-                            (item) => item.value === values.receiver_state
-                          ),
-                          [receiverStateOptions, values.receiver_state]
+                        receiverStateOptions?.find(
+                          (item) => item.value === values.receiver_state
                         ) || ''
                       }
                       onValueChange={async (value) => {
@@ -291,10 +260,7 @@ export default function PricingForm({ onSubmit, initials, viewOnly, buttonText }
                       placeholder="Select City"
                       options={senderCityOptions}
                       value={
-                        useMemoized(
-                          senderCityOptions?.find((item) => item.value === values.from_city_id),
-                          [senderCityOptions, values.from_city_id]
-                        ) || ''
+                        senderCityOptions?.find((item) => item.value === values.from_city_id) || ''
                       }
                       onValueChange={(value) => {
                         setFieldTouched('from_city_id', true);
@@ -314,10 +280,7 @@ export default function PricingForm({ onSubmit, initials, viewOnly, buttonText }
                       placeholder="Select City"
                       options={receiverCityOptions}
                       value={
-                        useMemoized(
-                          receiverCityOptions?.find((item) => item.value === values.to_city_id),
-                          [receiverCityOptions, values.to_city_id]
-                        ) || ''
+                        receiverCityOptions?.find((item) => item.value === values.to_city_id) || ''
                       }
                       onValueChange={(value) => {
                         setFieldTouched('to_city_id', true);
@@ -346,10 +309,7 @@ export default function PricingForm({ onSubmit, initials, viewOnly, buttonText }
                       name="is_fixed"
                       title="Price Type"
                       options={priceVariationOptions}
-                      value={useMemoized(
-                        priceVariationOptions?.find((item) => item.value === values.is_fixed),
-                        [priceVariationOptions, values.is_fixed]
-                      )}
+                      value={priceVariationOptions?.find((item) => item.value === values.is_fixed)}
                       required
                       placeholder="Select is price fixed"
                       onValueChange={async (is_fixed) => {

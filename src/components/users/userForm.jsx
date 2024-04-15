@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Formik } from 'formik';
 import ErrorMsg from '../error-msg';
 import { Box, Button, Card, Typography } from '@mui/material';
@@ -15,21 +15,18 @@ import {
 } from 'src/utils';
 import toast from 'react-hot-toast';
 import _ from 'lodash';
-import useMemoized from 'src/hooks/useMemoized';
 import { MuiTelInput } from 'mui-tel-input';
 
 export default function UserForm({ onSubmit, initials, viewOnly, buttonText }) {
   const [initialValues, setInitialValues] = useState({ ...initials });
   const [checkedPermissions, setCheckedPermissions] = useState({});
   const { data: userRoles, loading, error } = useQuery(ENDPOINTS.USER_ROLES);
-  const { data: countries, loading: cntLoading, error: cntError } = useQuery(ENDPOINTS.COUNTRIES);
-  const [getRolePermissions, { data: role, loading: rpLoading, error: rpError }] = useLazyQuery(
-    ENDPOINTS.USER_ROLES
-  );
+  const { data: countries, error: cntError } = useQuery(ENDPOINTS.COUNTRIES);
+  const [getRolePermissions, { data: role, error: rpError }] = useLazyQuery(ENDPOINTS.USER_ROLES);
   const [fetchCountryStates, { data: states, error: stError }] = useLazyQuery(ENDPOINTS.COUNTRIES);
   const [fetchStateCities, { data: cities, error: citiesError }] = useLazyQuery(ENDPOINTS.STATES);
-  const [fetchCity, { data: city, error: cityError }] = useLazyQuery(ENDPOINTS.CITIES);
-  const [fetchState, { data: state, error: stateError }] = useLazyQuery(ENDPOINTS.STATES);
+  const [fetchCity, { error: cityError }] = useLazyQuery(ENDPOINTS.CITIES);
+  const [fetchState, { error: stateError }] = useLazyQuery(ENDPOINTS.STATES);
 
   const userRoleOptions = userRoles?.map((role) => ({ value: role.id, label: role.name }));
   const countriesOptions = countries?.map((country) => ({
@@ -255,10 +252,7 @@ export default function UserForm({ onSubmit, initials, viewOnly, buttonText }) {
                     required
                     placeholder="Select Country"
                     options={countriesOptions}
-                    value={useMemoized(
-                      countriesOptions?.find((item) => item.value === values.country),
-                      [countriesOptions, values.country]
-                    )}
+                    value={countriesOptions?.find((item) => item.value === values.country)}
                     onValueChange={async (value) => {
                       setFieldTouched('country', true);
                       setFieldValue('country', value.value);
@@ -277,12 +271,7 @@ export default function UserForm({ onSubmit, initials, viewOnly, buttonText }) {
                     required
                     placeholder="Select State"
                     options={stateOptions}
-                    value={
-                      useMemoized(
-                        stateOptions?.find((item) => item.value === values.state),
-                        [stateOptions, values.state]
-                      ) || ''
-                    }
+                    value={stateOptions?.find((item) => item.value === values.state) || ''}
                     onValueChange={async (value) => {
                       setFieldTouched('state', true);
                       setFieldValue('state', value.value);
@@ -300,12 +289,7 @@ export default function UserForm({ onSubmit, initials, viewOnly, buttonText }) {
                     required
                     placeholder="Select City"
                     options={cityOptions}
-                    value={
-                      useMemoized(
-                        cityOptions?.find((item) => item.value === values.city),
-                        [cityOptions, values.city]
-                      ) || ''
-                    }
+                    value={cityOptions?.find((item) => item.value === values.city) || ''}
                     onValueChange={(value) => {
                       setFieldTouched('city', true);
                       setFieldValue('city', value.value);
@@ -319,10 +303,7 @@ export default function UserForm({ onSubmit, initials, viewOnly, buttonText }) {
                     name="userRole"
                     title="User Role"
                     required
-                    value={useMemoized(
-                      userRoleOptions?.find((item) => item.value === values.userRole),
-                      [userRoleOptions, values.userRole]
-                    )}
+                    value={userRoleOptions?.find((item) => item.value === values.userRole)}
                     options={userRoleOptions}
                     placeholder="Select User Role"
                     onValueChange={async (role) => {

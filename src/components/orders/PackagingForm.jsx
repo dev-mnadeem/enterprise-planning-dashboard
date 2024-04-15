@@ -4,20 +4,15 @@ import ErrorMsg from '../error-msg';
 import { Box, Button, Card, Divider, Typography } from '@mui/material';
 import { CustomDropdown, InputField } from '../common';
 import { SHIPMENT_ROUTE, createPackagingSchema } from 'src/constants';
-import _ from 'lodash';
 import NumberField from '../common/Input/NumberField';
 import Iconify from '../iconify/iconify';
 import { ADD_PACKAGING_INITIALS } from 'src/sections/packaging/utils';
-import useMemoized from 'src/hooks/useMemoized';
 
 export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText }) {
-  const [initialValues, setInitialValues] = useState({ ...initials });
+  const [initialValues] = useState({ ...initials });
   const { AIR, SEA, ROAD } = SHIPMENT_ROUTE;
 
-  const shipmentByOptions = useMemoized(
-    [AIR, SEA, ROAD].map((type) => ({ value: type, label: type })),
-    []
-  );
+  const shipmentByOptions = [AIR, SEA, ROAD].map((type) => ({ value: type, label: type }));
 
   const onSubmitForm = (values) => {
     onSubmit({ ...values });
@@ -71,10 +66,7 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                       name="route"
                       title="Shipment Route"
                       options={shipmentByOptions}
-                      value={useMemoized(
-                        shipmentByOptions?.find((item) => item.value === values.route),
-                        [shipmentByOptions, values.route]
-                      )}
+                      value={shipmentByOptions?.find((item) => item.value === values.route)}
                       required
                       placeholder="Select Shipment By"
                       onValueChange={(route) => {

@@ -15,23 +15,15 @@ import {
   Typography,
 } from '@mui/material';
 import { CustomDropdown, InputField } from '../common';
-import {
-  NUMBER_FORMATS,
-  SHIPMENT_ROUTE,
-  SHIPMENT_TYPE,
-  createOrderSchema,
-  customNumberFormat,
-} from 'src/constants';
+import { SHIPMENT_ROUTE, SHIPMENT_TYPE, createOrderSchema } from 'src/constants';
 import { useLazyQuery, useQuery } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import toast from 'react-hot-toast';
-import _ from 'lodash';
 import { MuiTelInput, matchIsValidTel } from 'mui-tel-input';
 import { PersonSearch } from '@mui/icons-material';
 import Iconify from '../iconify/iconify';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
-import useMemoized from 'src/hooks/useMemoized';
 import { ADD_ORDER_INITIALS } from 'src/sections/orders/utils';
 import { useAppSelector } from 'src/state/hooks';
 import NumberField from '../common/Input/NumberField';
@@ -39,12 +31,12 @@ import { calculateRemainingWeightLimit, sumSafely } from 'src/utils';
 
 export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) {
   const { user } = useAppSelector((state) => state.userReducer);
-  const [initialValues, setInitialValues] = useState({ ...initials });
+  const [initialValues] = useState({ ...initials });
   const { AIR, SEA, ROAD } = SHIPMENT_ROUTE;
   const { DOMESTIC, INTERNATIONAL } = SHIPMENT_TYPE;
 
   const [searchUser] = useLazyQuery(ENDPOINTS.USERS);
-  const { data: countries, loading: cntLoading, error: cntError } = useQuery(ENDPOINTS.COUNTRIES);
+  const { data: countries, error: cntError } = useQuery(ENDPOINTS.COUNTRIES);
   const [senderCountryStates, { data: senderStates }] = useLazyQuery(ENDPOINTS.COUNTRIES);
   const [receiverCountryStates, { data: receiverStates }] = useLazyQuery(ENDPOINTS.COUNTRIES);
   const [senderStateCities, { data: senderCities }] = useLazyQuery(ENDPOINTS.STATES);
@@ -52,56 +44,32 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
   const [getRoutePackagings, { data: packagings }] = useLazyQuery(ENDPOINTS.PACKAGINGS);
   const [getShipmentPricing, { data: shipmentPricing }] = useLazyQuery(ENDPOINTS.PRICING);
 
-  const [getRolePermissions, { data: role, loading: rpLoading, error: rpError }] = useLazyQuery(
-    ENDPOINTS.USER_ROLES
-  );
-
-  const countriesOptions = useMemoized(
-    countries?.map((country) => ({ value: country.id, label: country.name })),
-    [countries]
-  );
-  const senderStateOptions = useMemoized(
-    senderStates?.map((state) => ({ value: state.id, label: state.name })),
-    [senderStates]
-  );
-  const receiverStateOptions = useMemoized(
-    receiverStates?.map((state) => ({ value: state.id, label: state.name })),
-    [receiverStates]
-  );
-  const senderCityOptions = useMemoized(
-    senderCities?.map((city) => ({ value: city.id, label: city.name })),
-    [senderCities]
-  );
-  const receiverCityOptions = useMemoized(
-    receiverCities?.map((city) => ({ value: city.id, label: city.name })),
-    [receiverCities]
-  );
-  const branchesOptions = useMemoized(
-    user?.locations?.map((location) => ({ value: location.id, label: location.name })),
-    [user?.locations]
-  );
-  const courierTypeOptions = useMemoized(
-    ['Standard', 'Express'].map((type) => ({ value: type, label: type })),
-    []
-  );
-  const paymentTypeOptions = useMemoized(
-    ['Cash', 'Credit Card'].map((type) => ({ value: type, label: type })),
-    []
-  );
-  const packagingOptions = useMemoized(
-    packagings?.map((packaging) => ({ value: packaging.id, label: packaging.name })),
-    [packagings]
-  );
+  const countriesOptions = countries?.map((country) => ({
+    value: country.id,
+    label: country.name,
+  }));
+  const senderStateOptions = senderStates?.map((state) => ({ value: state.id, label: state.name }));
+  const receiverStateOptions = receiverStates?.map((state) => ({
+    value: state.id,
+    label: state.name,
+  }));
+  const senderCityOptions = senderCities?.map((city) => ({ value: city.id, label: city.name }));
+  const receiverCityOptions = receiverCities?.map((city) => ({ value: city.id, label: city.name }));
+  const branchesOptions = user?.locations?.map((location) => ({
+    value: location.id,
+    label: location.name,
+  }));
+  const courierTypeOptions = ['Standard', 'Express'].map((type) => ({ value: type, label: type }));
+  const paymentTypeOptions = ['Cash', 'Credit Card'].map((type) => ({ value: type, label: type }));
+  const packagingOptions = packagings?.map((packaging) => ({
+    value: packaging.id,
+    label: packaging.name,
+  }));
 
   const shipmentRouteOptions = (type = '') =>
-    useMemoized(
-      [type === DOMESTIC ? [ROAD] : [SEA, AIR]]
-        .flat()
-        .map((type) => ({ value: type, label: type })),
-      [type]
-    );
+    [type === DOMESTIC ? [ROAD] : [SEA, AIR]].flat().map((type) => ({ value: type, label: type }));
 
-  if (rpError || cntError) return <div>Something went wrong</div>;
+  if (cntError) return <div>Something went wrong</div>;
 
   /** FIXED PAGE SCROLLING TOP ON API CALL, NEED TO OPTIMIZE IT */
   document.activeElement.scrollIntoView({ block: 'center' });
@@ -144,7 +112,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
     if (matchIsValidTel(phoneNo)) {
       const res = await searchUser({ phoneNumber: phoneNo });
       if (res?.results?.length) {
-        const { email, name, address } = res?.results[0];
+        const { email, name, address } = res.results[0];
         email && setFieldValue(`${fieldKey}_email`, email);
         name && setFieldValue(`${fieldKey}_name`, name);
         address && setFieldValue(`${fieldKey}_address`, address);
@@ -190,17 +158,11 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
         const isInternationalShipment = values?.type == INTERNATIONAL;
 
         /** IN INTERNATIONAL SHIPMENT, SENDER AND RECEIVER COUNTRY CANNOT BE SAME */
-        const receiverCountryOptions = useMemoized(
-          countriesOptions?.filter((option) =>
-            isInternationalShipment ? option.value !== values?.sender_country : true
-          ),
-          [countriesOptions, values?.sender_country, isInternationalShipment]
+        const receiverCountryOptions = countriesOptions?.filter((option) =>
+          isInternationalShipment ? option.value !== values?.sender_country : true
         );
-        const senderCountryOptions = useMemoized(
-          countriesOptions?.filter((option) =>
-            isInternationalShipment ? option.value !== values?.receiver_country : true
-          ),
-          [countriesOptions, values?.receiver_country, isInternationalShipment]
+        const senderCountryOptions = countriesOptions?.filter((option) =>
+          isInternationalShipment ? option.value !== values?.receiver_country : true
         );
 
         useEffect(() => {
@@ -346,12 +308,11 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       name="shipment_route"
                       title="Shipment Route"
                       options={shipmentRouteOptions(values?.type)}
-                      value={useMemoized(
+                      value={
                         shipmentRouteOptions(values?.type)?.find(
                           (item) => item.value === values.shipment_route
-                        ) || null,
-                        [values?.type, values.shipment_route]
-                      )}
+                        ) || null
+                      }
                       required
                       placeholder="Select Shipment Route"
                       onValueChange={async (shipment_route) => {
@@ -372,10 +333,9 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       name="package_id "
                       title="Shipment Packaging"
                       options={packagingOptions}
-                      value={useMemoized(
-                        packagingOptions?.find((item) => item.value === values.package_id) || null,
-                        [packagingOptions, values.package_id]
-                      )}
+                      value={
+                        packagingOptions?.find((item) => item.value === values.package_id) || null
+                      }
                       required
                       placeholder="Select Shipment Packaging"
                       onValueChange={async (package_id) => {
@@ -396,10 +356,9 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       required
                       placeholder="Select Branch"
                       options={branchesOptions}
-                      value={useMemoized(
-                        branchesOptions?.find((item) => item.value === values.location_id) || null,
-                        [branchesOptions, values.location_id]
-                      )}
+                      value={
+                        branchesOptions?.find((item) => item.value === values.location_id) || null
+                      }
                       onValueChange={async (value) => {
                         await setFieldTouched('location_id', true);
                         await setFieldValue('location_id', value.value);
@@ -622,11 +581,10 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       required
                       placeholder="Select Country"
                       options={senderCountryOptions}
-                      value={useMemoized(
+                      value={
                         countriesOptions?.find((item) => item.value === values.sender_country) ||
-                          null,
-                        [countriesOptions, values.sender_country]
-                      )}
+                        null
+                      }
                       onValueChange={async (value) => {
                         setFieldTouched('sender_country', true);
                         setFieldValue('sender_country', value.value);
@@ -648,11 +606,10 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       required
                       placeholder="Select Country"
                       options={receiverCountryOptions}
-                      value={useMemoized(
+                      value={
                         countriesOptions?.find((item) => item.value === values.receiver_country) ||
-                          null,
-                        [countriesOptions, values.receiver_country]
-                      )}
+                        null
+                      }
                       onValueChange={async (value) => {
                         setFieldTouched('receiver_country', true);
                         setFieldValue('receiver_country', value.value);
@@ -675,11 +632,9 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       placeholder="Select State"
                       options={senderStateOptions}
                       value={
-                        useMemoized(
-                          senderStateOptions?.find((item) => item.value === values.sender_state) ||
-                            null,
-                          [senderStateOptions, values.sender_state]
-                        ) || ''
+                        senderStateOptions?.find((item) => item.value === values.sender_state) ||
+                        null ||
+                        ''
                       }
                       onValueChange={async (value) => {
                         setFieldTouched('sender_state', true);
@@ -701,12 +656,11 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       placeholder="Select State"
                       options={receiverStateOptions}
                       value={
-                        useMemoized(
-                          receiverStateOptions?.find(
-                            (item) => item.value === values.receiver_state
-                          ) || null,
-                          [receiverStateOptions, values.receiver_state]
-                        ) || ''
+                        receiverStateOptions?.find(
+                          (item) => item.value === values.receiver_state
+                        ) ||
+                        null ||
+                        ''
                       }
                       onValueChange={async (value) => {
                         setFieldTouched('receiver_state', true);
@@ -728,11 +682,9 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       placeholder="Select City"
                       options={senderCityOptions}
                       value={
-                        useMemoized(
-                          senderCityOptions?.find((item) => item.value === values.sender_city_id) ||
-                            null,
-                          [senderCityOptions, values.sender_city_id]
-                        ) || ''
+                        senderCityOptions?.find((item) => item.value === values.sender_city_id) ||
+                        null ||
+                        ''
                       }
                       onValueChange={async (value) => {
                         setFieldTouched('sender_city_id', true);
@@ -752,12 +704,11 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       placeholder="Select City"
                       options={receiverCityOptions}
                       value={
-                        useMemoized(
-                          receiverCityOptions?.find(
-                            (item) => item.value === values.receiver_city_id
-                          ) || null,
-                          [receiverCityOptions, values.receiver_city_id]
-                        ) || ''
+                        receiverCityOptions?.find(
+                          (item) => item.value === values.receiver_city_id
+                        ) ||
+                        null ||
+                        ''
                       }
                       onValueChange={async (value) => {
                         setFieldTouched('receiver_city_id', true);
@@ -774,11 +725,10 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       name="courier_type "
                       title="Courier Type"
                       options={courierTypeOptions}
-                      value={useMemoized(
+                      value={
                         courierTypeOptions?.find((item) => item.value === values.courier_type) ||
-                          null,
-                        [courierTypeOptions, values.courier_type]
-                      )}
+                        null
+                      }
                       required
                       placeholder="Select Courier Type"
                       onValueChange={(courier_type) => {
@@ -796,11 +746,10 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       name="payment_type "
                       title="Payment Type"
                       options={paymentTypeOptions}
-                      value={useMemoized(
+                      value={
                         paymentTypeOptions?.find((item) => item.value === values.payment_type) ||
-                          null,
-                        [paymentTypeOptions, values.payment_type]
-                      )}
+                        null
+                      }
                       required
                       placeholder="Select Payment Type"
                       onValueChange={async (payment_type) => {
@@ -961,7 +910,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       disabled={!!shipmentPricing?.[0]?.price}
                       isCustomOnChange={true}
                       onChange={(e) => {
-                        if (!!shipmentPricing?.[0]?.price) return;
+                        if (shipmentPricing?.[0]?.price) return;
                         setFieldTouched(`sub_total`, true);
                         setFieldValue(`sub_total`, e.target.value);
                       }}
@@ -969,7 +918,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                     {touched.sub_total && errors?.sub_total && (
                       <ErrorMsg error={errors.sub_total} />
                     )}
-                    {!!!shipmentPricing?.[0]?.price && (
+                    {!shipmentPricing?.[0]?.price && (
                       <Typography className="text-xs italic">
                         Price list not found for that shipment route. You can add price.
                       </Typography>

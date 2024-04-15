@@ -4,26 +4,24 @@ import ErrorMsg from '../error-msg';
 import { Box, Button, Card, Divider } from '@mui/material';
 import { CustomDropdown, InputField } from '../common';
 import { createVehicleSchema } from 'src/constants';
-import _ from 'lodash';
 import Iconify from '../iconify/iconify';
-import useMemoized from 'src/hooks/useMemoized';
 import { ADD_VEHICLE_INITIALS } from 'src/sections/vehicles/utils';
 import { useQuery } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
 
 export default function VehicleForm({ onSubmit, initials, viewOnly, buttonText }) {
-  const [initialValues, setInitialValues] = useState({ ...initials });
+  const [initialValues] = useState({ ...initials });
   const { data: drivers } = useQuery(`${ENDPOINTS.USERS}?role=driver`);
   const { data: vehicleTypes } = useQuery(ENDPOINTS.VEHICLE_TYPES);
 
-  const driversOptions = useMemoized(
-    drivers?.results?.map((driver) => ({ value: driver.id, label: driver.name })),
-    [drivers]
-  );
-  const vehicleTypesOptions = useMemoized(
-    vehicleTypes?.map((vehicleType) => ({ value: vehicleType.id, label: vehicleType.name })),
-    [vehicleTypes]
-  );
+  const driversOptions = drivers?.results?.map((driver) => ({
+    value: driver.id,
+    label: driver.name,
+  }));
+  const vehicleTypesOptions = vehicleTypes?.map((vehicleType) => ({
+    value: vehicleType.id,
+    label: vehicleType.name,
+  }));
   const vehicleStatusOptions = [
     { value: true, label: 'Active' },
     { value: false, label: 'Inactive' },
@@ -99,10 +97,7 @@ export default function VehicleForm({ onSubmit, initials, viewOnly, buttonText }
                     name="driver_id"
                     title="Select Vehicle Driver"
                     options={driversOptions}
-                    value={useMemoized(
-                      driversOptions?.find((item) => item.value === values.driver_id),
-                      [driversOptions, values.driver_id]
-                    )}
+                    value={driversOptions?.find((item) => item.value === values.driver_id)}
                     required
                     placeholder="Select Driver"
                     onValueChange={(driver_id) => {
@@ -118,9 +113,8 @@ export default function VehicleForm({ onSubmit, initials, viewOnly, buttonText }
                     name="vehicle_type_id"
                     title="Vehicle Type"
                     options={vehicleTypesOptions}
-                    value={useMemoized(
-                      vehicleTypesOptions?.find((item) => item.value === values.vehicle_type_id),
-                      [vehicleTypesOptions, values.vehicle_type_id]
+                    value={vehicleTypesOptions?.find(
+                      (item) => item.value === values.vehicle_type_id
                     )}
                     required
                     placeholder="Select Vehicle Type"
