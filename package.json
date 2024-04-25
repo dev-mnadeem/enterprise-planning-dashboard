@@ -4,6 +4,9 @@
   "licence": "MIT",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=v20.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "start": "vite preview",
