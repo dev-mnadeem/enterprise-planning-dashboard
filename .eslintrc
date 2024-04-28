@@ -10,8 +10,8 @@
     "prettier"
   ],
   "extends": [
-    "airbnb",
-    "airbnb/hooks",
+    // "airbnb",
+    // "airbnb/hooks",
     "prettier"
   ],
   "parserOptions": {
