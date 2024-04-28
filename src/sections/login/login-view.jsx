@@ -19,29 +19,58 @@ import { bgGradient } from 'src/theme/css';
 
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
+import { useFormik } from 'formik';
 
 // ----------------------------------------------------------------------
 
 export default function LoginView() {
   const theme = useTheme();
-
   const router = useRouter();
-
   const [showPassword, setShowPassword] = useState(false);
+
+  const { values, errors, handleChange, handleSubmit } = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    onSubmit: async () =>
+      // await loginUser({
+      //   variables: {
+      //     input: {
+      //       username: values.email,
+      //       password: values.password,
+      //     },
+      //   },
+      // }),
+      console.log(values.email, values.password),
+  });
 
   const handleClick = () => {
     router.push('/dashboard');
   };
 
   const renderForm = (
-    <>
+    <Box component="form" onSubmit={handleSubmit}>
       <Stack spacing={3}>
-        <TextField name="email" label="Email address" />
+        <TextField
+          name="email"
+          label="Email address"
+          fullWidth
+          margin="dense"
+          value={values.email}
+          onChange={handleChange}
+          error={!!errors.email}
+          helperText={errors.email}
+        />
 
         <TextField
           name="password"
           label="Password"
           type={showPassword ? 'text' : 'password'}
+          value={values.password}
+          onChange={handleChange}
+          error={!!errors.password}
+          helperText={errors.password}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -66,31 +95,24 @@ export default function LoginView() {
         type="submit"
         variant="contained"
         color="inherit"
-        onClick={handleClick}
+        // onClick={handleClick}
       >
         Login
       </LoadingButton>
-    </>
+    </Box>
   );
 
   return (
     <Box
       sx={{
-        ...bgGradient({
-          color: alpha(theme.palette.background.default, 0.9),
-          imgUrl: '/assets/background/overlay_4.jpg',
-        }),
+        backgroundImage: 'url(/assets/background/adinkra-cover.png)',
+        boxShadow: 'inset 0 0 0 2000px rgb(0 0 0 / 20%)',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: '0% 0%',
+        backgroundSize: '100% 100%',
         height: 1,
       }}
     >
-      <Logo
-        sx={{
-          position: 'fixed',
-          top: { xs: 16, md: 24 },
-          left: { xs: 16, md: 24 },
-        }}
-      />
-
       <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
         <Card
           sx={{
@@ -99,54 +121,27 @@ export default function LoginView() {
             maxWidth: 420,
           }}
         >
-          <Typography variant="h4">Sign in to Adinkra</Typography>
-
-          <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
-            Don’t have an account?
-            <Link variant="subtitle2" sx={{ ml: 0.5 }}>
-              Get started
-            </Link>
+          <Typography variant="h4">
+            <Logo
+              sx={{
+                display: 'block',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+              }}
+            />
           </Typography>
 
-          <Stack direction="row" spacing={2}>
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:google-fill" color="#DF3E30" />
-            </Button>
-
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:facebook-fill" color="#1877F2" />
-            </Button>
-
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:twitter-fill" color="#1C9CEA" />
-            </Button>
-          </Stack>
-
           <Divider sx={{ my: 3 }}>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              OR
+            <Typography variant="body2" sx={{ mt: 2, mb: 4, color: 'text.primary' }}>
+              Login to Your Account
             </Typography>
           </Divider>
 
           {renderForm}
+
+          <Typography variant="body2" sx={{ mt: 2, mb: 0, textAlign: 'center' }}>
+            <Link variant="subtitle2">Register as a Customer</Link>
+          </Typography>
         </Card>
       </Stack>
     </Box>
