@@ -12,8 +12,8 @@ export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 // ----------------------------------------------------------------------
 
-export default function Router() {
-  const routes = useRoutes([
+const AdminRoutes = (props) => {
+  return useRoutes([
     {
       element: (
         <DashboardLayout>
@@ -42,6 +42,6 @@ export default function Router() {
       element: <Navigate to="/404" replace />,
     },
   ]);
+};
 
-  return routes;
-}
+export default AdminRoutes;
