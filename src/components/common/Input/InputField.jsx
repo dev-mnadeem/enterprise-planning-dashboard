@@ -1,6 +1,9 @@
-import { Box, Typography, TextField, TextFieldProps } from '@mui/material';
+import { useFormikContext } from 'formik';
+import { Box, Typography, TextField } from '@mui/material';
 
 export const InputField = (props) => {
+  const context = useFormikContext();
+
   return (
     <Box>
       <Box className="flex justify-between items-center">
