@@ -8,6 +8,9 @@ export const BlogPage = lazy(() => import('src/pages/blog'));
 export const UserPage = lazy(() => import('src/pages/user'));
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
+export const LocationPage = lazy(() => import('src/pages/locations'));
+export const AddLocationPage = lazy(() => import('src/pages/add-location'));
+export const EditLocationPage = lazy(() => import('src/pages/edit-location'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 // ----------------------------------------------------------------------
@@ -25,6 +28,9 @@ const AdminRoutes = (props) => {
       children: [
         { element: <IndexPage />, index: true },
         { path: 'user', element: <UserPage /> },
+        { path: 'locations', element: <LocationPage /> },
+        { path: 'locations/add', element: <AddLocationPage /> },
+        { path: 'locations/:id', element: <EditLocationPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
       ],
