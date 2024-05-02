@@ -6,11 +6,17 @@ import Box from '@mui/material/Box';
 import Nav from './nav';
 import Main from './main';
 import Header from './header';
+import { useAppSelector } from 'src/state/hooks';
+import { useNavigate } from 'react-router-dom';
 
 // ----------------------------------------------------------------------
 
 export default function DashboardLayout({ children }) {
   const [openNav, setOpenNav] = useState(false);
+  const navigate = useNavigate();
+  const { userSession } = useAppSelector((state) => state.userReducer);
+
+  if (!userSession?.token) navigate('/login');
 
   return (
     <>
