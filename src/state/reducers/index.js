@@ -1,7 +1,9 @@
+import userReducer from './userReducer';
 import locationReducer from './locationReducer';
 import { combineReducers, createAction } from '@reduxjs/toolkit';
 
 const applicationReducer = combineReducers({
+  userReducer: userReducer,
   locationReducer: locationReducer,
 });
 
