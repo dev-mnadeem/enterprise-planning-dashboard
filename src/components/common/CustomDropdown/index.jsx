@@ -52,7 +52,7 @@ const CustomDropdown = (props) => {
           clearIndicator: (provided) => ({
             ...provided,
             padding: '0px',
-            color: colors.Mischka,
+            color: colors.indigo,
           }),
 
           placeholder: (provided) => ({
