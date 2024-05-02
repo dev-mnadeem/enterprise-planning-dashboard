@@ -42,6 +42,8 @@ export default function LoginView() {
       //     },
       //   },
       // }),
+
+      // after user logged in store the user accessToken and refreshToken in Redux "userSession"
       console.log(values.email, values.password),
   });
 
