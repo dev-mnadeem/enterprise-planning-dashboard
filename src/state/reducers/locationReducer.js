@@ -33,8 +33,6 @@ export const locationSlice = createSlice({
         }
       });
 
-      console.log('tempLocations', tempLocations);
-
       return {
         ...state,
         locations: tempLocations,
