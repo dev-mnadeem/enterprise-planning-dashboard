@@ -20,13 +20,21 @@ import { bgGradient } from 'src/theme/css';
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
 import { useFormik } from 'formik';
+import { useMutation } from 'src/api';
+import { ENDPOINTS } from 'src/api/Endpoints';
+import { useAppDispatch, useAppSelector } from 'src/state/hooks';
+import { storeUserSession } from 'src/state/reducers/userReducer';
+import { useEffect } from 'react';
 
 // ----------------------------------------------------------------------
 
 export default function LoginView() {
   const theme = useTheme();
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = useState(false);
+  const { userSession } = useAppSelector((state) => state.userReducer);
+  const [mutate, { data, loading, error }] = useMutation(ENDPOINTS.LOGIN);
 
   const { values, errors, handleChange, handleSubmit } = useFormik({
     initialValues: {
@@ -34,22 +42,30 @@ export default function LoginView() {
       password: '',
     },
     onSubmit: async () =>
-      // await loginUser({
-      //   variables: {
-      //     input: {
-      //       username: values.email,
-      //       password: values.password,
-      //     },
-      //   },
-      // }),
-
-      // after user logged in store the user accessToken and refreshToken in Redux "userSession"
-      console.log(values.email, values.password),
+      mutate({
+        email: values.email,
+        password: values.password,
+      }),
   });
 
-  const handleClick = () => {
-    router.push('/dashboard');
-  };
+  if (loading) console.log('loading:', loading);
+  if (error) console.log('error:', error);
+
+  useEffect(() => {
+    if (userSession) {
+      router.replace('/');
+    }
+
+    if (data?.token) {
+      dispatch(
+        storeUserSession({
+          token: data?.token,
+          ...values,
+        })
+      );
+      router.replace('/');
+    }
+  }, [data?.token]);
 
   const renderForm = (
     <Box component="form" onSubmit={handleSubmit}>
@@ -134,7 +150,7 @@ export default function LoginView() {
           </Typography>
 
           <Divider sx={{ my: 3 }}>
-            <Typography variant="body2" sx={{ mt: 2, mb: 4, color: 'text.primary' }}>
+            <Typography variant="h6" sx={{ mt: 2, mb: 4, color: 'text.primary' }}>
               Login to Your Account
             </Typography>
           </Divider>

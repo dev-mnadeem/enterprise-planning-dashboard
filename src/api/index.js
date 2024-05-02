@@ -4,7 +4,7 @@ import axios, { isAxiosError } from 'axios';
 import { networkErrorHandler } from 'src/utils/networkErrorHandler';
 import { store } from 'src/state/store';
 
-axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 const interceptedAxios = axios.create();
 const nonIntercepted = axios.create();
@@ -20,7 +20,7 @@ interceptedAxios.interceptors.request.use(
     // change the token format if it is changed and also get refreshToken from redux
 
     if (accessToken?.length) {
-      if (moment(expiry).isBefore(moment().add(1, 'minute'))) {
+      if (moment(new Date()).isBefore(moment().add(1, 'minute'))) {
         // Get updated Token here and add the updated token to the headers
         // waiting for the backend service
       } else {

@@ -11,6 +11,18 @@ const navConfig = [
     title: 'dashboard',
     path: '/',
     icon: icon('ic_analytics'),
+    menuItems: [
+      {
+        title: 'Access Control',
+        path: '/user',
+        icon: icon('ic_user'),
+      },
+      {
+        title: 'Shipments',
+        path: '/#',
+        icon: icon('ic_cart'),
+      },
+    ],
   },
   {
     title: 'Access Control',
