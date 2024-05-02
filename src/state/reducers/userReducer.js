@@ -13,7 +13,7 @@ export const userSlice = createSlice({
       return { ...state, user: action.payload };
     },
 
-    storeUserSession: (state) => {
+    storeUserSession: (state, action) => {
       return { ...state, userSession: action.payload };
     },
     updateUser: (state, action) => {
