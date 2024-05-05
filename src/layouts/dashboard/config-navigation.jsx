@@ -1,4 +1,5 @@
 import SvgColor from 'src/components/svg-color';
+import { ROUTES } from 'src/constants';
 
 // ----------------------------------------------------------------------
 
@@ -14,7 +15,7 @@ const navConfig = [
     menuItems: [
       {
         title: 'Access Control',
-        path: '/user',
+        path: ROUTES.USERS,
         icon: icon('ic_user'),
       },
       {
@@ -26,7 +27,7 @@ const navConfig = [
   },
   {
     title: 'Access Control',
-    path: '/user',
+    path: ROUTES.USERS,
     icon: icon('ic_user'),
   },
   {

@@ -3,10 +3,6 @@ import { TableHeadData } from '../utils';
 import Iconify from 'src/components/iconify';
 import { useNavigate } from 'react-router-dom';
 import Scrollbar from 'src/components/scrollbar';
-import { useAppSelector } from 'src/state/hooks';
-import LocationTableRow from '../location-table-row';
-import LocationTableHead from '../location-table-head';
-import LocationTableToolbar from '../location-table-toolbar';
 import { applyFilter, emptyRows, getComparator } from 'src/utils/table';
 import {
   Card,
@@ -19,9 +15,18 @@ import {
   TableContainer,
   TablePagination,
 } from '@mui/material';
-import { TableEmptyRows, TableNoData } from 'src/components/common';
+import {
+  TableEmptyRows,
+  TableNoData,
+  TableSearchHead,
+  TableSortToolbar,
+} from 'src/components/common';
+import UsersTableRow from '../users-table-row';
+import { ENDPOINTS } from 'src/api/Endpoints';
+import { useQuery } from 'src/api';
+import { ROUTES } from 'src/constants';
 
-const LocationPage = () => {
+const UsersListPage = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
@@ -29,7 +34,10 @@ const LocationPage = () => {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const { locations } = useAppSelector((state) => state.locationReducer);
+  const { data: users, loading, error } = useQuery(ENDPOINTS.USERS);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error</div>;
 
   const handleFilterByName = (event) => {
     setPage(0);
@@ -44,18 +52,9 @@ const LocationPage = () => {
     }
   };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = users.map((n) => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
-
   const dataFiltered = applyFilter({
-    fieldToSearch: 'name',
-    inputData: locations,
+    fieldToSearch: 'username',
+    inputData: users,
     comparator: getComparator(order, orderBy),
     filterName,
   });
@@ -69,23 +68,23 @@ const LocationPage = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const notFound = !dataFiltered.length && !!filterName;
+  const notFound = !dataFiltered?.length && !!filterName;
 
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Locations</Typography>
+        <Typography variant="h4">Manage System Users</Typography>
         <Button
-          onClick={() => navigate('/locations/add')}
+          onClick={() => navigate(ROUTES.ADD_USER)}
           variant="contained"
           color="inherit"
           startIcon={<Iconify icon="eva:plus-fill" />}
         >
-          New Location
+          New User
         </Button>
       </Stack>
       <Card>
-        <LocationTableToolbar
+        <TableSortToolbar
           numSelected={selected.length}
           filterName={filterName}
           onFilterName={handleFilterByName}
@@ -93,36 +92,32 @@ const LocationPage = () => {
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
-              <LocationTableHead
+              <TableSearchHead
                 order={order}
                 orderBy={orderBy}
                 headLabel={TableHeadData}
                 onRequestSort={handleSort}
-                rowCount={locations.length}
-                numSelected={selected.length}
-                onSelectAllClick={handleSelectAllClick}
+                rowCount={users?.length}
               />
               <TableBody>
                 {dataFiltered
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
-                    <LocationTableRow
+                    <UsersTableRow
                       id={row.id}
                       key={row.id}
-                      name={row.name}
-                      city={row.city}
-                      status={row.status}
-                      country={row.country}
-                      address={row.address}
-                      locationType={row.locationType}
-                      selected={selected.indexOf(row.name) !== -1}
+                      username={row.username}
+                      role_id={row.role_id}
+                      email={row.email}
+                      branch={row.branch}
+                      mobile_number={row.mobile_number}
                       handleClick={(event) => handleClick(event, row.name)}
                     />
                   ))}
 
                 <TableEmptyRows
                   height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, locations.length)}
+                  emptyRows={emptyRows(page, rowsPerPage, users?.length)}
                 />
 
                 {notFound && <TableNoData query={filterName} />}
@@ -133,7 +128,7 @@ const LocationPage = () => {
         <TablePagination
           page={page}
           component="div"
-          count={locations.length}
+          count={users?.length || 0}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}
@@ -144,4 +139,4 @@ const LocationPage = () => {
   );
 };
 
-export default LocationPage;
+export default UsersListPage;
