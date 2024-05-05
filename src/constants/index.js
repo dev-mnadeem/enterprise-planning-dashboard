@@ -1,8 +1,15 @@
-export const ROLE_ADMIN = 'admin';
-export const ROLE_BRANCH_MANAGER = 'branchManager';
-export const ROLE_CUSTOMER = 'customer';
-export const ROLE_DRIVER = 'driver';
-export const ROLE_EMPLOYEE = 'employee';
+export const ROUTES = {
+  LOGIN: '/login',
+  USERS: '/users',
+  ADD_USER: '/users/add',
+};
 
-export * from './yupValidations/admin';
-export * from './yupValidations/common';
+export const USER_ROLE = {
+  ADMIN: 'admin',
+  BRANCH_MANAGER: 'branchManager',
+  CUSTOMER: 'customer',
+  DRIVER: 'driver',
+  EMPLOYEE: 'employee',
+};
+
+export * from './yupValidations';

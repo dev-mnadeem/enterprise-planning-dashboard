@@ -6,10 +6,8 @@ import Scrollbar from 'src/components/scrollbar';
 import { useAppSelector } from 'src/state/hooks';
 import LocationTableRow from '../location-table-row';
 import LocationTableHead from '../location-table-head';
-import TableNoData from 'src/sections/user/table-no-data';
 import LocationTableToolbar from '../location-table-toolbar';
-import TableEmptyRows from 'src/sections/user/table-empty-rows';
-import { applyFilter, emptyRows, getComparator } from 'src/sections/user/utils';
+import { applyFilter, emptyRows, getComparator } from 'src/utils/table';
 import {
   Card,
   Stack,
@@ -21,6 +19,7 @@ import {
   TableContainer,
   TablePagination,
 } from '@mui/material';
+import { TableEmptyRows, TableNoData } from 'src/components/common';
 
 const LocationPage = () => {
   const navigate = useNavigate();
@@ -55,6 +54,7 @@ const LocationPage = () => {
   };
 
   const dataFiltered = applyFilter({
+    fieldToSearch: 'name',
     inputData: locations,
     comparator: getComparator(order, orderBy),
     filterName,
