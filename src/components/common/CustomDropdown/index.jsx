@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, Typography, colors } from '@mui/material';
 import Select from 'react-select';
 
-const CustomDropdown = (props) => {
+export const CustomDropdown = (props) => {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
@@ -114,5 +114,3 @@ const CustomDropdown = (props) => {
     </Box>
   );
 };
-
-export default CustomDropdown;

@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios, { isAxiosError } from 'axios';
 import { networkErrorHandler } from 'src/utils/networkErrorHandler';
 import { store } from 'src/state/store';
@@ -37,15 +37,16 @@ interceptedAxios.interceptors.request.use(
   }
 );
 
-export const useMutation = (endpoint, intercepted = true, headers = {}) => {
+export const useMutation = (endpoint, intercepted = true, headers = {}, params = {}) => {
   const [error, setError] = useState();
   const [data, setData] = useState(undefined);
   const [loading, setLoading] = useState(false);
-  const mutate = async (variables) => {
+  const mutate = async (variables, method = 'post') => {
     try {
       setLoading(true);
       setError(undefined);
-      const response = await (intercepted ? interceptedAxios : nonIntercepted).post(
+      const requestMethod = method.toLowerCase();
+      const response = await (intercepted ? interceptedAxios : nonIntercepted)[requestMethod](
         `/${endpoint}`,
         variables,
         {

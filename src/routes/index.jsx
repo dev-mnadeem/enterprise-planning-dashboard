@@ -1,16 +1,9 @@
-import {
-  ROLE_ADMIN,
-  ROLE_BRANCH_MANAGER,
-  ROLE_CUSTOMER,
-  ROLE_DRIVER,
-  ROLE_EMPLOYEE,
-} from 'src/constants';
-
 import AdminRoutes from './Admin';
 import { useAppSelector } from 'src/state/hooks';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import PublicRoutes from './public';
+import { USER_ROLE } from 'src/constants';
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -28,23 +21,23 @@ export default function Router() {
 
   if (userSession?.token) {
     switch (role) {
-      case ROLE_ADMIN:
+      case USER_ROLE.ADMIN:
         routes = <AdminRoutes />;
         break;
 
-      case ROLE_BRANCH_MANAGER:
+      case USER_ROLE.BRANCH_MANAGER:
         // routes = <BranchManagerRoutes />
         break;
 
-      case ROLE_CUSTOMER:
+      case USER_ROLE.CUSTOMER:
         // routes = <CustomerRoutes />
         break;
 
-      case ROLE_DRIVER:
+      case USER_ROLE.DRIVER:
         // routes = <DriverRoutes />
         break;
 
-      case ROLE_EMPLOYEE:
+      case USER_ROLE.EMPLOYEE:
         // routes = <EmployeeRoutes />
         break;
 
