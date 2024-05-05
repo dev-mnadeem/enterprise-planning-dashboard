@@ -3,8 +3,7 @@ import { Formik } from 'formik';
 import PropTypes from 'prop-types';
 import ErrorMsg from '../error-msg';
 import { Box, Button } from '@mui/material';
-import CustomDropdown from '../common/CustomDropdown';
-import { InputField } from '../common/Input/InputField';
+import { CustomDropdown, InputField } from '../common';
 import {
   Cities,
   Countries,
@@ -32,7 +31,7 @@ export default function LocationForm({ onSubmit, initials, buttonText }) {
         values,
       }) => (
         <div>
-          <div class="grid gap-4 grid-cols-2 mt-10">
+          <div className="grid gap-4 grid-cols-2 mt-10">
             <Box>
               <InputField
                 name="name"
