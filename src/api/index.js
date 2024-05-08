@@ -41,13 +41,13 @@ export const useMutation = (endpoint, intercepted = true, headers = {}, params =
   const [error, setError] = useState();
   const [data, setData] = useState(undefined);
   const [loading, setLoading] = useState(false);
-  const mutate = async (variables, method = 'post') => {
+  const mutate = async (variables, method = 'post', requestParams = '') => {
     try {
       setLoading(true);
       setError(undefined);
       const requestMethod = method.toLowerCase();
       const response = await (intercepted ? interceptedAxios : nonIntercepted)[requestMethod](
-        `/${endpoint}`,
+        `/${endpoint}/${requestParams}`,
         variables,
         {
           headers: { ..._headers, ...headers },
@@ -75,30 +75,33 @@ export const useQuery = (endpoint, params, options = { headers: {} }) => {
   const [error, setError] = useState();
   const [loading, setLoading] = useState(false);
 
+  const query = async () => {
+    try {
+      setLoading(true);
+      setError(undefined);
+      const response = await interceptedAxios.get(`/${endpoint}`, {
+        params,
+        headers: { ..._headers, ...headers },
+      });
+
+      setData(response?.data);
+      return response?.data;
+    } catch (err) {
+      const errorMessage = networkErrorHandler(err);
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const query = async () => {
-      try {
-        setLoading(true);
-        setError(undefined);
-        const response = await interceptedAxios.get(`/${endpoint}`, {
-          params,
-          headers: { ..._headers, ...headers },
-        });
-
-        setData(response?.data);
-        return response?.data;
-      } catch (err) {
-        const errorMessage = networkErrorHandler(err);
-        setError(errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     query();
   }, []);
 
-  return { data, loading, error };
+  const refetch = () => {
+    query();
+  };
+
+  return { data, loading, error, refetch };
 };
 
 export const useLazyQuery = (endpoint, options) => {

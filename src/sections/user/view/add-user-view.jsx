@@ -17,7 +17,6 @@ const AddUserPage = () => {
       username: values.username,
       email: values.email,
       role_id: values.userRole,
-      password: '12345678', // *** REMOVE IT LATER
     });
   };
 
