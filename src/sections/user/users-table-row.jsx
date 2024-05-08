@@ -16,11 +16,11 @@ import { ROUTES } from 'src/constants';
 export default function UsersTableRow({
   id,
   username,
-  role_id,
+  user_role,
   email,
   branch,
   mobile_number,
-  handleClick,
+  onDeleteUser,
 }) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -28,11 +28,13 @@ export default function UsersTableRow({
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
-  const handleDelte = () => {
+  const handleDelte = (username) => {
+    if (!id) return;
+
     handleCloseMenu();
-    const confirmed = window.confirm('Are you sure to Delete this User?');
+    const confirmed = window.confirm(`Are you sure to Delete "${username}" User?`);
     if (confirmed) {
-      // DELETE USER....
+      onDeleteUser(id);
     }
   };
 
@@ -50,7 +52,7 @@ export default function UsersTableRow({
       <TableRow hover tabIndex={-1}>
         <TableCell>{username}</TableCell>
         <TableCell>{email}</TableCell>
-        <TableCell>{'role_id'}</TableCell>
+        <TableCell>{user_role?.name}</TableCell>
         <TableCell align="center">
           <Label>{branch}</Label>
         </TableCell>
@@ -80,7 +82,7 @@ export default function UsersTableRow({
           <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
           Edit
         </MenuItem>
-        <MenuItem onClick={handleDelte} sx={{ color: 'error.main' }}>
+        <MenuItem onClick={() => handleDelte(username)} sx={{ color: 'error.main' }}>
           <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
           Delete
         </MenuItem>

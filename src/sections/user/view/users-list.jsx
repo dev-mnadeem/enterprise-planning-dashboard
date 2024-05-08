@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TableHeadData } from '../utils';
 import Iconify from 'src/components/iconify';
 import { useNavigate } from 'react-router-dom';
@@ -23,7 +23,7 @@ import {
 } from 'src/components/common';
 import UsersTableRow from '../users-table-row';
 import { ENDPOINTS } from 'src/api/Endpoints';
-import { useQuery } from 'src/api';
+import { useMutation, useQuery } from 'src/api';
 import { ROUTES } from 'src/constants';
 
 const UsersListPage = () => {
@@ -34,7 +34,8 @@ const UsersListPage = () => {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const { data: users, loading, error } = useQuery(ENDPOINTS.USERS);
+  const { data: users, loading, error, refetch: refetchUsers } = useQuery(ENDPOINTS.USERS);
+  const [deleteUserMutate, { data: updatedUser }] = useMutation(ENDPOINTS.USERS);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error</div>;
@@ -66,6 +67,15 @@ const UsersListPage = () => {
   const handleChangeRowsPerPage = (event) => {
     setPage(0);
     setRowsPerPage(parseInt(event.target.value, 10));
+  };
+
+  const deleteUser = async (userId) => {
+    if (!userId) return;
+
+    const res = await deleteUserMutate({}, 'DELETE', userId);
+    if (res) {
+      refetchUsers();
+    }
   };
 
   const notFound = !dataFiltered?.length && !!filterName;
@@ -107,11 +117,11 @@ const UsersListPage = () => {
                       id={row.id}
                       key={row.id}
                       username={row.username}
-                      role_id={row.role_id}
+                      user_role={row.user_role}
                       email={row.email}
                       branch={row.branch}
                       mobile_number={row.mobile_number}
-                      handleClick={(event) => handleClick(event, row.name)}
+                      onDeleteUser={(userId) => deleteUser(userId)}
                     />
                   ))}
 
