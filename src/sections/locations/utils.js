@@ -4,7 +4,7 @@ export const TableHeadData = [
   { id: 'name', label: 'Name' },
   { id: 'country', label: 'Country' },
   { id: 'city', label: 'City' },
-  { id: 'location_tyoe', label: 'Location Type', align: 'center' },
+  { id: 'location_type', label: 'Location Type', align: 'center' },
   { id: 'address', label: 'Address' },
   { id: 'status', label: 'Status' },
   { id: '' },

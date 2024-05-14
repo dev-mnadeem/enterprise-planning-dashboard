@@ -21,34 +21,23 @@ export default function LocationForm({ onSubmit, initials, buttonText }) {
       validationSchema={locationValidationSchema}
       initialValues={initials ? initials : ADD_LOCATION_INITIALS}
     >
-      {({
-        errors,
-        touched,
-        handleChange,
-        handleSubmit,
-        setFieldValue,
-        setFieldTouched,
-        values,
-      }) => (
+      {({ errors, touched, handleSubmit, setFieldValue, setFieldTouched, values }) => (
         <div>
+          {console.log('values', values)}
           <div className="grid gap-4 grid-cols-2 mt-10">
             <Box>
-              <InputField
-                name="name"
-                title="Name"
-                value={values.name}
-                placeholder="Enter name"
-                onChange={handleChange}
-              />
+              <InputField name="name" title="Name" placeholder="Enter name" />
               {touched.name && errors?.name && <ErrorMsg error={errors.name} />}
             </Box>
             <Box>
               <InputField
+                isAutoComplete
                 title="Address"
                 placeholder="Enter address"
                 name="address"
-                value={values.address}
-                onChange={handleChange}
+                setFinalValue={(address) => {
+                  setFieldValue('address', address);
+                }}
               />
               {touched.address && errors?.address && <ErrorMsg error={errors.address} />}
             </Box>
