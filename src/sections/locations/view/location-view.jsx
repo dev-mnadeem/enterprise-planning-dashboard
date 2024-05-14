@@ -7,6 +7,7 @@ import { useAppSelector } from 'src/state/hooks';
 import LocationTableRow from '../location-table-row';
 import LocationTableHead from '../location-table-head';
 import LocationTableToolbar from '../location-table-toolbar';
+import { TableEmptyRows, TableNoData } from 'src/components/common';
 import { applyFilter, emptyRows, getComparator } from 'src/utils/table';
 import {
   Card,
@@ -19,7 +20,6 @@ import {
   TableContainer,
   TablePagination,
 } from '@mui/material';
-import { TableEmptyRows, TableNoData } from 'src/components/common';
 
 const LocationPage = () => {
   const navigate = useNavigate();
@@ -29,7 +29,10 @@ const LocationPage = () => {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
   const { locations } = useAppSelector((state) => state.locationReducer);
+  const [selectedLocationType, setSelectedLocationType] = useState('');
 
   const handleFilterByName = (event) => {
     setPage(0);
@@ -46,7 +49,7 @@ const LocationPage = () => {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = users.map((n) => n.name);
+      const newSelecteds = locations.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -58,7 +61,12 @@ const LocationPage = () => {
     inputData: locations,
     comparator: getComparator(order, orderBy),
     filterName,
-  });
+  })
+    .filter((location) => selectedCity === '' || location.city === selectedCity)
+    .filter(
+      (location) => selectedLocationType === '' || location.locationType === selectedLocationType
+    )
+    .filter((location) => selectedStatus === '' || location.status === selectedStatus);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -69,7 +77,36 @@ const LocationPage = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
+  const handleClick = (event, name) => {
+    const selectedIndex = selected.indexOf(name);
+    let newSelected = [];
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, name);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
+    setSelected(newSelected);
+  };
+
   const notFound = !dataFiltered.length && !!filterName;
+
+  const handleLocationTypeChange = (event) => {
+    setSelectedLocationType(event.target.value);
+  };
+  const handleStatusChange = (event) => {
+    setSelectedStatus(event.target.value);
+  };
+
+  const handleCityChange = (event) => {
+    setSelectedCity(event.target.value);
+  };
 
   return (
     <Container>
@@ -99,8 +136,14 @@ const LocationPage = () => {
                 headLabel={TableHeadData}
                 onRequestSort={handleSort}
                 rowCount={locations.length}
+                selectedCity={selectedCity}
                 numSelected={selected.length}
+                selectedStatus={selectedStatus}
+                onCityChange={handleCityChange}
+                onStatusChange={handleStatusChange}
                 onSelectAllClick={handleSelectAllClick}
+                selectedLocationType={selectedLocationType}
+                onLocationTypeChange={handleLocationTypeChange}
               />
               <TableBody>
                 {dataFiltered
