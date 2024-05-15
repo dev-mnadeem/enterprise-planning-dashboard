@@ -26,7 +26,7 @@ export const CustomDropdown = (props) => {
             borderRadius: '8px',
             wordBreak: 'break-word',
             height: '56px',
-            padding: '0px 24px',
+            padding: '0px 12px',
             boxShadow: 'none',
             display: 'flex',
             justifyContent: 'space-between',
