@@ -24,7 +24,9 @@ import {
 import UsersTableRow from '../users-table-row';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useMutation, useQuery } from 'src/api';
-import { ROUTES } from 'src/constants';
+import { PERMISSION_TYPE, ROUTES } from 'src/constants';
+import { useAppSelector } from 'src/state/hooks';
+import { checkCurrentUserPermission } from 'src/utils';
 
 const UsersListPage = () => {
   const navigate = useNavigate();
@@ -36,6 +38,8 @@ const UsersListPage = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const { data: users, loading, error, refetch: refetchUsers } = useQuery(ENDPOINTS.USERS);
   const [deleteUserMutate, { data: updatedUser }] = useMutation(ENDPOINTS.USERS);
+  const { user } = useAppSelector((state) => state.userReducer);
+  const { ADD, VIEW, UPDATE, REMOVE } = PERMISSION_TYPE;
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error</div>;
@@ -84,14 +88,17 @@ const UsersListPage = () => {
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4">Manage System Users</Typography>
-        <Button
-          onClick={() => navigate(ROUTES.ADD_USER)}
-          variant="contained"
-          color="inherit"
-          startIcon={<Iconify icon="eva:plus-fill" />}
-        >
-          New User
-        </Button>
+
+        {checkCurrentUserPermission(user?.permissions, 'User', ADD) && (
+          <Button
+            onClick={() => navigate(ROUTES.ADD_USER)}
+            variant="contained"
+            color="inherit"
+            startIcon={<Iconify icon="eva:plus-fill" />}
+          >
+            New User
+          </Button>
+        )}
       </Stack>
       <Card>
         <TableSortToolbar

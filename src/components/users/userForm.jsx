@@ -1,19 +1,24 @@
-import React from 'react';
-import { Formik } from 'formik';
+import React, { useState } from 'react';
+import { Formik, useField, useFormikContext } from 'formik';
 import PropTypes from 'prop-types';
 import ErrorMsg from '../error-msg';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { CustomDropdown, InputField } from '../common';
 import { userFormValidationSchema } from 'src/constants';
 import { ADD_USER_INITIALS } from 'src/sections/user/utils';
-import { useQuery } from 'src/api';
+import { useLazyQuery, useQuery } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
+import PermissionsForm from '../permissions/form';
 
 export default function UserForm({ onSubmit, initials, buttonText }) {
+  const [checkedPermissions, setCheckedPermissions] = useState({});
   const { data: userRoles, loading, error } = useQuery(ENDPOINTS.USER_ROLES);
+  const [getRolePermissions, { data: role, loading: rpLoading, error: rpError }] = useLazyQuery(
+    ENDPOINTS.USER_ROLES
+  );
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error</div>;
+  if (loading) return;
+  if (error || rpError) return <div>Error</div>;
 
   const userRoleOptions = userRoles?.map((role) => ({ value: role.id, label: role.name }));
   const initialValues = {
@@ -21,9 +26,14 @@ export default function UserForm({ onSubmit, initials, buttonText }) {
     ...initials,
   };
 
+  const accountStatusOptions = [
+    { value: 'active', label: 'Active' },
+    { value: 'inactive', label: 'Inactive' },
+  ];
+
   return (
     <Formik
-      enableReinitialize
+      enableReinitialize={true}
       onSubmit={onSubmit}
       validationSchema={userFormValidationSchema}
       initialValues={initials ? initialValues : ADD_USER_INITIALS}
@@ -38,21 +48,21 @@ export default function UserForm({ onSubmit, initials, buttonText }) {
         values,
       }) => (
         <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 grid-cols-2 mt-10">
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 mt-10">
             <Box>
               <InputField
-                name="username"
+                name="name"
                 title="Name"
-                value={values.username}
-                placeholder="Enter name"
+                value={values.name}
+                placeholder="Jhon Doe"
                 onChange={handleChange}
               />
-              {touched.username && errors?.username && <ErrorMsg error={errors.username} />}
+              {touched.name && errors?.name && <ErrorMsg error={errors.name} />}
             </Box>
             <Box>
               <InputField
                 title="Email"
-                placeholder="Enter Email"
+                placeholder="jhon@example.com"
                 name="email"
                 value={values.email}
                 onChange={handleChange}
@@ -60,20 +70,130 @@ export default function UserForm({ onSubmit, initials, buttonText }) {
               {touched.email && errors?.email && <ErrorMsg error={errors.email} />}
             </Box>
             <Box>
+              <InputField
+                title="Phone Number"
+                placeholder="+1 123 456 7890"
+                name="phone_number"
+                value={values.phone_number}
+                onChange={handleChange}
+              />
+              {touched.phone_number && errors?.phone_number && (
+                <ErrorMsg error={errors.phone_number} />
+              )}
+            </Box>
+            <Box>
+              <InputField
+                title="Address"
+                placeholder="H # 123, Street # 2, NY"
+                name="address"
+                value={values.address}
+                onChange={handleChange}
+              />
+              {touched.address && errors?.address && <ErrorMsg error={errors.address} />}
+            </Box>
+
+            <Box>
+              <CustomDropdown
+                name="status"
+                title="Account Status"
+                value={accountStatusOptions?.find((item) => item.value === values.status)}
+                options={accountStatusOptions}
+                placeholder="Select Account Status"
+                onValueChange={(status) => {
+                  setFieldTouched('status', true);
+                  setFieldValue('status', status.value);
+                }}
+              />
+              {touched.status && errors?.status && <ErrorMsg error={errors.status} />}
+            </Box>
+
+            <Box>
+              <CustomDropdown
+                name="branch"
+                title="Working Branch"
+                value={null}
+                options={[]}
+                placeholder="Select Branch"
+                onValueChange={(branch) => {
+                  setFieldTouched('branch', true);
+                  setFieldValue('branch', branch.value);
+                }}
+              />
+              {touched.branch && errors?.branch && <ErrorMsg error={errors.branch} />}
+            </Box>
+
+            <Box>
+              <CustomDropdown
+                title="Country"
+                name="country"
+                placeholder="Selet Country"
+                options={Countries}
+                value={Countries.find((item) => item.value === values.country)}
+                onValueChange={(value) => {
+                  setFieldTouched('country', true);
+                  setFieldValue('country', value.value);
+                }}
+              />
+              {touched.country && errors?.country && <ErrorMsg error={errors.country} />}
+            </Box>
+
+            <Box>
+              <CustomDropdown
+                title="State"
+                name="state"
+                placeholder="Selet State"
+                options={Countries}
+                value={Countries.find((item) => item.value === values.state)}
+                onValueChange={(value) => {
+                  setFieldTouched('state', true);
+                  setFieldValue('state', value.value);
+                }}
+              />
+              {touched.country && errors?.country && <ErrorMsg error={errors.country} />}
+            </Box>
+
+            <Box>
+              <CustomDropdown
+                title="City"
+                name="city"
+                placeholder="Selet City"
+                options={Cities}
+                value={Cities.find((item) => item.value === values.city)}
+                onValueChange={(value) => {
+                  setFieldTouched('city', true);
+                  setFieldValue('city', value.value);
+                }}
+              />
+              {touched.city && errors?.city && <ErrorMsg error={errors.city} />}
+            </Box>
+
+            <Box>
               <CustomDropdown
                 name="userRole"
                 title="User Role"
                 value={userRoleOptions?.find((item) => item.value === values.userRole)}
                 options={userRoleOptions}
-                placeholder="Selet User Role"
-                onValueChange={(role) => {
+                placeholder="Select User Role"
+                onValueChange={async (role) => {
                   setFieldTouched('userRole', true);
                   setFieldValue('userRole', role.value);
+                  await getRolePermissions({}, role?.value);
                 }}
               />
               {touched.userRole && errors?.userRole && <ErrorMsg error={errors.userRole} />}
             </Box>
+
+            <Box className="col-span-2">
+              <Typography variant="subtitle1">Permissions assigned to this role:</Typography>
+              <Typography>You can also specify permissions for this user only</Typography>
+              <PermissionsForm
+                permissions={role?.permissions}
+                checkedPermissions={checkedPermissions}
+                setCheckedPermissions={setCheckedPermissions}
+              />
+            </Box>
           </div>
+
           <Button
             type="submit"
             variant="contained"

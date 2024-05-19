@@ -9,7 +9,13 @@ export const TableHeadData = [
 ];
 
 export const ADD_USER_INITIALS = {
-  username: '',
+  name: '',
   email: '',
   userRole: '',
+  branch: '',
+  phone_number: '',
+  status: 'active',
+  city_id: '',
+  address: '',
+  geo_location: '',
 };
