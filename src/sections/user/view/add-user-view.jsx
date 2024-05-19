@@ -9,18 +9,17 @@ import { ENDPOINTS } from 'src/api/Endpoints';
 
 const AddUserPage = () => {
   const navigation = useNavigate();
-  const dispatch = useAppDispatch();
   const [mutate, { data, loading, error }] = useMutation(ENDPOINTS.USERS);
 
   const onAddUser = (values) => {
     mutate({
-      username: values.username,
+      name: values.name,
       email: values.email,
       role_id: values.userRole,
     });
   };
 
-  if (loading) return <>Loading...</>;
+  if (loading) return;
   if (error) return <>Error</>;
   if (data) {
     navigation(ROUTES.USERS);

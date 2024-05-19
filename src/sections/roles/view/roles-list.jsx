@@ -21,14 +21,12 @@ import {
   TableSearchHead,
   TableSortToolbar,
 } from 'src/components/common';
-import UsersTableRow from '../users-table-row';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useMutation, useQuery } from 'src/api';
-import { PERMISSION_TYPE, ROUTES } from 'src/constants';
-import { useAppSelector } from 'src/state/hooks';
-import { checkCurrentUserPermission } from 'src/utils';
+import { ROUTES } from 'src/constants';
+import RolesTableRow from '../roles-table-row';
 
-const UsersListPage = () => {
+const RolesListPage = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
@@ -36,12 +34,10 @@ const UsersListPage = () => {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const { data: users, loading, error, refetch: refetchUsers } = useQuery(ENDPOINTS.USERS);
-  const [deleteUserMutate, { data: updatedUser }] = useMutation(ENDPOINTS.USERS);
-  const { user } = useAppSelector((state) => state.userReducer);
-  const { ADD, VIEW, UPDATE, REMOVE } = PERMISSION_TYPE;
+  const { data: userRoles, loading, error, refetch: refetchRoles } = useQuery(ENDPOINTS.USER_ROLES);
+  const [deleteUserRoleMutate, { data: updatedUser }] = useMutation(ENDPOINTS.USER_ROLES);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return;
   if (error) return <div>Error</div>;
 
   const handleFilterByName = (event) => {
@@ -58,8 +54,8 @@ const UsersListPage = () => {
   };
 
   const dataFiltered = applyFilter({
-    fieldToSearch: 'username',
-    inputData: users,
+    fieldToSearch: 'name',
+    inputData: userRoles,
     comparator: getComparator(order, orderBy),
     filterName,
   });
@@ -73,12 +69,12 @@ const UsersListPage = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const deleteUser = async (userId) => {
-    if (!userId) return;
+  const deleteRole = async (userRoleId) => {
+    if (!userRoleId) return;
 
-    const res = await deleteUserMutate({}, 'DELETE', userId);
+    const res = await deleteUserRoleMutate({}, 'DELETE', userRoleId);
     if (res) {
-      refetchUsers();
+      refetchRoles();
     }
   };
 
@@ -87,18 +83,15 @@ const UsersListPage = () => {
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Manage System Users</Typography>
-
-        {checkCurrentUserPermission(user?.permissions, 'User', ADD) && (
-          <Button
-            onClick={() => navigate(ROUTES.ADD_USER)}
-            variant="contained"
-            color="inherit"
-            startIcon={<Iconify icon="eva:plus-fill" />}
-          >
-            New User
-          </Button>
-        )}
+        <Typography variant="h4">Manage System Roles</Typography>
+        <Button
+          onClick={() => navigate(ROUTES.ADD_USER_ROLE)}
+          variant="contained"
+          color="inherit"
+          startIcon={<Iconify icon="eva:plus-fill" />}
+        >
+          New Role
+        </Button>
       </Stack>
       <Card>
         <TableSortToolbar
@@ -114,27 +107,24 @@ const UsersListPage = () => {
                 orderBy={orderBy}
                 headLabel={TableHeadData}
                 onRequestSort={handleSort}
-                rowCount={users?.length}
+                rowCount={userRoles?.length}
               />
               <TableBody>
                 {dataFiltered
                   ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <UsersTableRow
+                  .map((row, index) => (
+                    <RolesTableRow
                       id={row.id}
                       key={row.id}
-                      username={row.username}
-                      user_role={row.user_role}
-                      email={row.email}
-                      branch={row.branch}
-                      mobile_number={row.mobile_number}
-                      onDeleteUser={(userId) => deleteUser(userId)}
+                      index={index}
+                      name={row.name}
+                      onDeleteRole={(userRoleId) => deleteRole(userRoleId)}
                     />
                   ))}
 
                 <TableEmptyRows
                   height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, users?.length)}
+                  emptyRows={emptyRows(page, rowsPerPage, userRoles?.length)}
                 />
 
                 {notFound && <TableNoData query={filterName} />}
@@ -145,7 +135,7 @@ const UsersListPage = () => {
         <TablePagination
           page={page}
           component="div"
-          count={users?.length || 0}
+          count={userRoles?.length || 0}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}
@@ -156,4 +146,4 @@ const UsersListPage = () => {
   );
 };
 
-export default UsersListPage;
+export default RolesListPage;

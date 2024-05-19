@@ -17,7 +17,7 @@ const EditUserPage = ({ id }) => {
   const { data: user, loading: queryLoading, error: queryError } = useQuery(userEndPoint);
   const [mutate, { data: updatedUser, loading, error }] = useMutation(userEndPoint);
 
-  if (queryLoading) return <>Loading...</>;
+  if (queryLoading) return;
   if (!user) navigate(ROUTES.USERS);
 
   const onEditUser = (values) => {
@@ -31,7 +31,7 @@ const EditUserPage = ({ id }) => {
     );
   };
 
-  if (loading) return <>Loading...</>;
+  if (loading) return;
   if (error) return <>{error}</>;
   if (updatedUser) {
     navigate(ROUTES.USERS);
