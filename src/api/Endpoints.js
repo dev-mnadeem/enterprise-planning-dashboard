@@ -3,4 +3,7 @@ export const ENDPOINTS = {
   USERS: 'users',
   USER_ROLES: 'user-roles',
   PERMISSIONS: 'permissions',
+  COUNTRIES: 'countries',
+  STATES: 'states',
+  CITIES: 'cities',
 };

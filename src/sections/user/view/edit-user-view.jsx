@@ -23,9 +23,16 @@ const EditUserPage = ({ id }) => {
   const onEditUser = (values) => {
     mutate(
       {
-        username: values.username,
-        email: values.email,
-        role_id: values.userRole,
+        name: values?.name,
+        email: values?.email,
+        role_id: values?.userRole,
+        branch: values?.branch,
+        phone_number: values?.phone_number,
+        status: values?.status,
+        city_id: values?.city,
+        address: values?.address,
+        geo_location: '',
+        permissions: values?.permissions,
       },
       'patch'
     );

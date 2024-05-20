@@ -17,7 +17,7 @@ export default function UserRoleForm({ onSubmit, initials, viewOnly, buttonText 
   const { data: permissions, loading, error } = useQuery(ENDPOINTS.PERMISSIONS);
 
   useEffect(() => {
-    if (initials?.permissions?.length && _.isEmpty()) {
+    if (initials?.permissions?.length && _.isEmpty(checkedPermissions)) {
       const _initialPermissions = formateInitialPermissionsData(initials?.permissions);
       setCheckedPermissions(_initialPermissions);
     }

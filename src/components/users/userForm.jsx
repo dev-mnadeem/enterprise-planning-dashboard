@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { Formik, useField, useFormikContext } from 'formik';
-import PropTypes from 'prop-types';
+import React, { useEffect, useState } from 'react';
+import { Formik } from 'formik';
 import ErrorMsg from '../error-msg';
 import { Box, Button, Typography } from '@mui/material';
 import { CustomDropdown, InputField } from '../common';
@@ -9,16 +8,21 @@ import { ADD_USER_INITIALS } from 'src/sections/user/utils';
 import { useLazyQuery, useQuery } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import PermissionsForm from '../permissions/form';
+import {
+  formateInitialPermissionsData,
+  formattedPermissionsData,
+  removeFalsePermissions,
+} from 'src/utils';
+import toast from 'react-hot-toast';
+import _ from 'lodash';
 
 export default function UserForm({ onSubmit, initials, buttonText }) {
   const [checkedPermissions, setCheckedPermissions] = useState({});
   const { data: userRoles, loading, error } = useQuery(ENDPOINTS.USER_ROLES);
+  // const { data: countries, cntLoading, cntError } = useQuery(ENDPOINTS.COUNTRIES);
   const [getRolePermissions, { data: role, loading: rpLoading, error: rpError }] = useLazyQuery(
     ENDPOINTS.USER_ROLES
   );
-
-  if (loading) return;
-  if (error || rpError) return <div>Error</div>;
 
   const userRoleOptions = userRoles?.map((role) => ({ value: role.id, label: role.name }));
   const initialValues = {
@@ -26,15 +30,47 @@ export default function UserForm({ onSubmit, initials, buttonText }) {
     ...initials,
   };
 
+  useEffect(() => {
+    /** IF ACTION IS ADD, SET PERMISSIONS BASED ON SELECTED ROLE,
+     * ELSE IF ACTION IS EDIT, SET PERMISSIONS BASED ON INITIALS */
+    if (!initialValues?.userRole && role?.permissions?.length && _.isEmpty(checkedPermissions)) {
+      const _initialPermissions = formateInitialPermissionsData(role?.permissions);
+      setCheckedPermissions(_initialPermissions);
+    } else if (initialValues?.userRole && _.isEmpty(checkedPermissions)) {
+      const _initialPermissions = formateInitialPermissionsData(initialValues?.permissions);
+      setCheckedPermissions(_initialPermissions);
+    }
+  }, [role?.permissions]);
+
+  useEffect(() => {
+    const _roleId = initialValues?.userRole;
+    if (_roleId) {
+      getRolePermissions({}, _roleId);
+    }
+  }, [initialValues?.userRole]);
+
+  if (loading) return;
+  if (error || rpError) return <div>{error || rpError}</div>;
+
   const accountStatusOptions = [
     { value: 'active', label: 'Active' },
     { value: 'inactive', label: 'Inactive' },
   ];
 
+  const onSubmitForm = (values) => {
+    const _permissions = formattedPermissionsData(checkedPermissions, role?.permissions);
+    if (!_permissions?.length) {
+      toast.error('Please select atleast one permission to create a User!');
+      return;
+    }
+
+    onSubmit({ ...values, permissions: _permissions });
+  };
+
   return (
     <Formik
       enableReinitialize={true}
-      onSubmit={onSubmit}
+      onSubmit={onSubmitForm}
       validationSchema={userFormValidationSchema}
       initialValues={initials ? initialValues : ADD_USER_INITIALS}
     >
@@ -127,8 +163,8 @@ export default function UserForm({ onSubmit, initials, buttonText }) {
                 title="Country"
                 name="country"
                 placeholder="Selet Country"
-                options={Countries}
-                value={Countries.find((item) => item.value === values.country)}
+                options={[]}
+                value={[].find((item) => item.value === values.country)}
                 onValueChange={(value) => {
                   setFieldTouched('country', true);
                   setFieldValue('country', value.value);
@@ -142,8 +178,8 @@ export default function UserForm({ onSubmit, initials, buttonText }) {
                 title="State"
                 name="state"
                 placeholder="Selet State"
-                options={Countries}
-                value={Countries.find((item) => item.value === values.state)}
+                options={[]}
+                value={[].find((item) => item.value === values.state)}
                 onValueChange={(value) => {
                   setFieldTouched('state', true);
                   setFieldValue('state', value.value);
@@ -157,8 +193,8 @@ export default function UserForm({ onSubmit, initials, buttonText }) {
                 title="City"
                 name="city"
                 placeholder="Selet City"
-                options={Cities}
-                value={Cities.find((item) => item.value === values.city)}
+                options={[]}
+                value={[].find((item) => item.value === values.city)}
                 onValueChange={(value) => {
                   setFieldTouched('city', true);
                   setFieldValue('city', value.value);
@@ -187,7 +223,7 @@ export default function UserForm({ onSubmit, initials, buttonText }) {
               <Typography variant="subtitle1">Permissions assigned to this role:</Typography>
               <Typography>You can also specify permissions for this user only</Typography>
               <PermissionsForm
-                permissions={role?.permissions}
+                permissions={removeFalsePermissions(role?.permissions)}
                 checkedPermissions={checkedPermissions}
                 setCheckedPermissions={setCheckedPermissions}
               />
@@ -213,8 +249,3 @@ export default function UserForm({ onSubmit, initials, buttonText }) {
     </Formik>
   );
 }
-
-UserForm.propTypes = {
-  onSubmit: PropTypes.func,
-  initials: PropTypes.object,
-};
