@@ -6,6 +6,7 @@ import UserForm from 'src/components/users/userForm';
 import { ROUTES } from 'src/constants';
 import { useMutation } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
+import toast from 'react-hot-toast';
 
 const AddUserPage = () => {
   const navigation = useNavigate();
@@ -13,9 +14,17 @@ const AddUserPage = () => {
 
   useEffect(() => {
     if (data) {
+      toast.success('User added successfully!');
       navigation(ROUTES.USERS);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error || 'Something went wrong!');
+      navigation(ROUTES.USERS);
+    }
+  }, [error]);
 
   const onAddUser = (values) => {
     mutate({
@@ -33,7 +42,6 @@ const AddUserPage = () => {
   };
 
   if (loading) return;
-  if (error) return <>Error</>;
 
   return (
     <Container>

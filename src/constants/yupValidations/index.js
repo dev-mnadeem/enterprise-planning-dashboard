@@ -25,6 +25,9 @@ export const userFormValidationSchema = Yup.object().shape({
   name: Yup.string().required('User name is required'),
   email: emailValidation,
   userRole: Yup.string().required('User role is required'),
+  country: Yup.string().required('Country is required'),
+  state: Yup.string().required('State is required'),
+  city: Yup.string().required('City is required'),
 });
 
 export const userRoleFormValidationSchema = Yup.object().shape({

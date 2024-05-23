@@ -18,7 +18,7 @@ const AddRolePage = () => {
   };
 
   if (loading) return;
-  if (error) return <>Error</>;
+  if (error) return toast.error(error || 'Something went wrong!');
   if (data) {
     toast.success('Role created successfully');
     navigation(ROUTES.USER_ROLES);

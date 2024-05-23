@@ -18,7 +18,7 @@ export default function UsersTableRow({
   username,
   user_role,
   email,
-  branch,
+  status,
   mobile_number,
   onDeleteUser,
 }) {
@@ -38,6 +38,11 @@ export default function UsersTableRow({
     }
   };
 
+  const handleView = () => {
+    handleCloseMenu();
+    navigate(`${ROUTES.USERS}/${id}?action=view`);
+  };
+
   const handleEdit = () => {
     handleCloseMenu();
     navigate(`${ROUTES.USERS}/${id}`);
@@ -53,14 +58,9 @@ export default function UsersTableRow({
         <TableCell>{username}</TableCell>
         <TableCell>{email}</TableCell>
         <TableCell>{user_role?.name}</TableCell>
-        <TableCell align="center">
-          <Label>{branch}</Label>
-        </TableCell>
         <TableCell>{mobile_number || ' -- '}</TableCell>
         <TableCell>
-          <Label color={'status' === ('banned' || 'Banned') ? 'error' : 'success'}>
-            {'status'}
-          </Label>
+          <Label color={!status ? 'error' : 'success'}>{status ? 'Active' : 'Inactive'}</Label>
         </TableCell>
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
@@ -78,6 +78,10 @@ export default function UsersTableRow({
           sx: { width: 140 },
         }}
       >
+        <MenuItem onClick={handleView}>
+          <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
+          View
+        </MenuItem>
         <MenuItem onClick={handleEdit}>
           <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
           Edit

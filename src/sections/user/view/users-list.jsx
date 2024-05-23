@@ -39,7 +39,7 @@ const UsersListPage = () => {
   const { data: users, loading, error, refetch: refetchUsers } = useQuery(ENDPOINTS.USERS);
   const [deleteUserMutate, { data: updatedUser }] = useMutation(ENDPOINTS.USERS);
   const { user } = useAppSelector((state) => state.userReducer);
-  const { ADD, VIEW, UPDATE, REMOVE } = PERMISSION_TYPE;
+  const { ADD } = PERMISSION_TYPE;
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error</div>;
@@ -123,11 +123,11 @@ const UsersListPage = () => {
                     <UsersTableRow
                       id={row.id}
                       key={row.id}
-                      username={row.username}
+                      username={row.name}
                       user_role={row.user_role}
                       email={row.email}
-                      branch={row.branch}
-                      mobile_number={row.mobile_number}
+                      mobile_number={row.phone_number}
+                      status={row.status}
                       onDeleteUser={(userId) => deleteUser(userId)}
                     />
                   ))}
