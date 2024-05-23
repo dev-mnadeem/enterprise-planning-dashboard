@@ -8,15 +8,19 @@ import Checkbox from '@mui/material/Checkbox';
 import MenuItem from '@mui/material/MenuItem';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
-import { useAppDispatch } from 'src/state/hooks';
+import { useAppDispatch, useAppSelector } from 'src/state/hooks';
 import { deleteLocation } from 'src/state/reducers/locationReducer';
 import { Link, useNavigate } from 'react-router-dom';
-import { ROUTES } from 'src/constants';
+import { PERMISSION_TYPE, ROUTES } from 'src/constants';
+import { checkCurrentUserPermission } from 'src/utils';
 
 export default function RolesTableRow({ id, index, name, onDeleteRole }) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(null);
+  const { user } = useAppSelector((state) => state.userReducer);
+  const { DELETE, UPDATE } = PERMISSION_TYPE;
+
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
@@ -63,14 +67,19 @@ export default function RolesTableRow({ id, index, name, onDeleteRole }) {
           sx: { width: 140 },
         }}
       >
-        <MenuItem onClick={handleEdit}>
-          <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
-        <MenuItem onClick={() => handleDelete(name)} sx={{ color: 'error.main' }}>
-          <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
-          Delete
-        </MenuItem>
+        {checkCurrentUserPermission(user?.permissions, 'UserRole', UPDATE) && (
+          <MenuItem onClick={handleEdit}>
+            <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
+            Edit
+          </MenuItem>
+        )}
+
+        {checkCurrentUserPermission(user?.permissions, 'UserRole', DELETE) && (
+          <MenuItem onClick={() => handleDelete(name)} sx={{ color: 'error.main' }}>
+            <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
+            Delete
+          </MenuItem>
+        )}
       </Popover>
     </>
   );

@@ -127,6 +127,7 @@ export const useLazyQuery = (endpoint, options) => {
       dispatch(setLoadingActive({ active: true }));
       setLoading(true);
       setError(undefined);
+      // await sleepForTesting(3000);
       const response = await interceptedAxios.get(`/${endpoint}/${requestParams}`, {
         params,
         headers: { ..._headers, ...headers },
