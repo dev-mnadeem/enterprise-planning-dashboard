@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react';
 import axios, { isAxiosError } from 'axios';
 import { networkErrorHandler } from 'src/utils/networkErrorHandler';
 import { store } from 'src/state/store';
+import { useAppDispatch, useAppSelector } from 'src/state/hooks';
+import { setLoadingActive } from 'src/state/reducers/loadingReducer';
+import { sleepForTesting } from 'src/utils';
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
@@ -38,13 +41,16 @@ interceptedAxios.interceptors.request.use(
 );
 
 export const useMutation = (endpoint, intercepted = true, headers = {}, params = {}) => {
+  const dispatch = useAppDispatch();
   const [error, setError] = useState();
   const [data, setData] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const mutate = async (variables, method = 'post', requestParams = '') => {
     try {
+      dispatch(setLoadingActive({ active: true }));
       setLoading(true);
       setError(undefined);
+      // await sleepForTesting(6000);
       const requestMethod = method.toLowerCase();
       const response = await (intercepted ? interceptedAxios : nonIntercepted)[requestMethod](
         `/${endpoint}/${requestParams}`,
@@ -61,8 +67,10 @@ export const useMutation = (endpoint, intercepted = true, headers = {}, params =
       if (isAxiosError(err)) {
         formattedErr = err.response?.data?.Message;
       }
-      throw errorMessage || formattedErr;
+      setError(errorMessage || formattedErr);
+      // throw errorMessage || formattedErr;
     } finally {
+      dispatch(setLoadingActive({ active: false }));
       setLoading(false);
     }
   };
@@ -70,6 +78,7 @@ export const useMutation = (endpoint, intercepted = true, headers = {}, params =
 };
 
 export const useQuery = (endpoint, params, options = { headers: {} }) => {
+  const dispatch = useAppDispatch();
   const { headers } = options;
   const [data, setData] = useState(undefined);
   const [error, setError] = useState();
@@ -77,6 +86,7 @@ export const useQuery = (endpoint, params, options = { headers: {} }) => {
 
   const query = async () => {
     try {
+      dispatch(setLoadingActive({ active: true }));
       setLoading(true);
       setError(undefined);
       const response = await interceptedAxios.get(`/${endpoint}`, {
@@ -90,6 +100,7 @@ export const useQuery = (endpoint, params, options = { headers: {} }) => {
       const errorMessage = networkErrorHandler(err);
       setError(errorMessage);
     } finally {
+      dispatch(setLoadingActive({ active: false }));
       setLoading(false);
     }
   };
@@ -105,31 +116,30 @@ export const useQuery = (endpoint, params, options = { headers: {} }) => {
 };
 
 export const useLazyQuery = (endpoint, options) => {
+  const dispatch = useAppDispatch();
   const headers = options?.headers || {};
   const [error, setError] = useState();
   const [data, setData] = useState(undefined);
   const [loading, setLoading] = useState(false);
 
-  const lazyQuery = async (params = {}) => {
+  const lazyQuery = async (params = {}, requestParams = '') => {
     try {
+      dispatch(setLoadingActive({ active: true }));
       setLoading(true);
       setError(undefined);
-      const response = await interceptedAxios.get(`/${endpoint}`, {
-        params: params,
+      // await sleepForTesting(3000);
+      const response = await interceptedAxios.get(`/${endpoint}/${requestParams}`, {
+        params,
         headers: { ..._headers, ...headers },
       });
-      console.log(store.getState().User?.auth);
+
       setData(response?.data);
-      !!options?.onCompleted && options?.onCompleted(response?.data);
       return response?.data;
     } catch (err) {
       const errorMessage = networkErrorHandler(err);
-      Sentry.captureException(err, (scope) => {
-        scope.setTransactionName(getReadableExceptionTitle(endpoint));
-        return scope;
-      });
-      throw errorMessage || formattedErr;
+      setError(errorMessage);
     } finally {
+      dispatch(setLoadingActive({ active: false }));
       setLoading(false);
     }
   };

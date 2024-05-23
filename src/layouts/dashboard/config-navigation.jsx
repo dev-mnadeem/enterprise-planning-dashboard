@@ -12,23 +12,28 @@ const navConfig = [
     title: 'dashboard',
     path: '/',
     icon: icon('ic_analytics'),
+  },
+  {
+    title: 'Access Control',
+    path: '#',
+    icon: icon('ic_user'),
     menuItems: [
       {
-        title: 'Access Control',
+        title: 'Users',
         path: ROUTES.USERS,
         icon: icon('ic_user'),
       },
       {
-        title: 'Shipments',
-        path: '/#',
-        icon: icon('ic_cart'),
+        title: 'Roles',
+        path: ROUTES.USER_ROLES,
+        icon: icon('ic_user'),
       },
+      // {
+      //   title: 'Permissions',
+      //   path: ROUTES.PERMISSIONS,
+      //   icon: icon('ic_user'),
+      // },
     ],
-  },
-  {
-    title: 'Access Control',
-    path: ROUTES.USERS,
-    icon: icon('ic_user'),
   },
   {
     title: 'Shipments',

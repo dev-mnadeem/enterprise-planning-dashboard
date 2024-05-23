@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Typography } from '@mui/material';
 import LocationForm from 'src/components/location-form';
 import { useAppDispatch, useAppSelector } from 'src/state/hooks';
@@ -9,38 +9,69 @@ import { ENDPOINTS } from 'src/api/Endpoints';
 import { useMutation, useQuery } from 'src/api';
 import UserForm from 'src/components/users/userForm';
 import { method } from 'lodash';
+import toast from 'react-hot-toast';
 
 const EditUserPage = ({ id }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const userEndPoint = `${ENDPOINTS.USERS}/${id}`;
-  const { data: user, loading: queryLoading, error: queryError } = useQuery(userEndPoint);
+  const { search } = useLocation();
+  const viewOnly = new URLSearchParams(search).get('action') === 'view';
+  const { data: user, loading: queryLoading, error: userError } = useQuery(userEndPoint);
   const [mutate, { data: updatedUser, loading, error }] = useMutation(userEndPoint);
 
-  if (queryLoading) return <>Loading...</>;
-  if (!user) navigate(ROUTES.USERS);
+  useEffect(() => {
+    if (updatedUser) {
+      toast.success('User added successfully!');
+      navigate(ROUTES.USERS);
+    }
+  }, [updatedUser]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error || 'Something went wrong!');
+      navigate(ROUTES.USERS);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (!user && userError) {
+      toast.error(userError || 'Something went wrong!');
+      navigate(ROUTES.USERS);
+    }
+  }, [user, queryLoading]);
+
+  if (queryLoading) return;
 
   const onEditUser = (values) => {
     mutate(
       {
-        username: values.username,
-        email: values.email,
-        role_id: values.userRole,
+        name: values?.name,
+        email: values?.email,
+        role_id: values?.userRole,
+        branch: values?.branch,
+        phone_number: values?.phone_number,
+        status: values?.status,
+        city_id: values?.city,
+        address: values?.address,
+        geo_location: '',
+        permissions: values?.permissions,
       },
       'patch'
     );
   };
 
-  if (loading) return <>Loading...</>;
-  if (error) return <>{error}</>;
-  if (updatedUser) {
-    navigate(ROUTES.USERS);
-  }
+  if (loading) return;
 
   return (
     <Container>
-      <Typography variant="h4">Update Location</Typography>
-      <UserForm initials={user} onSubmit={onEditUser} buttonText="Update User" />
+      <Typography variant="h4">{viewOnly ? user?.name : 'Edit User Role'}</Typography>
+      <UserForm
+        initials={user}
+        onSubmit={onEditUser}
+        viewOnly={viewOnly}
+        buttonText={viewOnly ? 'User Details' : 'Update User'}
+      />
     </Container>
   );
 };
