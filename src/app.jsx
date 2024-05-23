@@ -6,16 +6,18 @@ import { Provider } from 'react-redux';
 import { persistStore } from 'redux-persist';
 import { useScrollToTop } from 'src/hooks/use-scroll-to-top';
 import { PersistGate } from 'redux-persist/integration/react';
+import AppWrapper from './layouts/AppWrapper';
 
 export default function App() {
-  useScrollToTop();
   let persistor = persistStore(store);
 
   return (
     <Provider store={store}>
       <PersistGate persistor={persistor}>
         <ThemeProvider>
-          <Router />
+          <AppWrapper>
+            <Router />
+          </AppWrapper>
         </ThemeProvider>
       </PersistGate>
     </Provider>

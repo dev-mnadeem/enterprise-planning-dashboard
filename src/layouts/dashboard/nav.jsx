@@ -166,18 +166,12 @@ function NavItem({ item }) {
               }),
             }}
           >
-            <ListItemIcon
-              sx={{
-                color: 'red',
-              }}
-            >
-              {item.icon}
-            </ListItemIcon>
+            <ListItemIcon sx={{ minWidth: 24, height: 24, mr: 2 }}>{item.icon}</ListItemIcon>
             <ListItemText disableTypography primary={<Typography>{item.title}</Typography>} />
             {open ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
           </ListItemButton>
           <Collapse in={open} timeout="auto">
-            <List>
+            <List sx={{ pl: 4 }}>
               {item.menuItems?.map((route, index) =>
                 route ? <NavItem item={route} key={index} /> : <></>
               )}

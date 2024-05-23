@@ -4,27 +4,26 @@ import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { alpha, useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 import InputAdornment from '@mui/material/InputAdornment';
 
 import { useRouter } from 'src/routes/hooks';
-
-import { bgGradient } from 'src/theme/css';
-
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
 import { useFormik } from 'formik';
 import { useMutation } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useAppDispatch, useAppSelector } from 'src/state/hooks';
-import { storeUserSession } from 'src/state/reducers/userReducer';
+import { storeUser, storeUserSession } from 'src/state/reducers/userReducer';
 import { useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { jwtDecode } from 'jwt-decode';
+import { logoutUser } from 'src/state/reducers';
 
 // ----------------------------------------------------------------------
 
@@ -48,24 +47,31 @@ export default function LoginView() {
       }),
   });
 
-  if (loading) console.log('loading:', loading);
-  if (error) console.log('error:', error);
-
   useEffect(() => {
     if (userSession) {
       router.replace('/');
     }
 
     if (data?.token) {
-      dispatch(
-        storeUserSession({
-          token: data?.token,
-          ...values,
-        })
-      );
-      router.replace('/');
+      try {
+        const decoded = jwtDecode(data?.token);
+        const user = JSON.parse(decoded.id);
+        dispatch(
+          storeUserSession({
+            token: data?.token,
+          })
+        );
+        dispatch(storeUser(user));
+        router.replace('/');
+      } catch (error) {
+        dispatch(logoutUser());
+      }
     }
   }, [data?.token]);
+
+  useEffect(() => {
+    if (error) toast.error(error?.message || 'Something went wrong');
+  }, [error]);
 
   const renderForm = (
     <Box component="form" onSubmit={handleSubmit}>
@@ -107,14 +113,7 @@ export default function LoginView() {
         </Link>
       </Stack>
 
-      <LoadingButton
-        fullWidth
-        size="large"
-        type="submit"
-        variant="contained"
-        color="inherit"
-        // onClick={handleClick}
-      >
+      <LoadingButton fullWidth size="large" type="submit" variant="contained" color="inherit">
         Login
       </LoadingButton>
     </Box>
