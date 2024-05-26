@@ -1,7 +1,9 @@
 export const ROUTES = {
   LOGIN: '/login',
   USERS: '/users',
+  LOCATIONS: '/locations',
   ADD_USER: '/users/add',
+  ADD_LOCATION: '/locations/add',
   PERMISSIONS: '/permissions',
   USER_ROLES: '/user-roles',
   ADD_USER_ROLE: '/user-roles/add',

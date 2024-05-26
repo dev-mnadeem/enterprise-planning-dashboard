@@ -6,4 +6,6 @@ export const ENDPOINTS = {
   COUNTRIES: 'countries',
   STATES: 'states',
   CITIES: 'cities',
+  LOCATION_TYPES: 'location-types',
+  LOCATIONS: 'locations',
 };

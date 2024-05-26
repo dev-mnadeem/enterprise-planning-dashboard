@@ -1,5 +1,5 @@
 export const checkCurrentUserPermission = (permissions = [], requiredPermission, type) => {
-  const hasPermission = permissions.some(
+  const hasPermission = permissions?.some(
     (permission) => permission.name === requiredPermission && _.get(permission.properties, type)
   );
 

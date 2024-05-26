@@ -11,7 +11,12 @@ export const InputField = (props) => {
   const handleAddressSelect = async () => {
     try {
       const addressObj = await googlePlaceAutoComplete().getFullAddress(autoComplete);
-      props.setFinalValue && props.setFinalValue(addressObj.formattedAddress, addressObj.parsedAdd);
+      props.setFinalValue &&
+        props.setFinalValue(
+          addressObj.formattedAddress,
+          addressObj.geo_location,
+          addressObj.parsedAdd
+        );
       const { city, state, zip } = addressObj.fields;
       props.setMetaAddress && props.setMetaAddress({ city, state, zip });
     } catch (e) {
@@ -20,13 +25,15 @@ export const InputField = (props) => {
   };
 
   useEffect(() => {
-    async function loadGoogleMaps() {
-      autoComplete = await googlePlaceAutoComplete().initAutoComplete(
-        ref.current,
-        handleAddressSelect
-      );
+    if (props.isAutoComplete) {
+      async function loadGoogleMaps() {
+        autoComplete = await googlePlaceAutoComplete().initAutoComplete(
+          ref.current,
+          handleAddressSelect
+        );
+      }
+      loadGoogleMaps();
     }
-    loadGoogleMaps();
   }, []);
 
   return (
