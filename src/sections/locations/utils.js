@@ -2,7 +2,7 @@ import * as Yup from 'yup';
 
 export const TableHeadData = [
   { id: 'name', label: 'Name' },
-  { id: 'country', label: 'Country' },
+  // { id: 'country', label: 'Country' },
   { id: 'city', label: 'City' },
   { id: 'location_type', label: 'Location Type', align: 'center' },
   { id: 'address', label: 'Address' },
