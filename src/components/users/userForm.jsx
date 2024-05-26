@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Formik } from 'formik';
 import ErrorMsg from '../error-msg';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Card, Typography } from '@mui/material';
 import { CustomDropdown, InputField } from '../common';
 import { userFormValidationSchema } from 'src/constants';
 import { ADD_USER_INITIALS } from 'src/sections/user/utils';
@@ -19,7 +19,6 @@ import _ from 'lodash';
 export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText }) {
   const [initialValues, setInitialValues] = useState({ ...initials });
   const [checkedPermissions, setCheckedPermissions] = useState({});
-  const [selectedState, setSelectedState] = useState(null);
   const { data: userRoles, loading, error } = useQuery(ENDPOINTS.USER_ROLES);
   const { data: countries, cntLoading, cntError } = useQuery(ENDPOINTS.COUNTRIES);
   const [getRolePermissions, { data: role, loading: rpLoading, error: rpError }] = useLazyQuery(
@@ -67,7 +66,7 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
   }, [initialValues?.userRole]);
 
   useEffect(() => {
-    /** FETCH STATE, CITY AND COUNTRY DATA BASED ON SELECTED CITY ID */
+    /** FETCH STATE, CITY AND COUNTRY DATA BASED ON INITIALS CITY ID */
     const _cityId = initialValues?.city_id;
     if (_cityId && countries?.length) {
       fetchCity({}, _cityId).then((_city) => {
@@ -88,7 +87,7 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
   }, [initialValues?.city_id, countries]);
 
   if (loading) return;
-  if (error || rpError || cntError || stError || citiesError)
+  if (error || rpError || cntError || stError || citiesError || cityError || stateError)
     return <div>Something went wrong</div>;
 
   const accountStatusOptions = [
@@ -122,176 +121,179 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
         setFieldTouched,
         values,
       }) => (
-        <form onSubmit={handleSubmit}>
-          <fieldset disabled={viewOnly ?? false}>
-            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 mt-10">
-              <Box>
-                <InputField
-                  name="name"
-                  title="Name"
-                  value={values.name}
-                  placeholder="Jhon Doe"
-                  onChange={handleChange}
-                />
-                {touched.name && errors?.name && <ErrorMsg error={errors.name} />}
-              </Box>
-              <Box>
-                <InputField
-                  title="Email"
-                  placeholder="jhon@example.com"
-                  name="email"
-                  value={values.email}
-                  onChange={handleChange}
-                />
-                {touched.email && errors?.email && <ErrorMsg error={errors.email} />}
-              </Box>
-              <Box>
-                <InputField
-                  title="Phone Number"
-                  placeholder="+1 123 456 7890"
-                  name="phone_number"
-                  value={values.phone_number}
-                  onChange={handleChange}
-                />
-                {touched.phone_number && errors?.phone_number && (
-                  <ErrorMsg error={errors.phone_number} />
-                )}
-              </Box>
-              <Box>
-                <InputField
-                  title="Address"
-                  placeholder="H # 123, Street # 2, NY"
-                  name="address"
-                  value={values.address}
-                  onChange={handleChange}
-                />
-                {touched.address && errors?.address && <ErrorMsg error={errors.address} />}
-              </Box>
+        <Card className="p-6">
+          <form onSubmit={handleSubmit}>
+            <fieldset disabled={viewOnly ?? false} className="border-none">
+              <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+                <Box>
+                  <InputField
+                    name="name"
+                    title="Name"
+                    value={values.name}
+                    placeholder="Jhon Doe"
+                    onChange={handleChange}
+                  />
+                  {touched.name && errors?.name && <ErrorMsg error={errors.name} />}
+                </Box>
+                <Box>
+                  <InputField
+                    title="Email"
+                    placeholder="jhon@example.com"
+                    name="email"
+                    value={values.email}
+                    onChange={handleChange}
+                  />
+                  {touched.email && errors?.email && <ErrorMsg error={errors.email} />}
+                </Box>
+                <Box>
+                  <InputField
+                    title="Phone Number"
+                    placeholder="+1 123 456 7890"
+                    name="phone_number"
+                    value={values.phone_number}
+                    onChange={handleChange}
+                  />
+                  {touched.phone_number && errors?.phone_number && (
+                    <ErrorMsg error={errors.phone_number} />
+                  )}
+                </Box>
+                <Box>
+                  <InputField
+                    title="Address"
+                    placeholder="H # 123, Street # 2, NY"
+                    name="address"
+                    value={values.address}
+                    onChange={handleChange}
+                  />
+                  {touched.address && errors?.address && <ErrorMsg error={errors.address} />}
+                </Box>
 
-              <Box>
-                <CustomDropdown
-                  name="status"
-                  title="Account Status"
-                  value={accountStatusOptions?.find((item) => item.value === values.status)}
-                  options={accountStatusOptions}
-                  placeholder="Select Account Status"
-                  onValueChange={(status) => {
-                    setFieldTouched('status', true);
-                    setFieldValue('status', status.value);
+                <Box>
+                  <CustomDropdown
+                    name="status"
+                    title="Account Status"
+                    value={accountStatusOptions?.find((item) => item.value === values.status)}
+                    options={accountStatusOptions}
+                    placeholder="Select Account Status"
+                    onValueChange={(status) => {
+                      setFieldTouched('status', true);
+                      setFieldValue('status', status.value);
+                    }}
+                  />
+                  {touched.status && errors?.status && <ErrorMsg error={errors.status} />}
+                </Box>
+
+                <Box>
+                  <CustomDropdown
+                    name="branch"
+                    title="Working Branch"
+                    value={null}
+                    options={[]}
+                    placeholder="Select Branch"
+                    onValueChange={(branch) => {
+                      setFieldTouched('branch', true);
+                      setFieldValue('branch', branch.value);
+                    }}
+                  />
+                  {touched.branch && errors?.branch && <ErrorMsg error={errors.branch} />}
+                </Box>
+
+                <Box>
+                  <CustomDropdown
+                    title="Country"
+                    name="country"
+                    placeholder="Select Country"
+                    options={countriesOptions}
+                    value={countriesOptions?.find((item) => item.value === values.country)}
+                    onValueChange={async (value) => {
+                      setFieldTouched('country', true);
+                      setFieldValue('country', value.value);
+                      setFieldValue('state', null);
+                      setFieldValue('city', null);
+                      await fetchCountryStates({}, `${value.value}/${ENDPOINTS.STATES}`);
+                    }}
+                  />
+                  {touched.country && errors?.country && <ErrorMsg error={errors.country} />}
+                </Box>
+
+                <Box>
+                  <CustomDropdown
+                    title="State"
+                    name="state"
+                    placeholder="Select State"
+                    options={stateOptions}
+                    value={stateOptions?.find((item) => item.value === values.state)}
+                    onValueChange={async (value) => {
+                      setFieldTouched('state', true);
+                      setFieldValue('state', value.value);
+                      setFieldValue('city', null);
+                      await fetchStateCities({}, `${value.value}/${ENDPOINTS.CITIES}`);
+                    }}
+                  />
+                  {touched.state && errors?.state && <ErrorMsg error={errors.state} />}
+                </Box>
+
+                <Box>
+                  <CustomDropdown
+                    title="City"
+                    name="city"
+                    placeholder="Select City"
+                    options={cityOptions}
+                    value={cityOptions?.find((item) => item.value === values.city)}
+                    onValueChange={(value) => {
+                      setFieldTouched('city', true);
+                      setFieldValue('city', value.value);
+                    }}
+                  />
+                  {touched.city && errors?.city && <ErrorMsg error={errors.city} />}
+                </Box>
+
+                <Box>
+                  <CustomDropdown
+                    name="userRole"
+                    title="User Role"
+                    value={userRoleOptions?.find((item) => item.value === values.userRole)}
+                    options={userRoleOptions}
+                    placeholder="Select User Role"
+                    onValueChange={async (role) => {
+                      setFieldTouched('userRole', true);
+                      setFieldValue('userRole', role.value);
+                      await getRolePermissions({}, role?.value);
+                    }}
+                  />
+                  {touched.userRole && errors?.userRole && <ErrorMsg error={errors.userRole} />}
+                </Box>
+
+                <Box className="col-span-2">
+                  <Typography variant="subtitle1">Permissions assigned to this role:</Typography>
+                  <Typography>You can also specify permissions for this user only</Typography>
+                  <PermissionsForm
+                    permissions={removeFalsePermissions(role?.permissions)}
+                    checkedPermissions={checkedPermissions}
+                    setCheckedPermissions={setCheckedPermissions}
+                  />
+                </Box>
+              </div>
+
+              {viewOnly ? null : (
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="inherit"
+                  sx={{
+                    display: 'flex',
+                    padding: '10px 16px',
+                    marginTop: '15px',
+                    alignSelf: 'flex-end',
+                    justifyContent: 'flex-end',
                   }}
-                />
-                {touched.status && errors?.status && <ErrorMsg error={errors.status} />}
-              </Box>
-
-              <Box>
-                <CustomDropdown
-                  name="branch"
-                  title="Working Branch"
-                  value={null}
-                  options={[]}
-                  placeholder="Select Branch"
-                  onValueChange={(branch) => {
-                    setFieldTouched('branch', true);
-                    setFieldValue('branch', branch.value);
-                  }}
-                />
-                {touched.branch && errors?.branch && <ErrorMsg error={errors.branch} />}
-              </Box>
-
-              <Box>
-                <CustomDropdown
-                  title="Country"
-                  name="country"
-                  placeholder="Select Country"
-                  options={countriesOptions}
-                  value={countriesOptions?.find((item) => item.value === values.country)}
-                  onValueChange={async (value) => {
-                    setFieldTouched('country', true);
-                    setFieldValue('country', value.value);
-                    setFieldValue('state', null);
-                    setFieldValue('city', null);
-                    await fetchCountryStates({}, `${value.value}/${ENDPOINTS.STATES}`);
-                  }}
-                />
-                {touched.country && errors?.country && <ErrorMsg error={errors.country} />}
-              </Box>
-
-              <Box>
-                <CustomDropdown
-                  title="State"
-                  name="state"
-                  placeholder="Select State"
-                  options={stateOptions}
-                  value={stateOptions?.find((item) => item.value === values.state)}
-                  onValueChange={async (value) => {
-                    setFieldTouched('state', true);
-                    setFieldValue('state', value.value);
-                    await fetchStateCities({}, `${value.value}/${ENDPOINTS.CITIES}`);
-                  }}
-                />
-                {touched.state && errors?.state && <ErrorMsg error={errors.state} />}
-              </Box>
-
-              <Box>
-                <CustomDropdown
-                  title="City"
-                  name="city"
-                  placeholder="Select City"
-                  options={cityOptions}
-                  value={cityOptions?.find((item) => item.value === values.city)}
-                  onValueChange={(value) => {
-                    setFieldTouched('city', true);
-                    setFieldValue('city', value.value);
-                  }}
-                />
-                {touched.city && errors?.city && <ErrorMsg error={errors.city} />}
-              </Box>
-
-              <Box>
-                <CustomDropdown
-                  name="userRole"
-                  title="User Role"
-                  value={userRoleOptions?.find((item) => item.value === values.userRole)}
-                  options={userRoleOptions}
-                  placeholder="Select User Role"
-                  onValueChange={async (role) => {
-                    setFieldTouched('userRole', true);
-                    setFieldValue('userRole', role.value);
-                    await getRolePermissions({}, role?.value);
-                  }}
-                />
-                {touched.userRole && errors?.userRole && <ErrorMsg error={errors.userRole} />}
-              </Box>
-
-              <Box className="col-span-2">
-                <Typography variant="subtitle1">Permissions assigned to this role:</Typography>
-                <Typography>You can also specify permissions for this user only</Typography>
-                <PermissionsForm
-                  permissions={removeFalsePermissions(role?.permissions)}
-                  checkedPermissions={checkedPermissions}
-                  setCheckedPermissions={setCheckedPermissions}
-                />
-              </Box>
-            </div>
-
-            {viewOnly ? null : (
-              <Button
-                type="submit"
-                variant="contained"
-                color="inherit"
-                sx={{
-                  display: 'flex',
-                  padding: '10px 16px',
-                  marginTop: '15px',
-                  alignSelf: 'flex-end',
-                  justifyContent: 'flex-end',
-                }}
-              >
-                {buttonText}
-              </Button>
-            )}
-          </fieldset>
-        </form>
+                >
+                  {buttonText}
+                </Button>
+              )}
+            </fieldset>
+          </form>
+        </Card>
       )}
     </Formik>
   );
