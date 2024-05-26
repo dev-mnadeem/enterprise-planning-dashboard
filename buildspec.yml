@@ -2,7 +2,8 @@ version: 0.1
 
 phases:
   install:
-    runtime-versions: nodejs:18
+    runtime-versions:
+      nodejs: 18
   pre_build:
     commands:
       - echo Installing dependencies...
