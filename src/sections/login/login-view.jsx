@@ -63,6 +63,7 @@ export default function LoginView() {
         );
         dispatch(storeUser(user));
         router.replace('/');
+        window.location.reload();
       } catch (error) {
         dispatch(logoutUser());
       }
