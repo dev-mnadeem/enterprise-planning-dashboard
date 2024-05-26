@@ -1,0 +1,18 @@
+version: 0.1
+
+phases:
+  install:
+    runtime-versions: nodejs:18
+  pre_build:
+    commands:
+      - echo Installing dependencies...
+      - yarn
+  build:
+    commands:
+      - echo Building...
+      - yarn build
+artifacts:
+  files:
+    - '**/*'
+  discard-paths: no
+  base-directory: build
