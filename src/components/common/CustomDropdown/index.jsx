@@ -13,7 +13,7 @@ export const CustomDropdown = (props) => {
 
       <Select
         {...props}
-        isSearchable={false}
+        isSearchable
         onChange={props.onValueChange}
         onMenuOpen={() => setIsFocused(true)}
         onMenuClose={() => setIsFocused(false)}

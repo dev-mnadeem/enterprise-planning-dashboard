@@ -1,26 +1,59 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useMutation, useQuery } from 'src/api';
+import toast from 'react-hot-toast';
+import { ROUTES } from 'src/constants';
+import { ENDPOINTS } from 'src/api/Endpoints';
 import { useNavigate } from 'react-router-dom';
 import { Container, Typography } from '@mui/material';
 import LocationForm from 'src/components/location-form';
-import { useAppDispatch, useAppSelector } from 'src/state/hooks';
-import { updateLocation } from 'src/state/reducers/locationReducer';
 
 const EditLocationPage = ({ id }) => {
   const navigation = useNavigate();
-  const dispatch = useAppDispatch();
-  const { locations } = useAppSelector((state) => state.locationReducer);
-  const location = locations?.find((loc) => loc.id === Number(id));
+  const locationEndPoint = `${ENDPOINTS.LOCATIONS}/${id}`;
+  const {
+    data: location,
+    loading: queryLoading,
+    error: locationError,
+  } = useQuery(locationEndPoint);
+  const [mutate, { data: updatedLocation, loading, error }] = useMutation(locationEndPoint);
 
-  const onEditLocation = (values) => {
-    dispatch(
-      updateLocation({
-        id: Number(id),
-        ...values,
-      })
+  useEffect(() => {
+    if (updatedLocation) {
+      toast.success('Location updated successfully!');
+      navigation(ROUTES.LOCATIONS);
+    }
+  }, [updatedLocation]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error || 'Something went wrong!');
+      navigation(ROUTES.LOCATIONS);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (!location && locationError) {
+      toast.error(locationError || 'Something went wrong!');
+      navigate(ROUTES.LOCATIONS);
+    }
+  }, [location, queryLoading]);
+
+  const onEditLocation = async (values) => {
+    await mutate(
+      {
+        name: values.name,
+        description: 'test',
+        city_id: values.city,
+        address: values.address,
+        geo_location: values.geoLocation,
+        location_type_id: values.locationType,
+        status: values.status === 'active' ? true : false,
+      },
+      'patch'
     );
-
-    navigation('/locations');
   };
+
+  if (queryLoading || loading) return;
   return (
     <Container>
       <Typography variant="h4">Update Location</Typography>

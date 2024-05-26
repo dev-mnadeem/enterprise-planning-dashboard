@@ -20,6 +20,8 @@ import {
   TableContainer,
   TablePagination,
 } from '@mui/material';
+import { ENDPOINTS } from 'src/api/Endpoints';
+import { useMutation, useQuery } from 'src/api';
 
 const LocationPage = () => {
   const navigate = useNavigate();
@@ -29,10 +31,16 @@ const LocationPage = () => {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
-  const { locations } = useAppSelector((state) => state.locationReducer);
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [deleteLocationMutate, { loading: deleteLoading }] = useMutation(ENDPOINTS.LOCATIONS);
   const [selectedLocationType, setSelectedLocationType] = useState('');
+  const {
+    error,
+    loading,
+    data: locations,
+    refetch: refetchlocations,
+  } = useQuery(ENDPOINTS.LOCATIONS);
 
   const handleFilterByName = (event) => {
     setPage(0);
@@ -47,26 +55,12 @@ const LocationPage = () => {
     }
   };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = locations.map((n) => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
-
   const dataFiltered = applyFilter({
     fieldToSearch: 'name',
     inputData: locations,
     comparator: getComparator(order, orderBy),
     filterName,
-  })
-    .filter((location) => selectedCity === '' || location.city === selectedCity)
-    .filter(
-      (location) => selectedLocationType === '' || location.locationType === selectedLocationType
-    )
-    .filter((location) => selectedStatus === '' || location.status === selectedStatus);
+  });
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -77,25 +71,7 @@ const LocationPage = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
-  };
-
-  const notFound = !dataFiltered.length && !!filterName;
+  const notFound = !dataFiltered?.length && !!filterName;
 
   const handleLocationTypeChange = (event) => {
     setSelectedLocationType(event.target.value);
@@ -107,6 +83,18 @@ const LocationPage = () => {
   const handleCityChange = (event) => {
     setSelectedCity(event.target.value);
   };
+
+  const deleteLocation = async (locationId) => {
+    if (!locationId) return;
+
+    const res = await deleteLocationMutate({}, 'DELETE', locationId);
+    if (res) {
+      refetchlocations();
+    }
+  };
+
+  if (loading || deleteLoading) return <div>Loading...</div>;
+  if (error) return <div>Error</div>;
 
   return (
     <Container>
@@ -123,7 +111,7 @@ const LocationPage = () => {
       </Stack>
       <Card>
         <LocationTableToolbar
-          numSelected={selected.length}
+          numSelected={0}
           filterName={filterName}
           onFilterName={handleFilterByName}
         />
@@ -135,37 +123,35 @@ const LocationPage = () => {
                 orderBy={orderBy}
                 headLabel={TableHeadData}
                 onRequestSort={handleSort}
-                rowCount={locations.length}
+                rowCount={locations?.length}
                 selectedCity={selectedCity}
-                numSelected={selected.length}
+                numSelected={0}
                 selectedStatus={selectedStatus}
                 onCityChange={handleCityChange}
                 onStatusChange={handleStatusChange}
-                onSelectAllClick={handleSelectAllClick}
                 selectedLocationType={selectedLocationType}
                 onLocationTypeChange={handleLocationTypeChange}
               />
               <TableBody>
                 {dataFiltered
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
                     <LocationTableRow
                       id={row.id}
                       key={row.id}
                       name={row.name}
-                      city={row.city}
+                      city={row.city_id}
                       status={row.status}
                       country={row.country}
                       address={row.address}
-                      locationType={row.locationType}
-                      selected={selected.indexOf(row.name) !== -1}
-                      handleClick={(event) => handleClick(event, row.name)}
+                      locationType={row.location_type_id}
+                      onDeleteLocation={deleteLocation}
                     />
                   ))}
 
                 <TableEmptyRows
                   height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, locations.length)}
+                  emptyRows={emptyRows(page, rowsPerPage, locations?.length)}
                 />
 
                 {notFound && <TableNoData query={filterName} />}
@@ -176,7 +162,7 @@ const LocationPage = () => {
         <TablePagination
           page={page}
           component="div"
-          count={locations.length}
+          count={locations?.length}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}

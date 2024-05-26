@@ -21,7 +21,6 @@ export default function LocationTableHead({
   onRequestSort,
   selectedStatus,
   onStatusChange,
-  onSelectAllClick,
   onLocationTypeChange,
   selectedLocationType,
 }) {
@@ -96,14 +95,6 @@ export default function LocationTableHead({
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-          />
-        </TableCell>
-
         {headLabel.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -112,48 +103,19 @@ export default function LocationTableHead({
             sortDirection={orderBy === headCell.id ? order : false}
             sx={{ width: headCell.width, minWidth: headCell.minWidth }}
           >
-            {headCell.id === 'location_type' ? (
-              <FilterComponent
-                id={headCell.id}
-                label={headCell.label}
-                options={LocationTypes}
-                onChange={onLocationTypeChange}
-                showFilter={showLocationTypeDropdown}
-                selectedValue={selectedLocationType}
-              />
-            ) : headCell.id === 'status' ? (
-              <FilterComponent
-                id={headCell.id}
-                label={headCell.label}
-                options={LocationStatus}
-                onChange={onStatusChange}
-                showFilter={showStatusDropdown}
-                selectedValue={selectedStatus}
-              />
-            ) : headCell.id === 'city' ? (
-              <FilterComponent
-                id={headCell.id}
-                label={headCell.label}
-                options={Cities}
-                onChange={onCityChange}
-                showFilter={showCityDropdown}
-                selectedValue={selectedCity}
-              />
-            ) : (
-              <TableSortLabel
-                hideSortIcon
-                active={orderBy === headCell.id}
-                direction={orderBy === headCell.id ? order : 'asc'}
-                onClick={onSort(headCell.id)}
-              >
-                {headCell.label}
-                {orderBy === headCell.id ? (
-                  <Box sx={{ ...visuallyHidden }}>
-                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                  </Box>
-                ) : null}
-              </TableSortLabel>
-            )}
+            <TableSortLabel
+              hideSortIcon
+              active={orderBy === headCell.id}
+              direction={orderBy === headCell.id ? order : 'asc'}
+              onClick={onSort(headCell.id)}
+            >
+              {headCell.label}
+              {orderBy === headCell.id ? (
+                <Box sx={{ ...visuallyHidden }}>
+                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                </Box>
+              ) : null}
+            </TableSortLabel>
           </TableCell>
         ))}
       </TableRow>
@@ -168,7 +130,6 @@ LocationTableHead.propTypes = {
   headLabel: PropTypes.array,
   numSelected: PropTypes.number,
   onRequestSort: PropTypes.func,
-  onSelectAllClick: PropTypes.func,
   onLocationTypeChange: PropTypes.func,
   onStatusChange: PropTypes.func,
   onCityChange: PropTypes.func,

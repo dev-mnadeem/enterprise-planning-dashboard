@@ -1,7 +1,7 @@
 const googlePlaceAutoComplete = (type) => {
   const initAutoComplete = async (input, callback) => {
     let autoComplete = new window.google.maps.places.Autocomplete(input, {
-      fields: ['address_components', 'name', 'formatted_address', 'place_id'],
+      fields: ['address_components', 'name', 'formatted_address', 'place_id', 'geometry'],
       libraries: ['places', 'city'],
       language: 'en',
       strictBounds: true,
@@ -38,8 +38,9 @@ const googlePlaceAutoComplete = (type) => {
 
   const getFullAddress = async (autoComplete) => {
     const place = await autoComplete.getPlace();
+    const lat = place.geometry.location.lat();
+    const lng = place.geometry.location.lng();
     const address = parseAddress(place.address_components);
-    console.log('address', address);
     const fields = setAddressFields(address);
     const parsedAdd = getParsedAddress(fields);
     return {
@@ -49,6 +50,7 @@ const googlePlaceAutoComplete = (type) => {
       formattedAddress: place.formatted_address,
       name: place?.name ?? '',
       place_id: place?.place_id ?? '',
+      geo_location: `${lat} ${lng}`,
     };
   };
 
