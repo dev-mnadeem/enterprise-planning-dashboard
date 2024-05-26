@@ -10,3 +10,12 @@
   background-image: none !important;
   height: 0px;
 }
+
+.required:after {
+  content: "*";
+  position: relative;
+  font-size: inherit;
+  color: #f1416c;
+  padding-left: .25rem;
+  font-weight: 700;
+}

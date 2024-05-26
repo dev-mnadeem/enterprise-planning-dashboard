@@ -37,7 +37,7 @@ const navConfig = [
   },
   {
     title: 'Shipments',
-    path: '/#',
+    path: ROUTES.ADD_SHIPMENT,
     icon: icon('ic_cart'),
   },
   {
