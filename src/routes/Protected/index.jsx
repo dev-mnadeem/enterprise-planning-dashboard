@@ -18,6 +18,9 @@ export const PermissionsPage = lazy(() => import('src/pages/permissions'));
 export const UserRolesPage = lazy(() => import('src/pages/roles'));
 export const AddUserRolePage = lazy(() => import('src/pages/roles/add-role'));
 export const EditUserRolePage = lazy(() => import('src/pages/roles/edit-role'));
+export const ShipmentsListPage = lazy(() => import('src/pages/shipments'));
+export const AddShipmentPage = lazy(() => import('src/pages/shipments/add-shipment'));
+export const EditShipmentPage = lazy(() => import('src/pages/shipments/edit-shipment'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 // ----------------------------------------------------------------------
@@ -90,6 +93,22 @@ const ProtectedRoutes = (props) => {
             <PrivateRoute element={EditUserRolePage} requiredPermission="UserRole" type={UPDATE} />
           ),
         },
+        // {
+        //   path: ROUTES.SHIPMENTS,
+        //   element: (
+        //     <PrivateRoute element={ShipmentsListPage} requiredPermission="Shipment" type={VIEW} />
+        //   ),
+        // },
+        {
+          path: ROUTES.ADD_SHIPMENT,
+          element: <AddShipmentPage />,
+        },
+        // {
+        //   path: `${ROUTES.SHIPMENTS}/:id`,
+        //   element: (
+        //     <PrivateRoute element={EditUserRolePage} requiredPermission="UserRole" type={UPDATE} />
+        //   ),
+        // },
       ],
     },
     {

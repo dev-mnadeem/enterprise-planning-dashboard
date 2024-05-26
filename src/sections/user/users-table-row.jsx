@@ -79,7 +79,7 @@ export default function UsersTableRow({
         }}
       >
         <MenuItem onClick={handleView}>
-          <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
+          <Iconify icon="eva:eye-outline" sx={{ mr: 2 }} />
           View
         </MenuItem>
         <MenuItem onClick={handleEdit}>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Formik } from 'formik';
 import ErrorMsg from '../error-msg';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Card, Typography } from '@mui/material';
 import { InputField } from '../common';
 import { userRoleFormValidationSchema } from 'src/constants';
 import { useQuery } from 'src/api';
@@ -57,49 +57,51 @@ export default function UserRoleForm({ onSubmit, initials, viewOnly, buttonText 
         values,
         isSubmitting,
       }) => (
-        <form onSubmit={handleSubmit}>
-          <fieldset disabled={viewOnly ?? false}>
-            <div className="grid gap-4 grid-cols-1 mt-10">
-              <Box>
-                <InputField
-                  name="name"
-                  title="Role Name"
-                  value={values.name}
-                  placeholder="Enter name i.e Manager"
-                  onChange={handleChange}
-                />
-                {touched.name && errors?.name && <ErrorMsg error={errors.name} />}
-              </Box>
+        <Card className="p-6">
+          <form onSubmit={handleSubmit}>
+            <fieldset disabled={viewOnly ?? false} className="border-none">
+              <div className="grid gap-4 grid-cols-1">
+                <Box>
+                  <InputField
+                    name="name"
+                    title="Role Name"
+                    value={values.name}
+                    placeholder="Enter name i.e Manager"
+                    onChange={handleChange}
+                  />
+                  {touched.name && errors?.name && <ErrorMsg error={errors.name} />}
+                </Box>
 
-              <Typography className="font-semibold	">
-                {viewOnly
-                  ? 'Permissions assigned to this role'
-                  : 'Select Permissions to assign this role'}
-              </Typography>
-              <PermissionsForm
-                permissions={permissions}
-                checkedPermissions={checkedPermissions}
-                setCheckedPermissions={setCheckedPermissions}
-              />
-            </div>
-            {viewOnly ? null : (
-              <Button
-                type="submit"
-                variant="contained"
-                color="inherit"
-                sx={{
-                  display: 'flex',
-                  padding: '10px 16px',
-                  marginTop: '15px',
-                  alignSelf: 'flex-end',
-                  justifyContent: 'flex-end',
-                }}
-              >
-                {buttonText}
-              </Button>
-            )}
-          </fieldset>
-        </form>
+                <Typography className="font-semibold	">
+                  {viewOnly
+                    ? 'Permissions assigned to this role'
+                    : 'Select Permissions to assign this role'}
+                </Typography>
+                <PermissionsForm
+                  permissions={permissions}
+                  checkedPermissions={checkedPermissions}
+                  setCheckedPermissions={setCheckedPermissions}
+                />
+              </div>
+              {viewOnly ? null : (
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="inherit"
+                  sx={{
+                    display: 'flex',
+                    padding: '10px 16px',
+                    marginTop: '15px',
+                    alignSelf: 'flex-end',
+                    justifyContent: 'flex-end',
+                  }}
+                >
+                  {buttonText}
+                </Button>
+              )}
+            </fieldset>
+          </form>
+        </Card>
       )}
     </Formik>
   );

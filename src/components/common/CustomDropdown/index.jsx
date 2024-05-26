@@ -8,7 +8,7 @@ export const CustomDropdown = (props) => {
   return (
     <Box>
       <Box className="flex justify-between items-center">
-        <Typography>{props.title}</Typography>
+        <Typography className={props.required ? 'required' : ''}>{props.title}</Typography>
       </Box>
 
       <Select
