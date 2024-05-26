@@ -5,6 +5,8 @@ export const ROUTES = {
   PERMISSIONS: '/permissions',
   USER_ROLES: '/user-roles',
   ADD_USER_ROLE: '/user-roles/add',
+  SHIPMENTS: '/shipments',
+  ADD_SHIPMENT: '/shipments/add',
 };
 
 export const PERMISSION_TYPE = {

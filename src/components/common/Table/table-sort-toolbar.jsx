@@ -29,7 +29,7 @@ export const TableSortToolbar = ({ numSelected, filterName, onFilterName }) => {
         <OutlinedInput
           value={filterName}
           onChange={onFilterName}
-          placeholder="Search Location..."
+          placeholder="Search..."
           startAdornment={
             <InputAdornment position="start">
               <Iconify

@@ -20,3 +20,7 @@ export const ADD_USER_INITIALS = {
   address: '',
   geo_location: '',
 };
+
+export const ADD_SHIPMENT_INITIALS = {
+  weight: 0,
+};
