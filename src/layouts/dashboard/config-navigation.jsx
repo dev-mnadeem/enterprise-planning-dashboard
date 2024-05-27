@@ -42,8 +42,13 @@ const navConfig = [
   },
   {
     title: 'Locations',
-    path: '/locations',
+    path: ROUTES.LOCATIONS,
     icon: icon('ic_locations'),
+  },
+  {
+    title: 'Orders',
+    path: ROUTES.ORDERS,
+    icon: icon('ic_order'),
   },
   {
     title: 'Reports',

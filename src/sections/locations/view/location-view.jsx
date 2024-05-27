@@ -3,7 +3,6 @@ import { TableHeadData } from '../utils';
 import Iconify from 'src/components/iconify';
 import { useNavigate } from 'react-router-dom';
 import Scrollbar from 'src/components/scrollbar';
-import { useAppSelector } from 'src/state/hooks';
 import LocationTableRow from '../location-table-row';
 import LocationTableHead from '../location-table-head';
 import LocationTableToolbar from '../location-table-toolbar';
@@ -27,7 +26,6 @@ const LocationPage = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
-  const [selected, setSelected] = useState([]);
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);

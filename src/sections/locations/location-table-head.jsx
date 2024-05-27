@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import React, { useState } from 'react';
-import { Cities, LocationStatus, LocationTypes, visuallyHidden } from './utils';
+import { visuallyHidden } from './utils';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import TableRow from '@mui/material/TableRow';
-import Checkbox from '@mui/material/Checkbox';
 import TableHead from '@mui/material/TableHead';
 import TableCell from '@mui/material/TableCell';
 import TableSortLabel from '@mui/material/TableSortLabel';
@@ -13,7 +12,6 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 export default function LocationTableHead({
   order,
   orderBy,
-  rowCount,
   headLabel,
   numSelected,
   onCityChange,
@@ -99,7 +97,6 @@ export default function LocationTableHead({
           <TableCell
             key={headCell.id}
             align={headCell.align || 'left'}
-            onClick={() => onCellClick(headCell)}
             sortDirection={orderBy === headCell.id ? order : false}
             sx={{ width: headCell.width, minWidth: headCell.minWidth }}
           >
