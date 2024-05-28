@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Outlet, Navigate, useRoutes, Route } from 'react-router-dom';
 
 import DashboardLayout from 'src/layouts/dashboard';
-import { PERMISSION_TYPE, ROUTES } from 'src/constants';
+import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
 import _ from 'lodash';
 import PrivateRoute from './PrivateRoute';
 
@@ -27,6 +27,7 @@ export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 const ProtectedRoutes = (props) => {
   const { ADD, VIEW, UPDATE, REMOVE } = PERMISSION_TYPE;
+  const { USER, LOCATION, USER_ROLE, PERMISSION } = PERMISSION_ENTITIES;
 
   return useRoutes([
     {
@@ -42,55 +43,55 @@ const ProtectedRoutes = (props) => {
         {
           path: 'locations',
           element: (
-            <PrivateRoute element={LocationPage} requiredPermission="Location" type="view" />
+            <PrivateRoute element={LocationPage} requiredPermission={LOCATION} type={VIEW} />
           ),
         },
         {
           path: 'locations/add',
           element: (
-            <PrivateRoute element={AddLocationPage} requiredPermission="Location" type="add" />
+            <PrivateRoute element={AddLocationPage} requiredPermission={LOCATION} type={ADD} />
           ),
         },
         {
           path: 'locations/:id',
           element: (
-            <PrivateRoute element={EditLocationPage} requiredPermission="Location" type="update" />
+            <PrivateRoute element={EditLocationPage} requiredPermission={LOCATION} type={UPDATE} />
           ),
         },
         {
           path: ROUTES.USERS,
-          element: <PrivateRoute element={UsersListPage} requiredPermission="User" type={VIEW} />,
+          element: <PrivateRoute element={UsersListPage} requiredPermission={USER} type={VIEW} />,
         },
         {
           path: ROUTES.ADD_USER,
-          element: <PrivateRoute element={AddUserPage} requiredPermission="User" type={ADD} />,
+          element: <PrivateRoute element={AddUserPage} requiredPermission={USER} type={ADD} />,
         },
         {
           path: `${ROUTES.USERS}/:id`,
-          element: <PrivateRoute element={EditUserPage} requiredPermission="User" type={UPDATE} />,
+          element: <PrivateRoute element={EditUserPage} requiredPermission={USER} type={UPDATE} />,
         },
         {
           path: ROUTES.PERMISSIONS,
           element: (
-            <PrivateRoute element={PermissionsPage} requiredPermission="Permission" type={VIEW} />
+            <PrivateRoute element={PermissionsPage} requiredPermission={PERMISSION} type={VIEW} />
           ),
         },
         {
           path: ROUTES.USER_ROLES,
           element: (
-            <PrivateRoute element={UserRolesPage} requiredPermission="UserRole" type={VIEW} />
+            <PrivateRoute element={UserRolesPage} requiredPermission={USER_ROLE} type={VIEW} />
           ),
         },
         {
           path: ROUTES.ADD_USER_ROLE,
           element: (
-            <PrivateRoute element={AddUserRolePage} requiredPermission="UserRole" type={ADD} />
+            <PrivateRoute element={AddUserRolePage} requiredPermission={USER_ROLE} type={ADD} />
           ),
         },
         {
           path: `${ROUTES.USER_ROLES}/:id`,
           element: (
-            <PrivateRoute element={EditUserRolePage} requiredPermission="UserRole" type={UPDATE} />
+            <PrivateRoute element={EditUserRolePage} requiredPermission={USER_ROLE} type={UPDATE} />
           ),
         },
         // {

@@ -62,8 +62,8 @@ export default function LoginView() {
           })
         );
         dispatch(storeUser(user));
-        router.replace('/');
-        window.location.reload();
+        // router.replace('/');
+        window.location.replace('/');
       } catch (error) {
         dispatch(logoutUser());
       }
@@ -71,7 +71,7 @@ export default function LoginView() {
   }, [data?.token]);
 
   useEffect(() => {
-    if (error) toast.error(error?.message || 'Something went wrong');
+    if (error) toast.error(error || 'Something went wrong');
   }, [error]);
 
   const renderForm = (

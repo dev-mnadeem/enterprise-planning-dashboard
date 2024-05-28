@@ -24,7 +24,7 @@ import {
 import UsersTableRow from '../users-table-row';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useMutation, useQuery } from 'src/api';
-import { PERMISSION_TYPE, ROUTES } from 'src/constants';
+import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
 import { useAppSelector } from 'src/state/hooks';
 import { checkCurrentUserPermission } from 'src/utils';
 
@@ -40,6 +40,7 @@ const UsersListPage = () => {
   const [deleteUserMutate, { data: updatedUser }] = useMutation(ENDPOINTS.USERS);
   const { user } = useAppSelector((state) => state.userReducer);
   const { ADD } = PERMISSION_TYPE;
+  const { USER } = PERMISSION_ENTITIES;
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error</div>;
@@ -89,7 +90,7 @@ const UsersListPage = () => {
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4">Manage System Users</Typography>
 
-        {checkCurrentUserPermission(user?.permissions, 'User', ADD) && (
+        {checkCurrentUserPermission(user?.permissions, USER, ADD) && (
           <Button
             onClick={() => navigate(ROUTES.ADD_USER)}
             variant="contained"
