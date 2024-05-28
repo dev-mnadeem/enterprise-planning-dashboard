@@ -11,7 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import { useAppDispatch, useAppSelector } from 'src/state/hooks';
 import { deleteLocation } from 'src/state/reducers/locationReducer';
 import { Link, useNavigate } from 'react-router-dom';
-import { PERMISSION_TYPE, ROUTES } from 'src/constants';
+import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
 import { checkCurrentUserPermission } from 'src/utils';
 
 export default function RolesTableRow({ id, index, name, onDeleteRole }) {
@@ -19,7 +19,8 @@ export default function RolesTableRow({ id, index, name, onDeleteRole }) {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(null);
   const { user } = useAppSelector((state) => state.userReducer);
-  const { DELETE, UPDATE } = PERMISSION_TYPE;
+  const { REMOVE, UPDATE } = PERMISSION_TYPE;
+  const { USER_ROLE } = PERMISSION_ENTITIES;
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -67,14 +68,14 @@ export default function RolesTableRow({ id, index, name, onDeleteRole }) {
           sx: { width: 140 },
         }}
       >
-        {checkCurrentUserPermission(user?.permissions, 'UserRole', UPDATE) && (
+        {checkCurrentUserPermission(user?.permissions, USER_ROLE, UPDATE) && (
           <MenuItem onClick={handleEdit}>
             <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
             Edit
           </MenuItem>
         )}
 
-        {checkCurrentUserPermission(user?.permissions, 'UserRole', DELETE) && (
+        {checkCurrentUserPermission(user?.permissions, USER_ROLE, REMOVE) && (
           <MenuItem onClick={() => handleDelete(name)} sx={{ color: 'error.main' }}>
             <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
             Delete
