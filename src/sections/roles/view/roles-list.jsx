@@ -23,7 +23,7 @@ import {
 } from 'src/components/common';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useMutation, useQuery } from 'src/api';
-import { PERMISSION_TYPE, ROUTES } from 'src/constants';
+import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
 import RolesTableRow from '../roles-table-row';
 import { checkCurrentUserPermission } from 'src/utils';
 import { useAppSelector } from 'src/state/hooks';
@@ -40,6 +40,7 @@ const RolesListPage = () => {
   const { data: userRoles, loading, error, refetch: refetchRoles } = useQuery(ENDPOINTS.USER_ROLES);
   const [deleteUserRoleMutate, { data: deletedRole }] = useMutation(ENDPOINTS.USER_ROLES);
   const { ADD } = PERMISSION_TYPE;
+  const { USER_ROLE } = PERMISSION_ENTITIES;
 
   if (loading) return;
   if (error) return <div>Error</div>;
@@ -89,7 +90,7 @@ const RolesListPage = () => {
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4">Manage System Roles</Typography>
 
-        {checkCurrentUserPermission(user?.permissions, 'UserRole', ADD) && (
+        {checkCurrentUserPermission(user?.permissions, USER_ROLE, ADD) && (
           <Button
             onClick={() => navigate(ROUTES.ADD_USER_ROLE)}
             variant="contained"

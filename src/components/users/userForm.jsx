@@ -120,6 +120,7 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
         setFieldValue,
         setFieldTouched,
         values,
+        resetForm,
       }) => (
         <Card className="p-6">
           <form onSubmit={handleSubmit}>
@@ -206,10 +207,10 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
                     options={countriesOptions}
                     value={countriesOptions?.find((item) => item.value === values.country)}
                     onValueChange={async (value) => {
-                      setFieldTouched('country', true);
-                      setFieldValue('country', value.value);
-                      setFieldValue('state', null);
-                      setFieldValue('city', null);
+                      await setFieldTouched('country', true);
+                      await setFieldValue('country', value.value);
+                      await setFieldValue('state', null);
+                      await setFieldValue('city', null);
                       await fetchCountryStates({}, `${value.value}/${ENDPOINTS.STATES}`);
                     }}
                   />
@@ -224,9 +225,9 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
                     options={stateOptions}
                     value={stateOptions?.find((item) => item.value === values.state)}
                     onValueChange={async (value) => {
-                      setFieldTouched('state', true);
-                      setFieldValue('state', value.value);
-                      setFieldValue('city', null);
+                      await setFieldTouched('state', true);
+                      await setFieldValue('state', value.value);
+                      await setFieldValue('city', '');
                       await fetchStateCities({}, `${value.value}/${ENDPOINTS.CITIES}`);
                     }}
                   />
