@@ -61,3 +61,52 @@ export const OrderTableHeadData = [
   { id: 'toUser', label: 'To User' },
   { id: 'status', label: 'Status' },
 ];
+
+
+export const ORDER_ADDRESS = [{
+  label:"",
+  value: "Micheal Smith 534 fly drive Washington, NY 33021, United States"
+
+}];
+
+
+export const ORDER_DATA =[
+  {
+  label:"Name",
+  value: "John Smith",
+},
+  {
+  label:"Email",
+  value: "JohnSmith@gmail.com",
+},
+  {
+  label:"Phone",
+  value: "+555 5555 5555",
+},
+  {
+  label:"Payment Type",
+  value: "Card Payment",
+},
+];
+export const ORDER_AMOUNT =[
+  {
+  label:"Quantity",
+  value: "3",
+},
+{
+  label:"Price",
+  value: "100 * 3",
+},
+{
+  label:"Weight",
+  value: "500g",
+},
+  {
+  label:"Discount",
+  value: "10%",
+},
+  {
+  label:"Total Amount",
+  value: "$300",
+},
+];

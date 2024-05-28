@@ -15,6 +15,7 @@ export const OrdersPage = lazy(() => import('src/pages/orders'));
 export const LocationPage = lazy(() => import('src/pages/locations'));
 export const AddLocationPage = lazy(() => import('src/pages/add-location'));
 export const EditLocationPage = lazy(() => import('src/pages/edit-location'));
+export const OrdersDetailPage = lazy(() => import('src/pages/order-detail'));
 export const PermissionsPage = lazy(() => import('src/pages/permissions'));
 export const UserRolesPage = lazy(() => import('src/pages/roles'));
 export const AddUserRolePage = lazy(() => import('src/pages/roles/add-role'));
@@ -56,6 +57,12 @@ const ProtectedRoutes = (props) => {
           path: ROUTES.LOCATION_DETIAL,
           element: (
             <PrivateRoute element={EditLocationPage} requiredPermission="Location" type="update" />
+          ),
+        },
+        {
+          path: ROUTES.ORDER_DETAIL,
+          element: (
+            <PrivateRoute element={OrdersDetailPage} requiredPermission="Orders" type={VIEW} />
           ),
         },
         {
