@@ -8,10 +8,11 @@ import Checkbox from '@mui/material/Checkbox';
 import MenuItem from '@mui/material/MenuItem';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
-import { useAppDispatch } from 'src/state/hooks';
+import { useAppDispatch, useAppSelector } from 'src/state/hooks';
 import { deleteLocation } from 'src/state/reducers/locationReducer';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from 'src/constants';
+import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
+import { checkCurrentUserPermission } from 'src/utils';
 
 export default function UsersTableRow({
   id,
@@ -25,10 +26,14 @@ export default function UsersTableRow({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(null);
+  const { user } = useAppSelector((state) => state.userReducer);
+  const { REMOVE, UPDATE, VIEW } = PERMISSION_TYPE;
+  const { USER } = PERMISSION_ENTITIES;
+
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
-  const handleDelte = (username) => {
+  const handleDelete = (username) => {
     if (!id) return;
 
     handleCloseMenu();
@@ -78,18 +83,26 @@ export default function UsersTableRow({
           sx: { width: 140 },
         }}
       >
-        <MenuItem onClick={handleView}>
-          <Iconify icon="eva:eye-outline" sx={{ mr: 2 }} />
-          View
-        </MenuItem>
-        <MenuItem onClick={handleEdit}>
-          <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
-        <MenuItem onClick={() => handleDelte(username)} sx={{ color: 'error.main' }}>
-          <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
-          Delete
-        </MenuItem>
+        {checkCurrentUserPermission(user?.permissions, USER, VIEW) && (
+          <MenuItem onClick={handleView}>
+            <Iconify icon="eva:eye-outline" sx={{ mr: 2 }} />
+            View
+          </MenuItem>
+        )}
+
+        {checkCurrentUserPermission(user?.permissions, USER, UPDATE) && (
+          <MenuItem onClick={handleEdit}>
+            <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
+            Edit
+          </MenuItem>
+        )}
+
+        {checkCurrentUserPermission(user?.permissions, USER, REMOVE) && (
+          <MenuItem onClick={() => handleDelete(username)} sx={{ color: 'error.main' }}>
+            <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
+            Delete
+          </MenuItem>
+        )}
       </Popover>
     </>
   );
