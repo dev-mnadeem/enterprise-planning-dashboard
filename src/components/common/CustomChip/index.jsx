@@ -4,14 +4,10 @@ import { Chip  } from '@mui/material';
 export const CustomChip = ({background,color,fontWeight,label}) => {
 
   return (
-    <Chip label={label} sx={{
+    <Chip className='rounded-lg font-bold' label={label} sx={{
         background: background|| "#EEF4FF",
         color:color || "#6677F4",
-       fontWeight:fontWeight|| 700,
-       borderRadius:"8px"
     }}/>
-
-  
   );
 };
 

@@ -1,8 +1,8 @@
+import { ROUTES } from 'src/constants';
+import { useNavigate } from 'react-router-dom';
 import { CustomChip, OrderCard } from 'src/components/common';
 import { ORDER_ADDRESS, ORDER_DATA, ORDER_AMOUNT } from '../utils';
 import { Box, Grid, Stack, Button, Container, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from 'src/constants';
 
 export default function OrdersDetailPage() {
   const navigate = useNavigate();
@@ -13,15 +13,7 @@ export default function OrdersDetailPage() {
       </Stack>
       <Container>
         <Typography variant="h6">Order# 113212</Typography>
-        <Box
-          gap={12}
-          sx={{
-            gap: '12px',
-            display: 'flex',
-            margin: '12px 0px',
-            background: 'transparent',
-          }}
-        >
+        <Box className="flex flex-row gap-3 my-3 bg-transparent">
           <CustomChip label="Ready For Ship" />
           <CustomChip label="Placed On: 2024-05-21" background="#e6eaed" color="#374356" />
         </Box>
@@ -33,24 +25,11 @@ export default function OrdersDetailPage() {
             <OrderCard data={ORDER_ADDRESS} label="SHIPPING ADDRESS" />
           </Grid>
         </Grid>
-        <Container
-          sx={{
-            marginTop: '12px',
-            padding: '0px !important',
-          }}
-        >
+        <Container className="mt-3 p-0">
           <OrderCard label="Quantity & Price" data={ORDER_AMOUNT} />
         </Container>
 
-        <Container
-          sx={{
-            width: '100%',
-            display: 'flex',
-            margin: ' 12px 0px',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
+        <Container className="flex w-full my-3 items-center justify-center">
           <Button onClick={() => navigate(ROUTES.ORDERS)}>Back to Orders</Button>
         </Container>
       </Container>
