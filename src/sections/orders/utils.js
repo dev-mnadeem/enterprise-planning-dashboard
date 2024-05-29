@@ -53,8 +53,8 @@ export const orders = [
 
 export const OrderTableHeadData = [
   { id: 'id', label: 'Id' },
-  { id: 'orderNumber', label: 'Order Number' },
-  { id: 'trackingNumber', label: 'Tracking Number' },
+  { id: 'orderNumber', label: 'Order #' },
+  { id: 'trackingNumber', label: 'Tracking #' },
   { id: 'from', label: 'From Location' },
   { id: 'to', label: 'To Location' },
   { id: 'fromUser', label: 'From User' },
@@ -62,51 +62,50 @@ export const OrderTableHeadData = [
   { id: 'status', label: 'Status' },
 ];
 
-
-export const ORDER_ADDRESS = [{
-  label:"",
-  value: "Micheal Smith 534 fly drive Washington, NY 33021, United States"
-
-}];
-
-
-export const ORDER_DATA =[
+export const ORDER_ADDRESS = [
   {
-  label:"Name",
-  value: "John Smith",
-},
-  {
-  label:"Email",
-  value: "JohnSmith@gmail.com",
-},
-  {
-  label:"Phone",
-  value: "+555 5555 5555",
-},
-  {
-  label:"Payment Type",
-  value: "Card Payment",
-},
+    label: '',
+    value: 'Micheal Smith 534 fly drive Washington, NY 33021, United States',
+  },
 ];
-export const ORDER_AMOUNT =[
+
+export const ORDER_DATA = [
   {
-  label:"Quantity",
-  value: "3",
-},
-{
-  label:"Price",
-  value: "100 * 3",
-},
-{
-  label:"Weight",
-  value: "500g",
-},
+    label: 'Name',
+    value: 'John Smith',
+  },
   {
-  label:"Discount",
-  value: "10%",
-},
+    label: 'Email',
+    value: 'JohnSmith@gmail.com',
+  },
   {
-  label:"Total Amount",
-  value: "$300",
-},
+    label: 'Phone',
+    value: '+555 5555 5555',
+  },
+  {
+    label: 'Payment Type',
+    value: 'Card Payment',
+  },
+];
+export const ORDER_AMOUNT = [
+  {
+    label: 'Quantity',
+    value: '3',
+  },
+  {
+    label: 'Price',
+    value: '100 * 3',
+  },
+  {
+    label: 'Weight',
+    value: '500g',
+  },
+  {
+    label: 'Discount',
+    value: '10%',
+  },
+  {
+    label: 'Total Amount',
+    value: '$300',
+  },
 ];

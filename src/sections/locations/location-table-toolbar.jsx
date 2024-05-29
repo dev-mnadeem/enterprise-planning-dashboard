@@ -7,7 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 
-const LocationTableToolbar = ({ numSelected, filterName, onFilterName }) => {
+const LocationTableToolbar = ({ numSelected, filterName, onFilterName, placeholder }) => {
   return (
     <Toolbar
       sx={{
@@ -29,7 +29,7 @@ const LocationTableToolbar = ({ numSelected, filterName, onFilterName }) => {
         <OutlinedInput
           value={filterName}
           onChange={onFilterName}
-          placeholder="Search Location..."
+          placeholder={placeholder ? placeholder : 'Search Location...'}
           startAdornment={
             <InputAdornment position="start">
               <Iconify

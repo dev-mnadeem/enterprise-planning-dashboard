@@ -1,8 +1,11 @@
 import { CustomChip, OrderCard } from 'src/components/common';
 import { ORDER_ADDRESS, ORDER_DATA, ORDER_AMOUNT } from '../utils';
 import { Box, Grid, Stack, Button, Container, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from 'src/constants';
 
-export default function OrdersPage() {
+export default function OrdersDetailPage() {
+  const navigate = useNavigate();
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
@@ -11,6 +14,7 @@ export default function OrdersPage() {
       <Container>
         <Typography variant="h6">Order# 113212</Typography>
         <Box
+          gap={12}
           sx={{
             gap: '12px',
             display: 'flex',
@@ -47,7 +51,7 @@ export default function OrdersPage() {
             justifyContent: 'center',
           }}
         >
-          <Button>Back to Orders</Button>
+          <Button onClick={() => navigate(ROUTES.ORDERS)}>Back to Orders</Button>
         </Container>
       </Container>
     </Container>
