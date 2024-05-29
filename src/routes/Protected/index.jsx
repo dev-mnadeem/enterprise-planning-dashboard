@@ -60,6 +60,10 @@ const ProtectedRoutes = (props) => {
           ),
         },
         {
+          path: ROUTES.ORDERS,
+          element: <PrivateRoute element={OrdersPage} requiredPermission="Orders" type={VIEW} />,
+        },
+        {
           path: ROUTES.ORDER_DETAIL,
           element: (
             <PrivateRoute element={OrdersDetailPage} requiredPermission="Orders" type={VIEW} />
@@ -117,11 +121,6 @@ const ProtectedRoutes = (props) => {
         //     <PrivateRoute element={EditUserRolePage} requiredPermission="UserRole" type={UPDATE} />
         //   ),
         // },
-
-        {
-          path: ROUTES.ORDERS,
-          element: <OrdersPage />,
-        },
       ],
     },
     {

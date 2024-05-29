@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Iconify from 'src/components/iconify';
-import { IconButton, MenuItem, Popover, TableCell, TableRow } from '@mui/material';
+import { Button, IconButton, MenuItem, Popover, TableCell, TableRow } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from 'src/constants';
 
 export default function OrderTableRow({
   id,
@@ -13,6 +15,7 @@ export default function OrderTableRow({
   orderNumber,
   trackingNumber,
 }) {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(null);
 
   const handleOpenMenu = (event) => {
@@ -33,7 +36,7 @@ export default function OrderTableRow({
 
   return (
     <>
-      <TableRow hover tabIndex={-1}>
+      <TableRow hover tabIndex={-2}>
         <TableCell>{id}</TableCell>
         <TableCell>{orderNumber}</TableCell>
         <TableCell>{trackingNumber}</TableCell>
@@ -42,6 +45,9 @@ export default function OrderTableRow({
         <TableCell>{fromUser}</TableCell>
         <TableCell>{toUser}</TableCell>
         <TableCell>{status}</TableCell>
+        <Button className="mt-4" onClick={() => navigate(`${ROUTES.ORDERS}/${id}`)}>
+          View
+        </Button>
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
             <Iconify icon="eva:more-vertical-fill" />

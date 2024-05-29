@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
-import { TableCell, TableHead, TableRow, TableSortLabel } from '@mui/material';
+import { visuallyHidden } from 'src/utils/table';
+import { Box, TableCell, TableHead, TableRow, TableSortLabel } from '@mui/material';
 
 export default function TableHeader({ order, orderBy, headLabel, onRequestSort }) {
   const onSort = (property) => (event) => {

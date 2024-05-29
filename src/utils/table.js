@@ -48,7 +48,7 @@ export function applyFilter({ fieldToSearch = 'name', inputData, comparator, fil
 
   if (filterName) {
     inputData = inputData?.filter(
-      (item) => item[fieldToSearch].toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      (item) => item[fieldToSearch]?.toLowerCase()?.indexOf(filterName?.toLowerCase()) !== -1
     );
   }
 

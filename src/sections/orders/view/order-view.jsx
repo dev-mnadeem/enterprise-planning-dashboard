@@ -8,6 +8,7 @@ import {
   Table,
   TableBody,
   TableContainer,
+  TablePagination,
   Typography,
 } from '@mui/material';
 import Scrollbar from 'src/components/scrollbar';
@@ -36,7 +37,7 @@ export default function OrdersPage() {
   };
 
   const dataFiltered = applyFilter({
-    fieldToSearch: 'name',
+    fieldToSearch: 'toUser',
     inputData: orders,
     comparator: getComparator(order, orderBy),
     filterName,
@@ -69,12 +70,13 @@ export default function OrdersPage() {
       <Card>
         <LocationTableToolbar
           numSelected={0}
+          placeholder="Search Orders"
           filterName={filterName}
           onFilterName={handleFilterByName}
         />
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }}>
+            <Table sx={{ minWidth: 860 }}>
               <TableHeader
                 order={order}
                 orderBy={orderBy}
@@ -100,6 +102,15 @@ export default function OrdersPage() {
             </Table>
           </TableContainer>
         </Scrollbar>
+        <TablePagination
+          page={page}
+          component="div"
+          count={orders?.length}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handleChangePage}
+          rowsPerPageOptions={[5, 10, 25]}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       </Card>
     </Container>
   );
