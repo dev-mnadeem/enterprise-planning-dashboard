@@ -37,6 +37,18 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
   const stateOptions = states?.map((state) => ({ value: state.id, label: state.name }));
   const cityOptions = cities?.map((city) => ({ value: city.id, label: city.name }));
 
+  const {
+    error:LocationError,
+    loading:locationLoading,
+    data: locations,
+  } = useQuery(ENDPOINTS.LOCATIONS);
+
+  const locationOptions = locations?.map((location) => ({
+    value: location.id,
+    label: location.name,
+  }));
+
+
   useEffect(() => {
     if (initials?.role_id) {
       setInitialValues({
@@ -86,8 +98,8 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
     }
   }, [initialValues?.city_id, countries]);
 
-  if (loading) return;
-  if (error || rpError || cntError || stError || citiesError || cityError || stateError)
+  if (loading|| locationLoading) return;
+  if (error || rpError || cntError || stError || citiesError || cityError || stateError|| LocationError)
     return <div>Something went wrong</div>;
 
   const accountStatusOptions = [
@@ -186,9 +198,10 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
                 <Box>
                   <CustomDropdown
                     name="branch"
+                    isMulti
                     title="Working Branch"
-                    value={null}
-                    options={[]}
+                    value={locationOptions?.find((item) => item.value === values.branch)}
+                    options={locationOptions}
                     placeholder="Select Branch"
                     onValueChange={(branch) => {
                       setFieldTouched('branch', true);
@@ -208,8 +221,8 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
                     onValueChange={async (value) => {
                       setFieldTouched('country', true);
                       setFieldValue('country', value.value);
-                      setFieldValue('state', null);
-                      setFieldValue('city', null);
+                      setFieldValue('state', '');
+                      setFieldValue('city', '');
                       await fetchCountryStates({}, `${value.value}/${ENDPOINTS.STATES}`);
                     }}
                   />
@@ -222,11 +235,11 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
                     name="state"
                     placeholder="Select State"
                     options={stateOptions}
-                    value={stateOptions?.find((item) => item.value === values.state)}
+                    value={stateOptions?.find((item) => item.value === values.state)||''}
                     onValueChange={async (value) => {
                       setFieldTouched('state', true);
                       setFieldValue('state', value.value);
-                      setFieldValue('city', null);
+                      setFieldValue('city', '');
                       await fetchStateCities({}, `${value.value}/${ENDPOINTS.CITIES}`);
                     }}
                   />
@@ -239,7 +252,7 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
                     name="city"
                     placeholder="Select City"
                     options={cityOptions}
-                    value={cityOptions?.find((item) => item.value === values.city)}
+                    value={cityOptions?.find((item) => item.value === values.city)|| ''}
                     onValueChange={(value) => {
                       setFieldTouched('city', true);
                       setFieldValue('city', value.value);

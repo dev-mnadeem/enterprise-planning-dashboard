@@ -9,7 +9,7 @@ const PrivateRoute = ({ element: Element, requiredPermission, type }) => {
 
   const hasPermission = checkCurrentUserPermission(permissions, requiredPermission, type);
 
-  return !hasPermission ? <Element /> : <Navigate to="/404" replace />;
+  return hasPermission ? <Element /> : <Navigate to="/404" replace />;
 };
 
 export default PrivateRoute;
