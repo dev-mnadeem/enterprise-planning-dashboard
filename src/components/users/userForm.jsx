@@ -140,6 +140,7 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
         setFieldValue,
         setFieldTouched,
         values,
+        resetForm,
       }) => (
         <Card className="p-6">
           <form onSubmit={handleSubmit}>
