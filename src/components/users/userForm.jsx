@@ -38,8 +38,8 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
   const cityOptions = cities?.map((city) => ({ value: city.id, label: city.name }));
 
   const {
-    error:LocationError,
-    loading:locationLoading,
+    error: LocationError,
+    loading: locationLoading,
     data: locations,
   } = useQuery(ENDPOINTS.LOCATIONS);
 
@@ -47,7 +47,6 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
     value: location.id,
     label: location.name,
   }));
-
 
   useEffect(() => {
     if (initials?.role_id) {
@@ -98,8 +97,17 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
     }
   }, [initialValues?.city_id, countries]);
 
-  if (loading|| locationLoading) return;
-  if (error || rpError || cntError || stError || citiesError || cityError || stateError|| LocationError)
+  if (loading || locationLoading) return;
+  if (
+    error ||
+    rpError ||
+    cntError ||
+    stError ||
+    citiesError ||
+    cityError ||
+    stateError ||
+    LocationError
+  )
     return <div>Something went wrong</div>;
 
   const accountStatusOptions = [
@@ -204,11 +212,16 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
                     options={locationOptions}
                     placeholder="Select Branch"
                     onValueChange={(branch) => {
+                      const ids = branch?.map((item) => item.value);
+                      setFieldValue('location_ids', ids);
                       setFieldTouched('branch', true);
+                      setFieldTouched('location_ids', true);
                       setFieldValue('branch', branch.value);
                     }}
                   />
-                  {touched.branch && errors?.branch && <ErrorMsg error={errors.branch} />}
+                  {touched.location_ids && errors?.location_ids && !values.location_ids.length && (
+                    <ErrorMsg error={errors.location_ids} />
+                  )}
                 </Box>
 
                 <Box>
@@ -235,7 +248,7 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
                     name="state"
                     placeholder="Select State"
                     options={stateOptions}
-                    value={stateOptions?.find((item) => item.value === values.state)||''}
+                    value={stateOptions?.find((item) => item.value === values.state) || ''}
                     onValueChange={async (value) => {
                       setFieldTouched('state', true);
                       setFieldValue('state', value.value);
@@ -252,7 +265,7 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
                     name="city"
                     placeholder="Select City"
                     options={cityOptions}
-                    value={cityOptions?.find((item) => item.value === values.city)|| ''}
+                    value={cityOptions?.find((item) => item.value === values.city) || ''}
                     onValueChange={(value) => {
                       setFieldTouched('city', true);
                       setFieldValue('city', value.value);
