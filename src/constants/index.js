@@ -21,4 +21,12 @@ export const PERMISSION_TYPE = {
   UPDATE: 'update',
 };
 
+/** PERMISSION KEY VALUES MUST MATCH WITH DB DATA  */
+export const PERMISSION_ENTITIES = {
+  USER: 'User',
+  LOCATION: 'Location',
+  USER_ROLE: 'UserRole',
+  PERMISSION: 'Permission',
+};
+
 export * from './yupValidations';
