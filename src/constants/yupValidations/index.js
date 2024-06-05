@@ -28,6 +28,7 @@ export const userFormValidationSchema = Yup.object().shape({
   country: Yup.string().required('Country is required'),
   state: Yup.string().required('State is required'),
   city: Yup.string().required('City is required'),
+  location_ids: Yup.array().of(Yup.string()).min(1, 'Please select at least one branch').nullable(),
 });
 
 export const userRoleFormValidationSchema = Yup.object().shape({
