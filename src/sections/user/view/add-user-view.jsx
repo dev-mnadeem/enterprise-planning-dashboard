@@ -38,6 +38,7 @@ const AddUserPage = () => {
       address: values?.address,
       geo_location: '',
       permissions: values?.permissions,
+      location_ids: values?.location_ids,
     });
   };
 

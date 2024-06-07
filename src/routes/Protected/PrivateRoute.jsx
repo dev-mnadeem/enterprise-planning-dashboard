@@ -7,7 +7,10 @@ const PrivateRoute = ({ element: Element, requiredPermission, type }) => {
 
   const permissions = user?.permissions || [];
 
-  const hasPermission = checkCurrentUserPermission(permissions, requiredPermission, type);
+  const hasPermission =
+    user?.user_role?.name === 'admin'
+      ? true
+      : checkCurrentUserPermission(permissions, requiredPermission, type);
 
   return hasPermission ? <Element /> : <Navigate to="/404" replace />;
 };

@@ -19,8 +19,13 @@ export const ADD_USER_INITIALS = {
   city: '',
   address: '',
   geo_location: '',
+  location_ids: [],
 };
 
 export const ADD_SHIPMENT_INITIALS = {
   weight: 0,
+};
+
+export const filterArrayByValues = (objectsArray, valuesArray) => {
+  return objectsArray?.filter((obj) => valuesArray?.includes(obj.value));
 };
