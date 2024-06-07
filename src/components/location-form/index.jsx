@@ -65,7 +65,7 @@ export default function LocationForm({ onSubmit, initials, buttonText }) {
       initialValues={initials ? initialValues : ADD_LOCATION_INITIALS}
     >
       {({ errors, touched, handleSubmit, setFieldValue, setFieldTouched, values }) => (
-        <Card className="p-6">
+        <Card className="p-6 overflow-visible">
           <fieldset className="border-none">
             <div className="grid gap-4 grid-cols-2">
               <Box>
