@@ -60,7 +60,7 @@ const UsersListPage = () => {
 
   const dataFiltered = applyFilter({
     fieldToSearch: 'username',
-    inputData: users,
+    inputData: users?.results,
     comparator: getComparator(order, orderBy),
     filterName,
   });
