@@ -11,9 +11,11 @@ export const UsersListPage = lazy(() => import('src/pages/users'));
 export const AddUserPage = lazy(() => import('src/pages/users/add-user'));
 export const EditUserPage = lazy(() => import('src/pages/users/edit-user'));
 export const LoginPage = lazy(() => import('src/pages/login'));
+export const OrdersPage = lazy(() => import('src/pages/orders'));
 export const LocationPage = lazy(() => import('src/pages/locations'));
 export const AddLocationPage = lazy(() => import('src/pages/add-location'));
 export const EditLocationPage = lazy(() => import('src/pages/edit-location'));
+export const OrdersDetailPage = lazy(() => import('src/pages/order-detail'));
 export const PermissionsPage = lazy(() => import('src/pages/permissions'));
 export const UserRolesPage = lazy(() => import('src/pages/roles'));
 export const AddUserRolePage = lazy(() => import('src/pages/roles/add-role'));
@@ -41,21 +43,31 @@ const ProtectedRoutes = (props) => {
       children: [
         { element: <IndexPage />, index: true },
         {
-          path: 'locations',
+          path: ROUTES.LOCATIONS,
           element: (
             <PrivateRoute element={LocationPage} requiredPermission={LOCATION} type={VIEW} />
           ),
         },
         {
-          path: 'locations/add',
+          path: ROUTES.ADD_LOCATION,
           element: (
             <PrivateRoute element={AddLocationPage} requiredPermission={LOCATION} type={ADD} />
           ),
         },
         {
-          path: 'locations/:id',
+          path: ROUTES.LOCATION_DETIAL,
           element: (
             <PrivateRoute element={EditLocationPage} requiredPermission={LOCATION} type={UPDATE} />
+          ),
+        },
+        {
+          path: ROUTES.ORDERS,
+          element: <PrivateRoute element={OrdersPage} requiredPermission="Orders" type={VIEW} />,
+        },
+        {
+          path: ROUTES.ORDER_DETAIL,
+          element: (
+            <PrivateRoute element={OrdersDetailPage} requiredPermission="Orders" type={VIEW} />
           ),
         },
         {

@@ -17,6 +17,7 @@ export const CustomDropdown = (props) => {
         onChange={props.onValueChange}
         onMenuOpen={() => setIsFocused(true)}
         onMenuClose={() => setIsFocused(false)}
+        isMulti={props.isMulti || false}
         styles={{
           control: (provided) => ({
             ...provided,
