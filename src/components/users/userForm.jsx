@@ -15,8 +15,10 @@ import {
 } from 'src/utils';
 import toast from 'react-hot-toast';
 import _ from 'lodash';
+import useMemoized from 'src/hooks/useMemoized';
+import { MuiTelInput } from 'mui-tel-input';
 
-export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText }) {
+export default function UserForm({ onSubmit, initials, viewOnly, buttonText }) {
   const [initialValues, setInitialValues] = useState({ ...initials });
   const [checkedPermissions, setCheckedPermissions] = useState({});
   const { data: userRoles, loading, error } = useQuery(ENDPOINTS.USER_ROLES);
@@ -50,12 +52,21 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
 
   useEffect(() => {
     if (initials?.role_id) {
-      setInitialValues({
-        ...initialValues,
+      setInitialValues((initValues) => ({
+        ...initValues,
         userRole: initials?.role_id,
-      });
+      }));
     }
   }, [initials?.role_id]);
+
+  useEffect(() => {
+    if (initials?.locations?.length) {
+      setInitialValues((initValues) => ({
+        ...initValues,
+        location_ids: initials?.locations?.map((item) => item.id),
+      }));
+    }
+  }, [initials?.locations]);
 
   useEffect(() => {
     /** IF ACTION IS ADD, SET PERMISSIONS BASED ON SELECTED ROLE,
@@ -150,34 +161,46 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
                   <InputField
                     name="name"
                     title="Name"
+                    required
                     value={values.name}
                     placeholder="Jhon Doe"
                     onChange={handleChange}
                   />
                   {touched.name && errors?.name && <ErrorMsg error={errors.name} />}
                 </Box>
+
                 <Box>
                   <InputField
                     title="Email"
                     placeholder="jhon@example.com"
                     name="email"
+                    required
                     value={values.email}
                     onChange={handleChange}
                   />
                   {touched.email && errors?.email && <ErrorMsg error={errors.email} />}
                 </Box>
+
                 <Box>
-                  <InputField
-                    title="Phone Number"
-                    placeholder="+1 123 456 7890"
+                  <Typography className="required">Phone Number</Typography>
+                  <MuiTelInput
                     name="phone_number"
+                    fullWidth
                     value={values.phone_number}
-                    onChange={handleChange}
+                    defaultCountry="US"
+                    forceCallingCode
+                    focusOnSelectCountry
+                    onlyCountries={countries?.map((country) => country.code)}
+                    onChange={(value) => {
+                      setFieldTouched('phone_number', true);
+                      setFieldValue('phone_number', value);
+                    }}
                   />
                   {touched.phone_number && errors?.phone_number && (
                     <ErrorMsg error={errors.phone_number} />
                   )}
                 </Box>
+
                 <Box>
                   <InputField
                     title="Address"
@@ -206,18 +229,18 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
 
                 <Box>
                   <CustomDropdown
-                    name="branch"
+                    name="location_ids"
                     isMulti
                     title="Working Branch"
-                    value={locationOptions?.find((item) => item.value === values.branch)}
+                    value={locationOptions?.filter((option) =>
+                      values?.location_ids?.includes(option.value)
+                    )}
                     options={locationOptions}
                     placeholder="Select Branch"
                     onValueChange={(branch) => {
                       const ids = branch?.map((item) => item.value);
                       setFieldValue('location_ids', ids);
-                      setFieldTouched('branch', true);
                       setFieldTouched('location_ids', true);
-                      setFieldValue('branch', branch.value);
                     }}
                   />
                   {touched.location_ids && errors?.location_ids && !values.location_ids.length && (
@@ -229,9 +252,13 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
                   <CustomDropdown
                     title="Country"
                     name="country"
+                    required
                     placeholder="Select Country"
                     options={countriesOptions}
-                    value={countriesOptions?.find((item) => item.value === values.country)}
+                    value={useMemoized(
+                      countriesOptions?.find((item) => item.value === values.country),
+                      [countriesOptions, values.country]
+                    )}
                     onValueChange={async (value) => {
                       setFieldTouched('country', true);
                       setFieldValue('country', value.value);
@@ -247,9 +274,15 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
                   <CustomDropdown
                     title="State"
                     name="state"
+                    required
                     placeholder="Select State"
                     options={stateOptions}
-                    value={stateOptions?.find((item) => item.value === values.state) || ''}
+                    value={
+                      useMemoized(
+                        stateOptions?.find((item) => item.value === values.state),
+                        [stateOptions, values.state]
+                      ) || ''
+                    }
                     onValueChange={async (value) => {
                       setFieldTouched('state', true);
                       setFieldValue('state', value.value);
@@ -264,9 +297,15 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
                   <CustomDropdown
                     title="City"
                     name="city"
+                    required
                     placeholder="Select City"
                     options={cityOptions}
-                    value={cityOptions?.find((item) => item.value === values.city) || ''}
+                    value={
+                      useMemoized(
+                        cityOptions?.find((item) => item.value === values.city),
+                        [cityOptions, values.city]
+                      ) || ''
+                    }
                     onValueChange={(value) => {
                       setFieldTouched('city', true);
                       setFieldValue('city', value.value);
@@ -279,7 +318,11 @@ export default function UserForm({ onSubmit, initials = {}, viewOnly, buttonText
                   <CustomDropdown
                     name="userRole"
                     title="User Role"
-                    value={userRoleOptions?.find((item) => item.value === values.userRole)}
+                    required
+                    value={useMemoized(
+                      userRoleOptions?.find((item) => item.value === values.userRole),
+                      [userRoleOptions, values.userRole]
+                    )}
                     options={userRoleOptions}
                     placeholder="Select User Role"
                     onValueChange={async (role) => {

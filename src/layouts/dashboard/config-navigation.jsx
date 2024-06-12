@@ -1,6 +1,14 @@
+import { Icon } from '@iconify/react';
 import SvgColor from 'src/components/svg-color';
 import { ROUTES } from 'src/constants';
-
+import {
+  ViewInAr,
+  LocalShipping,
+  LocationOn,
+  People,
+  LockPerson,
+  Security,
+} from '@mui/icons-material';
 // ----------------------------------------------------------------------
 
 const icon = (name) => (
@@ -16,17 +24,17 @@ const navConfig = [
   {
     title: 'Access Control',
     path: '#',
-    icon: icon('ic_user'),
+    icon: <Security />,
     menuItems: [
       {
         title: 'Users',
         path: ROUTES.USERS,
-        icon: icon('ic_user'),
+        icon: <People />,
       },
       {
         title: 'Roles',
         path: ROUTES.USER_ROLES,
-        icon: icon('ic_user'),
+        icon: <LockPerson />,
       },
       // {
       //   title: 'Permissions',
@@ -37,18 +45,18 @@ const navConfig = [
   },
   {
     title: 'Shipments',
-    path: ROUTES.ADD_SHIPMENT,
-    icon: icon('ic_cart'),
+    path: ROUTES.ORDERS,
+    icon: <LocalShipping />,
+  },
+  {
+    title: 'Packagings',
+    path: ROUTES.PACKAGINGS,
+    icon: <ViewInAr />,
   },
   {
     title: 'Locations',
     path: ROUTES.LOCATIONS,
-    icon: icon('ic_locations'),
-  },
-  {
-    title: 'Orders',
-    path: ROUTES.ORDERS,
-    icon: icon('ic_order'),
+    icon: <LocationOn />,
   },
   {
     title: 'Reports',

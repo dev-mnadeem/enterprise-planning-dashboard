@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { applyFilter, getComparator } from 'src/utils';
 import { OrderTableHeadData, orders } from '../utils';
 import {
+  Button,
   Card,
   Container,
   Stack,
@@ -12,11 +13,15 @@ import {
   Typography,
 } from '@mui/material';
 import Scrollbar from 'src/components/scrollbar';
-import TableHeader from 'src/components/table-header/inde';
 import LocationTableToolbar from 'src/sections/locations/location-table-toolbar';
 import OrderTableRow from '../order-table-row';
+import TableHeader from 'src/components/table-header';
+import Iconify from 'src/components/iconify';
+import { ROUTES } from 'src/constants';
+import { useNavigate } from 'react-router-dom';
 
 export default function OrdersPage() {
+  const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('name');
@@ -57,20 +62,20 @@ export default function OrdersPage() {
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Orders</Typography>
-        {/* <Button
-          onClick={() => navigate('/locations/add')}
+        <Typography variant="h4">Shipments</Typography>
+        <Button
+          onClick={() => navigate(ROUTES.ADD_ORDER)}
           variant="contained"
           color="inherit"
           startIcon={<Iconify icon="eva:plus-fill" />}
         >
-          New Order
-        </Button> */}
+          Create New Shipment
+        </Button>
       </Stack>
       <Card>
         <LocationTableToolbar
           numSelected={0}
-          placeholder="Search Orders"
+          placeholder="Search Shipment..."
           filterName={filterName}
           onFilterName={handleFilterByName}
         />

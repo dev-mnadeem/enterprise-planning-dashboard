@@ -8,4 +8,5 @@ export const ENDPOINTS = {
   CITIES: 'cities',
   LOCATION_TYPES: 'location-types',
   LOCATIONS: 'locations',
+  PACKAGINGS: 'packages',
 };

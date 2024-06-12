@@ -1,7 +1,16 @@
-export const checkCurrentUserPermission = (permissions = [], requiredPermission, type) => {
-  const hasPermission = permissions?.some(
-    (permission) => permission.name === requiredPermission && _.get(permission.properties, type)
-  );
+export const checkCurrentUserPermission = (
+  permissions = [],
+  requiredPermission,
+  type,
+  userRole = ''
+) => {
+  const hasPermission =
+    userRole === 'admin'
+      ? true
+      : permissions?.some(
+          (permission) =>
+            permission.name === requiredPermission && _.get(permission.properties, type)
+        );
 
   return hasPermission ?? false;
 };

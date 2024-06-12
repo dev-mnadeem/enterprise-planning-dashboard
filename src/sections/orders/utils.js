@@ -1,3 +1,43 @@
+export const ADD_ORDER_INITIALS = {
+  sender_name: '',
+  sender_email: '',
+  sender_phone: '',
+  sender_address: '',
+  sender_city_id: '',
+  receiver_name: '',
+  receiver_email: '',
+  receiver_phone: '',
+  receiver_address: '',
+  receiver_city_id: '',
+  total_quantity: 0,
+  sub_total: 0,
+  discount: 0,
+  total_amount: 0,
+  payment_type: '',
+  payment_status: '',
+  payment_date: '',
+  shipping_date: '',
+  collection_time: '',
+  status: '',
+  location_id: '',
+  package_id: '',
+  orderItems: [
+    {
+      name: '',
+      quantity: '',
+      price: '',
+      weight: '',
+      weight_type: '',
+      length: '',
+      width: '',
+      height: '',
+      total_price: '',
+      description: '',
+      courier_type: '',
+    },
+  ],
+};
+
 export const orders = [
   {
     id: 1,
@@ -60,6 +100,8 @@ export const OrderTableHeadData = [
   { id: 'fromUser', label: 'From User' },
   { id: 'toUser', label: 'To User' },
   { id: 'status', label: 'Status' },
+  { id: 'view', label: '' },
+  { id: 'action', label: '' },
 ];
 
 export const ORDER_ADDRESS = [

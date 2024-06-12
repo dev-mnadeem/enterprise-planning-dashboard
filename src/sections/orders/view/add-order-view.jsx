@@ -5,9 +5,9 @@ import { ROUTES } from 'src/constants';
 import { useMutation } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import toast from 'react-hot-toast';
-import ShipmentForm from 'src/components/orders/OrderForm';
+import OrderForm from 'src/components/orders/OrderForm';
 
-const AddShipmentPage = () => {
+const AddOrderPage = () => {
   const navigation = useNavigate();
   const [mutate, { data, loading, error }] = useMutation(ENDPOINTS.USERS);
 
@@ -25,16 +25,16 @@ const AddShipmentPage = () => {
     }
   }, [error]);
 
-  const onAddShipment = (values) => {};
+  const onAddOrder = (values) => {};
 
   if (loading) return;
 
   return (
     <Container>
       <Typography variant="h4">Add new Shipment</Typography>
-      <ShipmentForm onSubmit={onAddShipment} buttonText="Create Shipment" />
+      <OrderForm onSubmit={onAddOrder} buttonText="Create Shipment" />
     </Container>
   );
 };
 
-export default AddShipmentPage;
+export default AddOrderPage;
