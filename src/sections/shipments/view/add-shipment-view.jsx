@@ -5,7 +5,7 @@ import { ROUTES } from 'src/constants';
 import { useMutation } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import toast from 'react-hot-toast';
-import ShipmentForm from 'src/components/shipment/form';
+import ShipmentForm from 'src/components/orders/OrderForm';
 
 const AddShipmentPage = () => {
   const navigation = useNavigate();

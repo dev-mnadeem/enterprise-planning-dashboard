@@ -1,19 +1,12 @@
 import { Box, InputAdornment } from '@mui/material';
 import { InputField } from '..';
 
-export default function NumberField({ title, unit }) {
+export default function NumberField(props) {
   return (
     <Box display="flex" alignItems="center" className="">
       <InputField
+        {...props}
         type="number"
-        title={title}
-        name="weight"
-        required
-        value={0}
-        onChange={(value) => {
-          setFieldTouched('weight', true);
-          setFieldValue('weight', value);
-        }}
         InputProps={{
           endAdornment: (
             <InputAdornment position="start">
@@ -22,14 +15,14 @@ export default function NumberField({ title, unit }) {
                 alignItems="center"
                 style={{ backgroundColor: '#f0f0f0', padding: '0 10px' }}
               >
-                {unit}
+                {props?.unit || ''}
               </Box>
             </InputAdornment>
           ),
           style: { textAlign: 'center' },
         }}
         variant="outlined"
-        inputProps={{ min: 0, step: 0.1, style: { textAlign: 'center' } }}
+        inputProps={{ min: 0, step: 0.01, style: { textAlign: 'center' } }}
       />
     </Box>
   );

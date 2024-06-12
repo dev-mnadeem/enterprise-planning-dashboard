@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import PublicRoutes from './public';
 import { useScrollToTop } from 'src/hooks/use-scroll-to-top';
 import ProtectedRoutes from './Protected';
-import { jwtDecode } from 'jwt-decode';
 // ----------------------------------------------------------------------
 
 export default function Router() {

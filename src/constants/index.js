@@ -4,14 +4,15 @@ export const ROUTES = {
   LOCATIONS: '/locations',
   ADD_USER: '/users/add',
   ADD_LOCATION: '/locations/add',
-  ORDER_DETAIL: '/orders/:id',
   LOCATION_DETIAL: '/locations/:id',
   PERMISSIONS: '/permissions',
   USER_ROLES: '/user-roles',
   ADD_USER_ROLE: '/user-roles/add',
-  SHIPMENTS: '/shipments',
+  PACKAGINGS: '/packagings',
+  ADD_PACKAGING: '/packagings/add',
   ORDERS: '/orders',
-  ADD_SHIPMENT: '/shipments/add',
+  ADD_ORDER: '/orders/add',
+  ORDER_DETAIL: '/orders/:id',
 };
 
 export const PERMISSION_TYPE = {
@@ -27,6 +28,8 @@ export const PERMISSION_ENTITIES = {
   LOCATION: 'Location',
   USER_ROLE: 'UserRole',
   PERMISSION: 'Permission',
+  ORDER: 'Order',
+  PACKAGING: 'Package',
 };
 
 export * from './yupValidations';

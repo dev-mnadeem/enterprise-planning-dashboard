@@ -41,3 +41,48 @@ export const userRoleFormValidationSchema = Yup.object().shape({
       (value) => value.toLowerCase() !== 'admin'
     ),
 });
+
+export const createPackagingSchema = Yup.object().shape({
+  name: Yup.string().required(),
+  depth: Yup.number().required().positive().min(0.01),
+  width: Yup.number().required().positive().min(0.01),
+  height: Yup.number().required().positive().min(0.01),
+  price: Yup.number().required().positive().min(0.0),
+  weight_limit: Yup.number().optional().positive().min(0.0),
+});
+
+const createShipmentItemSchema = Yup.object().shape({
+  description: Yup.string().optional(),
+  courier_type: Yup.string().optional(),
+  quantity: Yup.number().required().positive().integer(),
+  price: Yup.number().required().positive(),
+  weight: Yup.string().required(),
+  weight_type: Yup.string().required(),
+  length: Yup.number().required().positive(),
+  width: Yup.number().required().positive(),
+  height: Yup.number().required().positive(),
+  total_price: Yup.number().required().positive(),
+});
+
+const createShipmentSchema = Yup.object().shape({
+  user_id: Yup.string().required(),
+  order_number: Yup.string().required(),
+  sender_name: Yup.string().required(),
+  sender_email: Yup.string().email().optional(),
+  sender_phone: Yup.string().required(),
+  sender_address: Yup.string().required(),
+  sender_city: Yup.string().required(),
+  receiver_name: Yup.string().required(),
+  receiver_email: Yup.string().email().optional(),
+  receiver_phone: Yup.string().required(),
+  receiver_address: Yup.string().required(),
+  receiver_city: Yup.string().required(),
+  total_quantity: Yup.number().required().positive().integer(),
+  sub_total: Yup.number().required().positive(),
+  discount: Yup.number().required().positive(),
+  total_amount: Yup.number().required().positive(),
+  payment_type: Yup.string().required(),
+  payment_status: Yup.string().required(),
+  payment_date: Yup.date().required(),
+  orderItems: Yup.array().of(createShipmentItemSchema).required(),
+});

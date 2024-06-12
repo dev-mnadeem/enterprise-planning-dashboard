@@ -27,6 +27,7 @@ import { useMutation, useQuery } from 'src/api';
 import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
 import { useAppSelector } from 'src/state/hooks';
 import { checkCurrentUserPermission } from 'src/utils';
+import toast from 'react-hot-toast';
 
 const UsersListPage = () => {
   const navigate = useNavigate();
@@ -37,13 +38,17 @@ const UsersListPage = () => {
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const { data: users, loading, error, refetch: refetchUsers } = useQuery(ENDPOINTS.USERS);
-  const [deleteUserMutate, { data: updatedUser }] = useMutation(ENDPOINTS.USERS);
+  const [deleteUserMutate, { error: deleteUserError }] = useMutation(ENDPOINTS.USERS);
   const { user } = useAppSelector((state) => state.userReducer);
   const { ADD } = PERMISSION_TYPE;
   const { USER } = PERMISSION_ENTITIES;
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error</div>;
+  if (error) {
+    toast.error(error || 'Something went wrong!');
+    return <div>Something went wrong!</div>;
+  }
+  if (deleteUserError) toast.error(deleteUserError || 'Something went wrong!');
 
   const handleFilterByName = (event) => {
     setPage(0);
@@ -79,6 +84,7 @@ const UsersListPage = () => {
 
     const res = await deleteUserMutate({}, 'DELETE', userId);
     if (res) {
+      toast.success('User deleted successfully!');
       refetchUsers();
     }
   };
