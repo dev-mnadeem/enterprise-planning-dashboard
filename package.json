@@ -23,6 +23,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@base_ui/react": "^1.0.0-alpha.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@faker-js/faker": "^8.1.0",

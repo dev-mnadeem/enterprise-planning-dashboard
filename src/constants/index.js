@@ -33,3 +33,16 @@ export const PERMISSION_ENTITIES = {
 };
 
 export * from './yupValidations';
+
+export const NUMBER_FORMATS = {
+  DOLLAR: {
+    style: 'currency',
+    currency: 'USD',
+    currencyDisplay: 'symbol',
+  },
+  KG: {
+    style: 'unit',
+    unit: 'kilogram',
+    unitDisplay: 'short',
+  },
+};
