@@ -9,11 +9,11 @@ import OrderForm from 'src/components/orders/OrderForm';
 
 const AddOrderPage = () => {
   const navigation = useNavigate();
-  const [mutate, { data, loading, error }] = useMutation(ENDPOINTS.USERS);
+  const [createOrder, { data, loading, error }] = useMutation(ENDPOINTS.ORDERS);
 
   useEffect(() => {
     if (data) {
-      toast.success('User added successfully!');
+      toast.success('Shipment created successfully!');
       navigation(ROUTES.USERS);
     }
   }, [data]);
@@ -21,13 +21,12 @@ const AddOrderPage = () => {
   useEffect(() => {
     if (error) {
       toast.error(error || 'Something went wrong!');
-      navigation(ROUTES.USERS);
     }
   }, [error]);
 
-  const onAddOrder = (values) => {};
-
-  if (loading) return;
+  const onAddOrder = async (values) => {
+    await createOrder({ ...values });
+  };
 
   return (
     <Container>

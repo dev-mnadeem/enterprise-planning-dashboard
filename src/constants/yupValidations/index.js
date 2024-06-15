@@ -64,25 +64,31 @@ const createShipmentItemSchema = Yup.object().shape({
   total_price: Yup.number().required().positive(),
 });
 
-const createShipmentSchema = Yup.object().shape({
-  user_id: Yup.string().required(),
-  order_number: Yup.string().required(),
-  sender_name: Yup.string().required(),
+export const createOrderSchema = Yup.object().shape({
+  sender_name: Yup.string().required('Customer name is required'),
   sender_email: Yup.string().email().optional(),
-  sender_phone: Yup.string().required(),
-  sender_address: Yup.string().required(),
-  sender_city: Yup.string().required(),
-  receiver_name: Yup.string().required(),
+  sender_phone: Yup.string().required('Customer phone number is required'),
+  sender_address: Yup.string().required('Customer address is required'),
+  receiver_name: Yup.string().required('Receiver name is required'),
   receiver_email: Yup.string().email().optional(),
-  receiver_phone: Yup.string().required(),
-  receiver_address: Yup.string().required(),
-  receiver_city: Yup.string().required(),
-  total_quantity: Yup.number().required().positive().integer(),
-  sub_total: Yup.number().required().positive(),
-  discount: Yup.number().required().positive(),
-  total_amount: Yup.number().required().positive(),
-  payment_type: Yup.string().required(),
-  payment_status: Yup.string().required(),
-  payment_date: Yup.date().required(),
-  orderItems: Yup.array().of(createShipmentItemSchema).required(),
+  receiver_phone: Yup.string().required('Receiver phone number is required'),
+  receiver_address: Yup.string().required('Receiver address is required'),
+  payment_type: Yup.string().required('Payment type is required'),
+  sender_city_id: Yup.string().required('Please select city'),
+  receiver_city_id: Yup.string().required('Please select city'),
+  shipping_date: Yup.date().required('Shipping date is required'),
+  collection_time: Yup.date().required('Collection time is required'),
+  location_id: Yup.string().required('Please select branch'),
+  package_id: Yup.string().required('Please select package'),
+
+  orderItems: Yup.array().of(
+    Yup.object().shape({
+      weight: Yup.number()
+        .required('Weight is required')
+        .min(0.01, 'Weight must be greater than or equal to 0.01'),
+      quantity: Yup.number()
+        .required('Quantity is required')
+        .min(1, 'Quantity must be greater than or equal to 1'),
+    })
+  ),
 });

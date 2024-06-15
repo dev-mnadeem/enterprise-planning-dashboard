@@ -9,4 +9,5 @@ export const ENDPOINTS = {
   LOCATION_TYPES: 'location-types',
   LOCATIONS: 'locations',
   PACKAGINGS: 'packages',
+  ORDERS: 'orders',
 };
