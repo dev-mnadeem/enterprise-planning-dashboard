@@ -24,7 +24,8 @@ export const EditPackagingPage = lazy(() => import('src/pages/packaging/edit-pac
 export const OrdersPage = lazy(() => import('src/pages/orders'));
 export const AddOrderPage = lazy(() => import('src/pages/orders/add-order'));
 export const EditOrderPage = lazy(() => import('src/pages/orders/edit-order'));
-export const OrdersDetailPage = lazy(() => import('src/pages/order-detail'));
+export const OrdersDetailPage = lazy(() => import('src/pages/orders/order-detail'));
+export const OrderInvoiceView = lazy(() => import('src/sections/invoices/order-invoice-view'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 // ----------------------------------------------------------------------
@@ -132,6 +133,12 @@ const ProtectedRoutes = (props) => {
           path: ROUTES.ORDER_DETAIL,
           element: (
             <PrivateRoute element={OrdersDetailPage} requiredPermission={ORDER} type={VIEW} />
+          ),
+        },
+        {
+          path: ROUTES.ORDER_INVOICE,
+          element: (
+            <PrivateRoute element={OrderInvoiceView} requiredPermission={ORDER} type={VIEW} />
           ),
         },
       ],

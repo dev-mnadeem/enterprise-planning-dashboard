@@ -1,32 +1,68 @@
 import { ROUTES } from 'src/constants';
 import { useNavigate } from 'react-router-dom';
 import { CustomChip, OrderCard } from 'src/components/common';
-import { ORDER_ADDRESS, ORDER_DATA, ORDER_AMOUNT } from '../utils';
+import { customerDetails, shippingDetails, shipmentDetails, orderPaymentDetails } from '../utils';
 import { Box, Grid, Stack, Button, Container, Typography } from '@mui/material';
+import { ENDPOINTS } from 'src/api/Endpoints';
+import { useQuery } from 'src/api';
+import { useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { Print } from '@mui/icons-material';
 
-export default function OrdersDetailPage() {
+export default function OrdersDetailPage({ id }) {
   const navigate = useNavigate();
+  const orderEndPoint = `${ENDPOINTS.ORDERS}/${id}`;
+  const { data: order, loading: queryLoading, error: orderError } = useQuery(orderEndPoint);
+
+  useEffect(() => {
+    if (!order && orderError) {
+      toast.error(orderError || 'Something went wrong!');
+      navigate(ROUTES.ORDERS);
+    }
+  }, [order, queryLoading]);
+
+  if (queryLoading) return;
+
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Order Detail</Typography>
+        <Typography variant="h4">Shipment Details</Typography>
       </Stack>
       <Container>
-        <Typography variant="h6">Order# 113212</Typography>
+        <Box className="flex justify-between">
+          <Typography variant="h6">
+            Shipment# <i>{order?.order_number}</i>
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<Print />}
+            onClick={() => navigate(`${ROUTES.ORDERS}/invoice/${id}`)}
+          >
+            Print Invoice
+          </Button>
+        </Box>
         <Box className="flex flex-row gap-3 my-3 bg-transparent">
-          <CustomChip label="Ready For Ship" />
-          <CustomChip label="Placed On: 2024-05-21" background="#e6eaed" color="#374356" />
+          <CustomChip label={order?.history[order?.history?.length - 1]?.status} />
+          <CustomChip
+            label={`Placed On: ${new Date(order?.createdAt || new Date()).toLocaleString()}`}
+            background="#e6eaed"
+            color="#374356"
+          />
         </Box>
         <Grid container spacing={1} direction="row">
           <Grid item xs={12} md={6} order={{ xs: 1, md: 1 }}>
-            <OrderCard data={ORDER_DATA} label="Customer & Order" />
+            <OrderCard data={customerDetails(order)} label="Customer" />
           </Grid>
           <Grid item xs={12} md={6} order={{ xs: 2, md: 2 }}>
-            <OrderCard data={ORDER_ADDRESS} label="SHIPPING ADDRESS" />
+            <OrderCard data={shippingDetails(order)} label="Delivery" />
           </Grid>
         </Grid>
         <Container className="mt-3 p-0">
-          <OrderCard label="Quantity & Price" data={ORDER_AMOUNT} />
+          <OrderCard label="Shipment Details" data={shipmentDetails(order)} />
+        </Container>
+
+        <Container className="mt-3 p-0">
+          <OrderCard label="Payment Details" data={orderPaymentDetails(order)} />
         </Container>
 
         <Container className="flex w-full my-3 items-center justify-center">

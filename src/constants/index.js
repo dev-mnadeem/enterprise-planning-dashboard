@@ -13,6 +13,7 @@ export const ROUTES = {
   ORDERS: '/orders',
   ADD_ORDER: '/orders/add',
   ORDER_DETAIL: '/orders/:id',
+  ORDER_INVOICE: '/orders/invoice/:id',
 };
 
 export const PERMISSION_TYPE = {
