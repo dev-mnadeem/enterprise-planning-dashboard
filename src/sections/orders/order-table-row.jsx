@@ -1,20 +1,11 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Iconify from 'src/components/iconify';
-import { Button, IconButton, MenuItem, Popover, TableCell, TableRow } from '@mui/material';
+import { Button, Chip, IconButton, MenuItem, Popover, TableCell, TableRow } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from 'src/constants';
 
-export default function OrderTableRow({
-  id,
-  to,
-  from,
-  toUser,
-  status,
-  fromUser,
-  orderNumber,
-  trackingNumber,
-}) {
+export default function OrderTableRow({ id, source, destination, customer, status, orderNumber }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(null);
 
@@ -22,7 +13,7 @@ export default function OrderTableRow({
     setOpen(event.currentTarget);
   };
 
-  const handleDelte = (id) => {
+  const handleCancel = (id) => {
     handleCloseMenu();
   };
 
@@ -37,14 +28,13 @@ export default function OrderTableRow({
   return (
     <>
       <TableRow hover tabIndex={-2}>
-        <TableCell>{id}</TableCell>
         <TableCell>{orderNumber}</TableCell>
-        <TableCell>{trackingNumber}</TableCell>
-        <TableCell>{from}</TableCell>
-        <TableCell>{to}</TableCell>
-        <TableCell>{fromUser}</TableCell>
-        <TableCell>{toUser}</TableCell>
-        <TableCell>{status}</TableCell>
+        <TableCell>{source}</TableCell>
+        <TableCell>{destination}</TableCell>
+        <TableCell>{customer}</TableCell>
+        <TableCell>
+          <Chip label={status} color="success" />
+        </TableCell>
         <Button className="mt-4" onClick={() => navigate(`${ROUTES.ORDERS}/${id}`)}>
           View
         </Button>
@@ -68,22 +58,11 @@ export default function OrderTableRow({
           <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
           Edit
         </MenuItem>
-        <MenuItem onClick={() => handleDelte(id)} sx={{ color: 'error.main' }}>
-          <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
-          Delete
+        <MenuItem onClick={() => handleCancel(id)} sx={{ color: 'error.main' }}>
+          <Iconify icon="eva:close-square-outline" sx={{ mr: 2 }} />
+          Cancel
         </MenuItem>
       </Popover>
     </>
   );
 }
-
-OrderTableRow.propTypes = {
-  id: PropTypes.number,
-  orderNumber: PropTypes.string,
-  trackingNumber: PropTypes.string,
-  from: PropTypes.string,
-  to: PropTypes.string,
-  fromUser: PropTypes.string,
-  toUser: PropTypes.string,
-  status: PropTypes.string,
-};

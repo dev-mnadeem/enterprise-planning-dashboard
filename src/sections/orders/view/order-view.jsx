@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { applyFilter, getComparator } from 'src/utils';
-import { OrderTableHeadData, orders } from '../utils';
+import { OrderTableHeadData } from '../utils';
 import {
   Button,
   Card,
@@ -19,6 +19,8 @@ import TableHeader from 'src/components/table-header';
 import Iconify from 'src/components/iconify';
 import { ROUTES } from 'src/constants';
 import { useNavigate } from 'react-router-dom';
+import { ENDPOINTS } from 'src/api/Endpoints';
+import { useQuery } from 'src/api';
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -27,6 +29,13 @@ export default function OrdersPage() {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const { data: orders, loading, error, refetch: refetchOrders } = useQuery(ENDPOINTS.ORDERS);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) {
+    toast.error(error || 'Something went wrong!');
+    return <div>Something went wrong!</div>;
+  }
 
   const handleFilterByName = (event) => {
     setPage(0);
@@ -42,7 +51,7 @@ export default function OrdersPage() {
   };
 
   const dataFiltered = applyFilter({
-    fieldToSearch: 'toUser',
+    fieldToSearch: 'order_number',
     inputData: orders,
     comparator: getComparator(order, orderBy),
     filterName,
@@ -93,14 +102,13 @@ export default function OrdersPage() {
                   ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
                     <OrderTableRow
-                      id={row.id}
-                      to={row.to}
-                      from={row.from}
-                      toUser={row.toUser}
-                      status={row.status}
-                      fromUser={row.fromUser}
-                      orderNumber={row.orderNumber}
-                      trackingNumber={row.trackingNumber}
+                      id={row?.id}
+                      key={row.id}
+                      source={row?.sender_city?.name}
+                      destination={row?.receiver_city?.name}
+                      customer={row.sender_name}
+                      status={row?.history[row?.history?.length - 1]?.status}
+                      orderNumber={row?.order_number}
                     />
                   ))}
               </TableBody>
@@ -110,7 +118,7 @@ export default function OrdersPage() {
         <TablePagination
           page={page}
           component="div"
-          count={orders?.length}
+          count={orders?.length || 0}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}
