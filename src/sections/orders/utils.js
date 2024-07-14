@@ -26,10 +26,7 @@ export const ADD_ORDER_INITIALS = {
     {
       name: '',
       quantity: '',
-      price: 0,
       weight: '',
-      weight_type: '',
-      total_price: 0,
       description: '',
       courier_type: '',
     },

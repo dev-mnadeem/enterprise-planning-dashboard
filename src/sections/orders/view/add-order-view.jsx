@@ -14,7 +14,7 @@ const AddOrderPage = () => {
   useEffect(() => {
     if (data) {
       toast.success('Shipment created successfully!');
-      navigation(ROUTES.USERS);
+      navigation(ROUTES.ORDERS);
     }
   }, [data]);
 
@@ -25,7 +25,7 @@ const AddOrderPage = () => {
   }, [error]);
 
   const onAddOrder = async (values) => {
-    await createOrder({ ...values });
+    await createOrder({ ...values, sub_total: 1, total_amount: 1, status: 'pending' });
   };
 
   return (

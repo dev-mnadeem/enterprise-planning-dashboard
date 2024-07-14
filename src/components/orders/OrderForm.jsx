@@ -77,6 +77,12 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
     [packagings]
   );
 
+  const packageValue = (id = '') =>
+    useMemoized(
+      packagingOptions?.find((item) => item.value === id),
+      [packagingOptions, id]
+    );
+
   useEffect(() => {
     /** FETCH STATE, CITY AND COUNTRY DATA BASED ON SELECTED CITY ID */
     const _cityId = initialValues?.city_id;
@@ -648,6 +654,11 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                               <NumberField
                                 name={`orderItems[${index}].weight`}
                                 title="Weight"
+                                max={Number(
+                                  packagings?.find((item) => item.id === values.package_id)
+                                    ?.weight_limit || 0
+                                )}
+                                min={0}
                                 unit={NUMBER_FORMATS.KG}
                                 value={Number(values?.orderItems?.[index]?.weight || 0)}
                                 required
