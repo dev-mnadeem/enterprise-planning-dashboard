@@ -1,44 +1,12 @@
-import { forwardRef, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Formik } from 'formik';
 import ErrorMsg from '../error-msg';
-import {
-  Autocomplete,
-  Box,
-  Button,
-  Card,
-  Divider,
-  FormControlLabel,
-  FormLabel,
-  IconButton,
-  Input,
-  InputAdornment,
-  Radio,
-  RadioGroup,
-  TextField,
-  Typography,
-  debounce,
-} from '@mui/material';
-import { CustomDropdown, InputField } from '../common';
-import { createPackagingSchema, userFormValidationSchema } from 'src/constants';
-import { useLazyQuery, useQuery } from 'src/api';
-import { ENDPOINTS } from 'src/api/Endpoints';
-import PermissionsForm from '../permissions/form';
-import {
-  formateInitialPermissionsData,
-  formattedPermissionsData,
-  removeFalsePermissions,
-} from 'src/utils';
-import toast from 'react-hot-toast';
+import { Box, Button, Card, Divider, Typography } from '@mui/material';
+import { InputField } from '../common';
+import { createPackagingSchema } from 'src/constants';
 import _ from 'lodash';
-import { MuiTelInput } from 'mui-tel-input';
-import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
 import NumberField from '../common/Input/NumberField';
 import Iconify from '../iconify/iconify';
-import { DateTimePicker } from '@mui/x-date-pickers';
-import dayjs from 'dayjs';
-import { AutoCompleteInput } from '../common/Input/AutoCompleteInput';
-import { ADD_SHIPMENT_INITIALS } from 'src/sections/shipments/utils';
-import useMemoized from 'src/hooks/useMemoized';
 import { ADD_PACKAGING_INITIALS } from 'src/sections/packaging/utils';
 
 export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText }) {

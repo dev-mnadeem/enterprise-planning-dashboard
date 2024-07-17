@@ -25,7 +25,7 @@ const AddOrderPage = () => {
   }, [error]);
 
   const onAddOrder = async (values) => {
-    await createOrder({ ...values, sub_total: 1, total_amount: 1, status: 'pending' });
+    await createOrder({ ...values });
   };
 
   return (

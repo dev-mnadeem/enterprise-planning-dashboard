@@ -51,17 +51,10 @@ export const createPackagingSchema = Yup.object().shape({
   weight_limit: Yup.number().optional().positive().min(0.0),
 });
 
-const createShipmentItemSchema = Yup.object().shape({
-  description: Yup.string().optional(),
-  courier_type: Yup.string().optional(),
-  quantity: Yup.number().required().positive().integer(),
-  price: Yup.number().required().positive(),
-  weight: Yup.string().required(),
-  weight_type: Yup.string().required(),
-  length: Yup.number().required().positive(),
-  width: Yup.number().required().positive(),
-  height: Yup.number().required().positive(),
-  total_price: Yup.number().required().positive(),
+export const createPricingSchema = Yup.object().shape({
+  from_city_id: Yup.string().required(),
+  to_city_id: Yup.string().required(),
+  price: Yup.number().required().positive().min(0.0),
 });
 
 export const createOrderSchema = Yup.object().shape({

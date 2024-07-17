@@ -3,18 +3,37 @@ import PropTypes from 'prop-types';
 import Iconify from 'src/components/iconify';
 import { Button, Chip, IconButton, MenuItem, Popover, TableCell, TableRow } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from 'src/constants';
+import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
+import { checkCurrentUserPermission } from 'src/utils';
+import { useAppSelector } from 'src/state/hooks';
 
-export default function OrderTableRow({ id, source, destination, customer, status, orderNumber }) {
+export default function OrderTableRow({
+  id,
+  source,
+  destination,
+  customer,
+  status,
+  orderNumber,
+  onCancelOrder,
+}) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(null);
+  const { user } = useAppSelector((state) => state.userReducer);
+  const { REMOVE, UPDATE } = PERMISSION_TYPE;
+  const { ORDER } = PERMISSION_ENTITIES;
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
 
   const handleCancel = (id) => {
+    if (!id) return;
+
     handleCloseMenu();
+    const confirmed = window.confirm(`Are you sure to Cancel #"${id}" Shipment?`);
+    if (confirmed) {
+      onCancelOrder(id);
+    }
   };
 
   const handleEdit = () => {
@@ -54,14 +73,19 @@ export default function OrderTableRow({ id, source, destination, customer, statu
           sx: { width: 140 },
         }}
       >
-        <MenuItem onClick={handleEdit}>
-          <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
-        <MenuItem onClick={() => handleCancel(id)} sx={{ color: 'error.main' }}>
-          <Iconify icon="eva:close-square-outline" sx={{ mr: 2 }} />
-          Cancel
-        </MenuItem>
+        {checkCurrentUserPermission(user?.permissions, ORDER, UPDATE) && (
+          <MenuItem onClick={handleEdit}>
+            <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
+            Edit
+          </MenuItem>
+        )}
+
+        {checkCurrentUserPermission(user?.permissions, ORDER, REMOVE) && (
+          <MenuItem onClick={() => handleCancel(id)} sx={{ color: 'error.main' }}>
+            <Iconify icon="eva:close-square-outline" sx={{ mr: 2 }} />
+            Cancel
+          </MenuItem>
+        )}
       </Popover>
     </>
   );

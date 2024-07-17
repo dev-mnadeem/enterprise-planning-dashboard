@@ -26,13 +26,17 @@ export const AddOrderPage = lazy(() => import('src/pages/orders/add-order'));
 export const EditOrderPage = lazy(() => import('src/pages/orders/edit-order'));
 export const OrdersDetailPage = lazy(() => import('src/pages/orders/order-detail'));
 export const OrderInvoiceView = lazy(() => import('src/sections/invoices/order-invoice-view'));
+export const PricingPage = lazy(() => import('src/pages/pricing'));
+export const AddPricingPage = lazy(() => import('src/pages/pricing/add-pricing'));
+export const EditPricingPage = lazy(() => import('src/pages/pricing/edit-pricing'));
+
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 // ----------------------------------------------------------------------
 
 const ProtectedRoutes = (props) => {
   const { ADD, VIEW, UPDATE, REMOVE } = PERMISSION_TYPE;
-  const { USER, LOCATION, USER_ROLE, PERMISSION, ORDER, PACKAGING } = PERMISSION_ENTITIES;
+  const { USER, LOCATION, USER_ROLE, PERMISSION, ORDER, PACKAGING, PRICING } = PERMISSION_ENTITIES;
 
   return useRoutes([
     {
@@ -119,6 +123,22 @@ const ProtectedRoutes = (props) => {
               requiredPermission={PACKAGING}
               type={UPDATE}
             />
+          ),
+        },
+        {
+          path: ROUTES.PRICING,
+          element: <PrivateRoute element={PricingPage} requiredPermission={PRICING} type={VIEW} />,
+        },
+        {
+          path: ROUTES.ADD_PRICING,
+          element: (
+            <PrivateRoute element={AddPricingPage} requiredPermission={PRICING} type={ADD} />
+          ),
+        },
+        {
+          path: `${ROUTES.PRICING}/:id`,
+          element: (
+            <PrivateRoute element={EditPricingPage} requiredPermission={PRICING} type={UPDATE} />
           ),
         },
         {
