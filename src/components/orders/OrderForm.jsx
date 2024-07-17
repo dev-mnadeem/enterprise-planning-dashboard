@@ -20,7 +20,6 @@ import NumberField from '../common/Input/BaseNumberField';
 
 export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) {
   const { user } = useAppSelector((state) => state.userReducer);
-  const [packages, setPackages] = useState([{}]);
   const [initialValues, setInitialValues] = useState({ ...initials });
 
   const [searchUser] = useLazyQuery(ENDPOINTS.USERS);
@@ -30,9 +29,8 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
   const [senderStateCities, { data: senderCities }] = useLazyQuery(ENDPOINTS.STATES);
   const [receiverStateCities, { data: receiverCities }] = useLazyQuery(ENDPOINTS.STATES);
   const { data: packagings } = useQuery(ENDPOINTS.PACKAGINGS);
+  const [getShipmentPricing, { data: shipmentPricing }] = useLazyQuery(ENDPOINTS.PRICING);
 
-  const [checkedPermissions, setCheckedPermissions] = useState({});
-  const [selectedState, setSelectedState] = useState(null);
   const [getRolePermissions, { data: role, loading: rpLoading, error: rpError }] = useLazyQuery(
     ENDPOINTS.USER_ROLES
   );
@@ -106,9 +104,10 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
 
   if (lcError || rpError || cntError) return <div>Something went wrong</div>;
 
-  const onSubmitForm = (values) => {
-    console.log('🚀 ~ onSubmitForm ~ values:', { ...values, weight_type: 'kg' });
+  /** FIXED PAGE SCROLLING TOP ON API CALL, NEED TO OPTIMIZE IT */
+  document.activeElement.scrollIntoView({ block: 'center' });
 
+  const onSubmitForm = (values) => {
     if (!matchIsValidTel(values?.sender_phone)) {
       toast.error('Please enter valid Customer Phone Number!');
       return;
@@ -119,7 +118,18 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
       return;
     }
 
-    onSubmit({ ...values, weight_type: 'kg' });
+    onSubmit({
+      ...values,
+      weight_type: 'kg',
+      total_amount: Number(shipmentPricing?.[0]?.price || 0),
+      sub_total: Number(shipmentPricing?.[0]?.price || 0),
+      status: 'pending',
+      pricing: {
+        from_city_id: shipmentPricing?.[0]?.from_city_id,
+        to_city_id: shipmentPricing?.[0]?.to_city_id,
+        price: Number(shipmentPricing?.[0]?.price || 0),
+      },
+    });
   };
 
   const searchUsers = async (phoneNo = '', setFieldValue) => {
@@ -501,9 +511,14 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                           [senderCityOptions, values.sender_city_id]
                         ) || ''
                       }
-                      onValueChange={(value) => {
+                      onValueChange={async (value) => {
                         setFieldTouched('sender_city_id', true);
                         setFieldValue('sender_city_id', value.value);
+                        values.receiver_city_id &&
+                          (await getShipmentPricing({
+                            fromCityId: value.value,
+                            toCityId: values.receiver_city_id,
+                          }));
                       }}
                     />
                     {touched.sender_city_id && errors?.sender_city_id && (
@@ -526,9 +541,14 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                           [receiverCityOptions, values.receiver_city_id]
                         ) || ''
                       }
-                      onValueChange={(value) => {
+                      onValueChange={async (value) => {
                         setFieldTouched('receiver_city_id', true);
                         setFieldValue('receiver_city_id', value.value);
+                        values.sender_city_id &&
+                          (await getShipmentPricing({
+                            fromCityId: values.sender_city_id,
+                            toCityId: value.value,
+                          }));
                       }}
                     />
                     {touched.receiver_city_id && errors?.receiver_city_id && (
@@ -735,7 +755,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       name="total_amount"
                       title="Amount to be Collected"
                       unit={NUMBER_FORMATS.DOLLAR}
-                      value={values.total_amount}
+                      value={Number(shipmentPricing?.[0]?.price || 0)}
                       disabled
                     />
                     {touched.total_amount && errors?.total_amount && (

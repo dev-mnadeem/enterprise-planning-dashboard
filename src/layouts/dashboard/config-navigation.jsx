@@ -8,6 +8,7 @@ import {
   People,
   LockPerson,
   Security,
+  PriceChange,
 } from '@mui/icons-material';
 // ----------------------------------------------------------------------
 
@@ -52,6 +53,11 @@ const navConfig = [
     title: 'Packagings',
     path: ROUTES.PACKAGINGS,
     icon: <ViewInAr />,
+  },
+  {
+    title: 'Pricings',
+    path: ROUTES.PRICING,
+    icon: <PriceChange />,
   },
   {
     title: 'Locations',

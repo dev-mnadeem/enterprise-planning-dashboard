@@ -20,7 +20,7 @@ import Iconify from 'src/components/iconify';
 import { ROUTES } from 'src/constants';
 import { useNavigate } from 'react-router-dom';
 import { ENDPOINTS } from 'src/api/Endpoints';
-import { useQuery } from 'src/api';
+import { useMutation, useQuery } from 'src/api';
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -30,12 +30,15 @@ export default function OrdersPage() {
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const { data: orders, loading, error, refetch: refetchOrders } = useQuery(ENDPOINTS.ORDERS);
+  const [cancelOrderMutate, { error: cancelOrderError }] = useMutation(ENDPOINTS.ORDERS);
 
   if (loading) return <div>Loading...</div>;
   if (error) {
     toast.error(error || 'Something went wrong!');
     return <div>Something went wrong!</div>;
   }
+
+  if (cancelOrderError) toast.error(cancelOrderError || 'Something went wrong!');
 
   const handleFilterByName = (event) => {
     setPage(0);
@@ -64,6 +67,16 @@ export default function OrdersPage() {
   const handleChangeRowsPerPage = (event) => {
     setPage(0);
     setRowsPerPage(parseInt(event.target.value, 10));
+  };
+
+  const cancelOrder = async (orderId) => {
+    if (!orderId) return;
+
+    const res = await cancelOrderMutate({}, 'DELETE', orderId);
+    if (res) {
+      toast.success('Order canceled successfully!');
+      refetchOrders();
+    }
   };
 
   const notFound = !orders?.length && !!filterName;
@@ -109,6 +122,7 @@ export default function OrdersPage() {
                       customer={row.sender_name}
                       status={row?.history[row?.history?.length - 1]?.status}
                       orderNumber={row?.order_number}
+                      onCancelOrder={(orderId) => cancelOrder(OrderId)}
                     />
                   ))}
               </TableBody>

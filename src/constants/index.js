@@ -14,6 +14,8 @@ export const ROUTES = {
   ADD_ORDER: '/orders/add',
   ORDER_DETAIL: '/orders/:id',
   ORDER_INVOICE: '/orders/invoice/:id',
+  PRICING: '/pricing',
+  ADD_PRICING: '/pricing/add',
 };
 
 export const PERMISSION_TYPE = {
@@ -31,6 +33,7 @@ export const PERMISSION_ENTITIES = {
   PERMISSION: 'Permission',
   ORDER: 'Order',
   PACKAGING: 'Package',
+  PRICING: 'Pricing',
 };
 
 export * from './yupValidations';

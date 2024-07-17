@@ -10,4 +10,5 @@ export const ENDPOINTS = {
   LOCATIONS: 'locations',
   PACKAGINGS: 'packages',
   ORDERS: 'orders',
+  PRICING: 'pricings',
 };
