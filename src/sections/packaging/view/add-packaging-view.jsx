@@ -32,6 +32,7 @@ const AddPackagingPage = () => {
       height: values?.height,
       price: values?.price,
       weight_limit: values?.weight_limit,
+      weight_type: values?.weight_type || 'kg',
     });
   };
 

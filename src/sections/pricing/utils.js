@@ -2,6 +2,7 @@ export const TableHeadData = [
   { id: 'fromCity', label: 'From' },
   { id: 'toCity', label: 'To' },
   { id: 'price', label: 'Price' },
+  { id: 'route', label: 'Route' },
   { id: 'updatedAt', label: 'Updated At' },
   { id: '' },
 ];

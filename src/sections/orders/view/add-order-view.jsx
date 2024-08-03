@@ -25,6 +25,7 @@ const AddOrderPage = () => {
   }, [error]);
 
   const onAddOrder = async (values) => {
+    console.log('🚀 ~ onAddOrder ~ values:', values);
     await createOrder({ ...values });
   };
 

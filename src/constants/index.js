@@ -50,3 +50,14 @@ export const NUMBER_FORMATS = {
     unitDisplay: 'short',
   },
 };
+
+export const SHIPMENT_ROUTE = {
+  AIR: 'air',
+  SEA: 'sea',
+  ROAD: 'road',
+};
+
+export const SHIPMENT_TYPE = {
+  DOMESTIC: 'domestic',
+  INTERNATIONAL: 'international',
+};

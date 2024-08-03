@@ -16,6 +16,7 @@ export default function PricingTableRow({
   toCity,
   price,
   updatedAt,
+  shipmentRoute,
   onDeletePricing,
 }) {
   const navigate = useNavigate();
@@ -57,9 +58,10 @@ export default function PricingTableRow({
   return (
     <>
       <TableRow hover tabIndex={-1}>
-        <TableCell>{fromCity?.name}</TableCell>
-        <TableCell>{toCity?.name}</TableCell>
+        <TableCell>{`${fromCity?.name}, ${fromCity?.state?.country?.name}`}</TableCell>
+        <TableCell>{`${toCity?.name}, ${toCity?.state?.country?.name}`}</TableCell>
         <TableCell>${price}</TableCell>
+        <TableCell>{shipmentRoute?.toUpperCase()}</TableCell>
         <TableCell>{new Date(updatedAt).toLocaleString()}</TableCell>
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>

@@ -3,7 +3,7 @@ import { Formik } from 'formik';
 import ErrorMsg from '../error-msg';
 import { Box, Button, Card, Divider, Typography } from '@mui/material';
 import { CustomDropdown, InputField } from '../common';
-import { createPackagingSchema, createPricingSchema } from 'src/constants';
+import { SHIPMENT_ROUTE, createPackagingSchema, createPricingSchema } from 'src/constants';
 import _ from 'lodash';
 import NumberField from '../common/Input/NumberField';
 import Iconify from '../iconify/iconify';
@@ -15,12 +15,14 @@ import { ENDPOINTS } from 'src/api/Endpoints';
 
 export default function PricingForm({ onSubmit, initials, viewOnly, buttonText }) {
   const [initialValues, setInitialValues] = useState({ ...initials });
+  const { AIR, SEA, ROAD } = SHIPMENT_ROUTE;
 
   const { data: countries, cntLoading, cntError } = useQuery(ENDPOINTS.COUNTRIES);
   const [senderCountryStates, { data: senderStates }] = useLazyQuery(ENDPOINTS.COUNTRIES);
   const [receiverCountryStates, { data: receiverStates }] = useLazyQuery(ENDPOINTS.COUNTRIES);
   const [senderStateCities, { data: senderCities }] = useLazyQuery(ENDPOINTS.STATES);
   const [receiverStateCities, { data: receiverCities }] = useLazyQuery(ENDPOINTS.STATES);
+  const [getRoutePackagings, { data: packagings }] = useLazyQuery(ENDPOINTS.PACKAGINGS);
 
   const countriesOptions = useMemoized(
     countries?.map((country) => ({ value: country.id, label: country.name })),
@@ -41,6 +43,16 @@ export default function PricingForm({ onSubmit, initials, viewOnly, buttonText }
   const receiverCityOptions = useMemoized(
     receiverCities?.map((city) => ({ value: city.id, label: city.name })),
     [receiverCities]
+  );
+
+  const shipmentRouteOptions = useMemoized(
+    [AIR, SEA, ROAD].map((type) => ({ value: type, label: type })),
+    []
+  );
+
+  const packagingOptions = useMemoized(
+    packagings?.map((packaging) => ({ value: packaging.id, label: packaging.name })),
+    [packagings]
   );
 
   const onSubmitForm = (values) => {
@@ -67,6 +79,52 @@ export default function PricingForm({ onSubmit, initials, viewOnly, buttonText }
           <form onSubmit={handleSubmit}>
             <fieldset disabled={viewOnly ?? false} className="border-none">
               <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
+                <Box>
+                  <CustomDropdown
+                    name="shipment_route"
+                    title="Shipment Route"
+                    options={shipmentRouteOptions}
+                    value={useMemoized(
+                      shipmentRouteOptions?.find((item) => item.value === values.shipment_route),
+                      [shipmentRouteOptions, values.shipment_route]
+                    )}
+                    required
+                    placeholder="Select Shipment By"
+                    onValueChange={async (shipment_route) => {
+                      setFieldTouched('shipment_route', true);
+                      setFieldValue('shipment_route', shipment_route.value);
+                      setFieldValue('weight_type', shipment_route.value === SEA ? 'cbm' : 'kg');
+                      await getRoutePackagings({
+                        route: shipment_route.value === SEA ? 'sea' : 'air',
+                      });
+                    }}
+                  />
+                  {touched.shipment_route && errors?.shipment_route && (
+                    <ErrorMsg error={errors.shipment_route} />
+                  )}
+                </Box>
+
+                <Box>
+                  <CustomDropdown
+                    name="package_id "
+                    title="Shipment Packaging"
+                    options={packagingOptions}
+                    value={useMemoized(
+                      packagingOptions?.find((item) => item.value === values.package_id),
+                      [packagingOptions, values.package_id]
+                    )}
+                    required
+                    placeholder="Select Shipment Packaging"
+                    onValueChange={(package_id) => {
+                      setFieldTouched('package_id', true);
+                      setFieldValue('package_id', package_id.value);
+                    }}
+                  />
+                  {touched.package_id && errors?.package_id && (
+                    <ErrorMsg error={errors.package_id} />
+                  )}
+                </Box>
+
                 <Box>
                   <CustomDropdown
                     title="From Country"

@@ -1,9 +1,21 @@
 import { useEffect, useState } from 'react';
 import { FieldArray, Formik } from 'formik';
 import ErrorMsg from '../error-msg';
-import { Box, Button, Card, Divider, IconButton, InputAdornment, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  Divider,
+  FormControlLabel,
+  FormLabel,
+  IconButton,
+  InputAdornment,
+  Radio,
+  RadioGroup,
+  Typography,
+} from '@mui/material';
 import { CustomDropdown, InputField } from '../common';
-import { NUMBER_FORMATS, createOrderSchema } from 'src/constants';
+import { NUMBER_FORMATS, SHIPMENT_ROUTE, SHIPMENT_TYPE, createOrderSchema } from 'src/constants';
 import { useLazyQuery, useQuery } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import toast from 'react-hot-toast';
@@ -21,6 +33,8 @@ import NumberField from '../common/Input/BaseNumberField';
 export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) {
   const { user } = useAppSelector((state) => state.userReducer);
   const [initialValues, setInitialValues] = useState({ ...initials });
+  const { AIR, SEA, ROAD } = SHIPMENT_ROUTE;
+  const { DOMESTIC, INTERNATIONAL } = SHIPMENT_TYPE;
 
   const [searchUser] = useLazyQuery(ENDPOINTS.USERS);
   const { data: countries, cntLoading, cntError } = useQuery(ENDPOINTS.COUNTRIES);
@@ -28,7 +42,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
   const [receiverCountryStates, { data: receiverStates }] = useLazyQuery(ENDPOINTS.COUNTRIES);
   const [senderStateCities, { data: senderCities }] = useLazyQuery(ENDPOINTS.STATES);
   const [receiverStateCities, { data: receiverCities }] = useLazyQuery(ENDPOINTS.STATES);
-  const { data: packagings } = useQuery(ENDPOINTS.PACKAGINGS);
+  const [getRoutePackagings, { data: packagings }] = useLazyQuery(ENDPOINTS.PACKAGINGS);
   const [getShipmentPricing, { data: shipmentPricing }] = useLazyQuery(ENDPOINTS.PRICING);
 
   const [getRolePermissions, { data: role, loading: rpLoading, error: rpError }] = useLazyQuery(
@@ -74,33 +88,19 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
     packagings?.map((packaging) => ({ value: packaging.id, label: packaging.name })),
     [packagings]
   );
+  const shipmentRouteOptions = (type = '') =>
+    useMemoized(
+      [type === DOMESTIC ? [ROAD] : [SEA, AIR]]
+        .flat()
+        .map((type) => ({ value: type, label: type })),
+      [type]
+    );
 
   const packageValue = (id = '') =>
     useMemoized(
       packagingOptions?.find((item) => item.value === id),
       [packagingOptions, id]
     );
-
-  useEffect(() => {
-    /** FETCH STATE, CITY AND COUNTRY DATA BASED ON SELECTED CITY ID */
-    const _cityId = initialValues?.city_id;
-    if (_cityId && countries?.length) {
-      fetchCity({}, _cityId).then((_city) => {
-        fetchState({}, _city?.state_id).then((_state) => {
-          senderCountryStates({}, `${_state?.country_id}/${ENDPOINTS.STATES}`).then(() => {
-            senderStateCities({}, `${_city?.state_id}/${ENDPOINTS.CITIES}`).then(() => {
-              setInitialValues({
-                ...initialValues,
-                country: _state?.country_id,
-                state: _city?.state_id,
-                city: _city?.id,
-              });
-            });
-          });
-        });
-      });
-    }
-  }, [initialValues?.city_id, countries]);
 
   if (lcError || rpError || cntError) return <div>Something went wrong</div>;
 
@@ -121,13 +121,15 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
     onSubmit({
       ...values,
       weight_type: 'kg',
-      total_amount: Number(shipmentPricing?.[0]?.price || 0),
-      sub_total: Number(shipmentPricing?.[0]?.price || 0),
+      total_amount: Number(values?.total_amount || 0),
+      sub_total: Number(values?.total_amount || 0),
       status: 'pending',
       pricing: {
-        from_city_id: shipmentPricing?.[0]?.from_city_id,
-        to_city_id: shipmentPricing?.[0]?.to_city_id,
-        price: Number(shipmentPricing?.[0]?.price || 0),
+        from_city_id: values?.sender_city_id,
+        to_city_id: values?.receiver_city_id,
+        price: Number(values?.total_amount || 0),
+        route: values?.shipment_route,
+        package_id: values?.package_id,
       },
     });
   };
@@ -166,6 +168,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
         setFieldValue,
         setFieldTouched,
         values,
+        resetForm,
       }) => {
         useEffect(() => {
           const totalWeight = values.orderItems?.reduce(
@@ -181,29 +184,107 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
           setFieldValue('total_quantity', totalQuantity);
         }, [values.orderItems, setFieldValue]);
 
+        useEffect(() => {
+          if (
+            values?.sender_city_id?.length &&
+            values?.receiver_city_id?.length &&
+            values?.package_id?.length &&
+            values?.shipment_route?.length
+          ) {
+            getShipmentPricing({
+              fromCityId: values.sender_city_id,
+              toCityId: values.receiver_city_id,
+              packageId: values.package_id,
+              route: values.shipment_route?.toLowerCase(),
+            });
+          }
+        }, [
+          values?.sender_city_id,
+          values?.receiver_city_id,
+          values?.package_id,
+          values?.shipment_route,
+        ]);
+
+        useEffect(() => {
+          setFieldValue('total_amount', shipmentPricing?.[0]?.price || 0);
+        }, [shipmentPricing?.[0]?.price]);
+
         return (
           <Card className="p-6">
             <form onSubmit={handleSubmit}>
               <fieldset disabled={viewOnly ?? false} className="border-none">
                 <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
-                  {/* COMMENTED FOR LATER USE
-                <Box className="col-span-2">
-                  <FormLabel>Shipment Type:</FormLabel>
-                  <RadioGroup row={true} name="position">
-                    <FormControlLabel
-                      value="pick"
-                      control={<Radio />}
-                      label="Pickup (For door to door delivery)"
-                    />
-                    <FormControlLabel
-                      value="drop"
-                      control={<Radio />}
-                      label="Drop off (For delivery package from branch directly)"
-                    />
-                  </RadioGroup>
-                </Box>
+                  <Box>
+                    <FormLabel>Shipment Type:</FormLabel>
+                    <RadioGroup
+                      row={true}
+                      name="type"
+                      value={values?.type || 'international'}
+                      onChange={async (e) => {
+                        resetForm();
+                        await setFieldValue('type', e.target.value);
+                      }}
+                    >
+                      <FormControlLabel
+                        value="domestic"
+                        control={<Radio required={true} />}
+                        label="Domestic"
+                      />
+                      <FormControlLabel
+                        value="international"
+                        control={<Radio required={true} />}
+                        label="International"
+                      />
+                    </RadioGroup>
+                  </Box>
 
-                <Divider className="col-span-2" /> */}
+                  <Divider className="col-span-2" />
+
+                  <Box>
+                    <CustomDropdown
+                      name="shipment_route"
+                      title="Shipment Route"
+                      options={shipmentRouteOptions(values?.type)}
+                      value={useMemoized(
+                        shipmentRouteOptions(values?.type)?.find(
+                          (item) => item.value === values.shipment_route
+                        ) || null,
+                        [values?.type, values.shipment_route]
+                      )}
+                      required
+                      placeholder="Select Shipment Route"
+                      onValueChange={async (shipment_route) => {
+                        setFieldTouched('shipment_route', true);
+                        setFieldValue('shipment_route', shipment_route.value);
+                        setFieldValue('package_id', '');
+                        await getRoutePackagings({ route: shipment_route.value });
+                      }}
+                    />
+                    {touched.shipment_route && errors?.shipment_route && (
+                      <ErrorMsg error={errors.shipment_route} />
+                    )}
+                  </Box>
+
+                  <Box>
+                    <CustomDropdown
+                      name="package_id "
+                      title="Shipment Packaging"
+                      options={packagingOptions}
+                      value={useMemoized(
+                        packagingOptions?.find((item) => item.value === values.package_id) || null,
+                        [packagingOptions, values.package_id]
+                      )}
+                      required
+                      placeholder="Select Shipment Packaging"
+                      onValueChange={(package_id) => {
+                        setFieldTouched('package_id', true);
+                        setFieldValue('package_id', package_id.value);
+                      }}
+                    />
+                    {touched.package_id && errors?.package_id && (
+                      <ErrorMsg error={errors.package_id} />
+                    )}
+                  </Box>
 
                   <Box>
                     <CustomDropdown
@@ -213,7 +294,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       placeholder="Select Branch"
                       options={branchesOptions}
                       value={useMemoized(
-                        branchesOptions?.find((item) => item.value === values.location_id),
+                        branchesOptions?.find((item) => item.value === values.location_id) || null,
                         [branchesOptions, values.location_id]
                       )}
                       onValueChange={async (value) => {
@@ -408,15 +489,17 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       placeholder="Select Country"
                       options={countriesOptions}
                       value={useMemoized(
-                        countriesOptions?.find((item) => item.value === values.sender_country),
+                        countriesOptions?.find((item) => item.value === values.sender_country) ||
+                          null,
                         [countriesOptions, values.sender_country]
                       )}
                       onValueChange={async (value) => {
                         setFieldTouched('sender_country', true);
                         setFieldValue('sender_country', value.value);
-                        setFieldValue('state', null);
-                        setFieldValue('city', null);
+                        setFieldValue('sender_state', null);
+                        setFieldValue('sender_city_id', null);
                         await senderCountryStates({}, `${value.value}/${ENDPOINTS.STATES}`);
+                        await senderStateCities({}, `-1/${ENDPOINTS.CITIES}`);
                       }}
                     />
                     {touched.sender_country && errors?.sender_country && (
@@ -432,15 +515,17 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       placeholder="Select Country"
                       options={countriesOptions}
                       value={useMemoized(
-                        countriesOptions?.find((item) => item.value === values.receiver_country),
+                        countriesOptions?.find((item) => item.value === values.receiver_country) ||
+                          null,
                         [countriesOptions, values.receiver_country]
                       )}
                       onValueChange={async (value) => {
                         setFieldTouched('receiver_country', true);
                         setFieldValue('receiver_country', value.value);
-                        setFieldValue('toState', null);
-                        setFieldValue('toCity', null);
+                        setFieldValue('receiver_state', null);
+                        setFieldValue('receiver_city_id', null);
                         await receiverCountryStates({}, `${value.value}/${ENDPOINTS.STATES}`);
+                        await receiverStateCities({}, `-1/${ENDPOINTS.CITIES}`);
                       }}
                     />
                     {touched.receiver_country && errors?.receiver_country && (
@@ -457,13 +542,15 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       options={senderStateOptions}
                       value={
                         useMemoized(
-                          senderStateOptions?.find((item) => item.value === values.sender_state),
+                          senderStateOptions?.find((item) => item.value === values.sender_state) ||
+                            null,
                           [senderStateOptions, values.sender_state]
                         ) || ''
                       }
                       onValueChange={async (value) => {
                         setFieldTouched('sender_state', true);
                         setFieldValue('sender_state', value.value);
+                        setFieldValue('sender_city_id', null);
                         await senderStateCities({}, `${value.value}/${ENDPOINTS.CITIES}`);
                       }}
                     />
@@ -483,13 +570,14 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                         useMemoized(
                           receiverStateOptions?.find(
                             (item) => item.value === values.receiver_state
-                          ),
+                          ) || null,
                           [receiverStateOptions, values.receiver_state]
                         ) || ''
                       }
                       onValueChange={async (value) => {
                         setFieldTouched('receiver_state', true);
                         setFieldValue('receiver_state', value.value);
+                        setFieldValue('receiver_city_id', null);
                         await receiverStateCities({}, `${value.value}/${ENDPOINTS.CITIES}`);
                       }}
                     />
@@ -507,18 +595,14 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       options={senderCityOptions}
                       value={
                         useMemoized(
-                          senderCityOptions?.find((item) => item.value === values.sender_city_id),
+                          senderCityOptions?.find((item) => item.value === values.sender_city_id) ||
+                            null,
                           [senderCityOptions, values.sender_city_id]
                         ) || ''
                       }
                       onValueChange={async (value) => {
                         setFieldTouched('sender_city_id', true);
                         setFieldValue('sender_city_id', value.value);
-                        values.receiver_city_id &&
-                          (await getShipmentPricing({
-                            fromCityId: value.value,
-                            toCityId: values.receiver_city_id,
-                          }));
                       }}
                     />
                     {touched.sender_city_id && errors?.sender_city_id && (
@@ -537,18 +621,13 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                         useMemoized(
                           receiverCityOptions?.find(
                             (item) => item.value === values.receiver_city_id
-                          ),
+                          ) || null,
                           [receiverCityOptions, values.receiver_city_id]
                         ) || ''
                       }
                       onValueChange={async (value) => {
                         setFieldTouched('receiver_city_id', true);
                         setFieldValue('receiver_city_id', value.value);
-                        values.sender_city_id &&
-                          (await getShipmentPricing({
-                            fromCityId: values.sender_city_id,
-                            toCityId: value.value,
-                          }));
                       }}
                     />
                     {touched.receiver_city_id && errors?.receiver_city_id && (
@@ -562,7 +641,8 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       title="Courier Type"
                       options={courierTypeOptions}
                       value={useMemoized(
-                        courierTypeOptions?.find((item) => item.value === values.courier_type),
+                        courierTypeOptions?.find((item) => item.value === values.courier_type) ||
+                          null,
                         [courierTypeOptions, values.courier_type]
                       )}
                       required
@@ -583,15 +663,16 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       title="Payment Type"
                       options={paymentTypeOptions}
                       value={useMemoized(
-                        paymentTypeOptions?.find((item) => item.value === values.payment_type),
+                        paymentTypeOptions?.find((item) => item.value === values.payment_type) ||
+                          null,
                         [paymentTypeOptions, values.payment_type]
                       )}
                       required
                       placeholder="Select Payment Type"
-                      onValueChange={(payment_type) => {
-                        setFieldTouched('payment_type', true);
-                        setFieldValue('payment_type', payment_type.value);
-                        setFieldValue('payment_date', new Date());
+                      onValueChange={async (payment_type) => {
+                        await setFieldTouched('payment_type', true);
+                        await setFieldValue('payment_type', payment_type.value);
+                        await setFieldValue('payment_date', new Date());
                       }}
                     />
                     {touched.payment_type && errors?.payment_type && (
@@ -616,27 +697,6 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                   <Typography variant="h4" className="col-span-2">
                     Package Info:
                   </Typography>
-
-                  <Box>
-                    <CustomDropdown
-                      name="package_id "
-                      title="Shipment Packaging"
-                      options={packagingOptions}
-                      value={useMemoized(
-                        packagingOptions?.find((item) => item.value === values.package_id),
-                        [packagingOptions, values.package_id]
-                      )}
-                      required
-                      placeholder="Select Shipment Packaging"
-                      onValueChange={(package_id) => {
-                        setFieldTouched('package_id', true);
-                        setFieldValue('package_id', package_id.value);
-                      }}
-                    />
-                    {touched.package_id && errors?.package_id && (
-                      <ErrorMsg error={errors.package_id} />
-                    )}
-                  </Box>
 
                   <FieldArray name="orderItems">
                     {({ push, remove }) => (
@@ -754,13 +814,22 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                     <NumberField
                       name="total_amount"
                       title="Amount to be Collected"
+                      required
+                      min={0.01}
                       unit={NUMBER_FORMATS.DOLLAR}
-                      value={Number(shipmentPricing?.[0]?.price || 0)}
-                      disabled
+                      value={Number(values?.total_amount || 0)}
+                      onChange={(v) => {
+                        setFieldTouched(`total_amount`, true);
+                        setFieldValue(`total_amount`, v);
+                      }}
                     />
                     {touched.total_amount && errors?.total_amount && (
                       <ErrorMsg error={errors.total_amount} />
                     )}
+                    <Typography className="text-xs italic">
+                      Changing the total amount will update/create a price list for that shipment
+                      route
+                    </Typography>
                   </Box>
 
                   <Box>

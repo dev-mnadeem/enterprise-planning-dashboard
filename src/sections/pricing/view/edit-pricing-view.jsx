@@ -45,6 +45,8 @@ const EditPricingPage = ({ id }) => {
         from_city_id: values?.from_city_id,
         to_city_id: values?.to_city_id,
         price: values?.price,
+        package_id: values?.package_id,
+        route: values?.shipment_route?.toLowerCase(),
       },
       'patch'
     );

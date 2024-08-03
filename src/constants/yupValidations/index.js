@@ -47,7 +47,7 @@ export const createPackagingSchema = Yup.object().shape({
   depth: Yup.number().required().positive().min(0.01),
   width: Yup.number().required().positive().min(0.01),
   height: Yup.number().required().positive().min(0.01),
-  price: Yup.number().required().positive().min(0.0),
+  // price: Yup.number().required().positive().min(0.0),
   weight_limit: Yup.number().optional().positive().min(0.0),
 });
 
@@ -55,6 +55,7 @@ export const createPricingSchema = Yup.object().shape({
   from_city_id: Yup.string().required(),
   to_city_id: Yup.string().required(),
   price: Yup.number().required().positive().min(0.0),
+  package_id: Yup.string().required(),
 });
 
 export const createOrderSchema = Yup.object().shape({
@@ -73,6 +74,9 @@ export const createOrderSchema = Yup.object().shape({
   collection_time: Yup.date().required('Collection time is required'),
   location_id: Yup.string().required('Please select branch'),
   package_id: Yup.string().required('Please select package'),
+  total_amount: Yup.number()
+    .required('Total amount is required')
+    .min(0.01, 'Weight must be greater than or equal to 0.01'),
 
   orderItems: Yup.array().of(
     Yup.object().shape({
