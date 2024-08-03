@@ -134,6 +134,7 @@ const PricingListPage = () => {
                       toCity={row.to_city}
                       price={row.price}
                       updatedAt={row.updated_at}
+                      shipmentRoute={row.route}
                       onDeletePricing={(pricingId) => deletePricing(pricingId)}
                     />
                   ))}

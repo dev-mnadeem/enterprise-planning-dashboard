@@ -87,7 +87,7 @@ export const orders = [
 ];
 
 export const OrderTableHeadData = [
-  { id: 'orderNumber', label: 'Order #' },
+  { id: 'orderNumber', label: 'Shipment #' },
   { id: 'source', label: 'Source' },
   { id: 'destination', label: 'Destination' },
   { id: 'customer', label: 'Customer' },
