@@ -29,6 +29,7 @@ import useMemoized from 'src/hooks/useMemoized';
 import { ADD_ORDER_INITIALS } from 'src/sections/orders/utils';
 import { useAppSelector } from 'src/state/hooks';
 import NumberField from '../common/Input/BaseNumberField';
+import { calculateRemainingWeightLimit } from 'src/utils';
 
 export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) {
   const { user } = useAppSelector((state) => state.userReducer);
@@ -339,6 +340,8 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                     )}
                   </Box>
 
+                  <Divider className="col-span-2" />
+
                   <Box>
                     <Typography className="required">Customer Phone</Typography>
                     <MuiTelInput
@@ -377,62 +380,6 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                   </Box>
 
                   <Box>
-                    <InputField
-                      title="Customer Email"
-                      placeholder="jhon@example.com"
-                      name="sender_email"
-                      value={values.sender_email}
-                      onChange={handleChange}
-                    />
-                    {touched.sender_email && errors?.sender_email && (
-                      <ErrorMsg error={errors.sender_email} />
-                    )}
-                  </Box>
-
-                  <Box>
-                    <InputField
-                      title="Customer Name"
-                      name="sender_name"
-                      required
-                      value={values.sender_name}
-                      placeholder="Jhon Doe"
-                      onChange={handleChange}
-                    />
-
-                    {touched.sender_name && errors?.sender_name && (
-                      <ErrorMsg error={errors.sender_name} />
-                    )}
-                  </Box>
-
-                  <Box>
-                    <InputField
-                      title="Customer Address"
-                      placeholder="H # 123, Street # 123"
-                      name="sender_address"
-                      required
-                      value={values.sender_address}
-                      onChange={handleChange}
-                    />
-                    {touched.sender_address && errors?.sender_address && (
-                      <ErrorMsg error={errors.sender_address} />
-                    )}
-                  </Box>
-
-                  <Box>
-                    <InputField
-                      title="Receiver Name"
-                      placeholder="Jhon Doe"
-                      name="receiver_name"
-                      required
-                      value={values.receiver_name}
-                      onChange={handleChange}
-                    />
-                    {touched.receiver_name && errors?.receiver_name && (
-                      <ErrorMsg error={errors.receiver_name} />
-                    )}
-                  </Box>
-
-                  <Box>
                     <Typography className="required">Receiver Phone</Typography>
                     <MuiTelInput
                       name="receiver_phone"
@@ -456,6 +403,19 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
 
                   <Box>
                     <InputField
+                      title="Customer Email"
+                      placeholder="jhon@example.com"
+                      name="sender_email"
+                      value={values.sender_email}
+                      onChange={handleChange}
+                    />
+                    {touched.sender_email && errors?.sender_email && (
+                      <ErrorMsg error={errors.sender_email} />
+                    )}
+                  </Box>
+
+                  <Box>
+                    <InputField
                       title="Receiver Email"
                       placeholder="mike@gmail.com"
                       name="receiver_email"
@@ -467,7 +427,50 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                     )}
                   </Box>
 
-                  <Box className="col-span-2">
+                  <Box>
+                    <InputField
+                      title="Customer Name"
+                      name="sender_name"
+                      required
+                      value={values.sender_name}
+                      placeholder="Jhon Doe"
+                      onChange={handleChange}
+                    />
+
+                    {touched.sender_name && errors?.sender_name && (
+                      <ErrorMsg error={errors.sender_name} />
+                    )}
+                  </Box>
+
+                  <Box>
+                    <InputField
+                      title="Receiver Name"
+                      placeholder="Jhon Doe"
+                      name="receiver_name"
+                      required
+                      value={values.receiver_name}
+                      onChange={handleChange}
+                    />
+                    {touched.receiver_name && errors?.receiver_name && (
+                      <ErrorMsg error={errors.receiver_name} />
+                    )}
+                  </Box>
+
+                  <Box>
+                    <InputField
+                      title="Customer Address"
+                      placeholder="H # 123, Street # 123"
+                      name="sender_address"
+                      required
+                      value={values.sender_address}
+                      onChange={handleChange}
+                    />
+                    {touched.sender_address && errors?.sender_address && (
+                      <ErrorMsg error={errors.sender_address} />
+                    )}
+                  </Box>
+
+                  <Box>
                     <InputField
                       title="Receiver Address"
                       placeholder="H # 123, Street # 123"
@@ -733,10 +736,21 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                             <Box>
                               <NumberField
                                 name={`orderItems[${index}].weight`}
-                                title="Weight"
-                                max={Number(
-                                  packagings?.find((item) => item.id === values.package_id)
-                                    ?.weight_limit || 0
+                                title={`Weight (${calculateRemainingWeightLimit(
+                                  values,
+                                  index,
+                                  Number(
+                                    packagings?.find((item) => item.id === values.package_id)
+                                      ?.weight_limit || 0
+                                  )
+                                )}kg limit)`}
+                                max={calculateRemainingWeightLimit(
+                                  values,
+                                  index,
+                                  Number(
+                                    packagings?.find((item) => item.id === values.package_id)
+                                      ?.weight_limit || 0
+                                  )
                                 )}
                                 min={0}
                                 unit={NUMBER_FORMATS.KG}
