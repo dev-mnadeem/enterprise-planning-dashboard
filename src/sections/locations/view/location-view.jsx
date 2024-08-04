@@ -142,7 +142,7 @@ const LocationPage = () => {
                       status={row.status}
                       country={row.country}
                       address={row.address}
-                      locationType={row.location_type_id}
+                      locationType={row.location_type}
                       onDeleteLocation={deleteLocation}
                     />
                   ))}
