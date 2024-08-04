@@ -41,3 +41,51 @@ export const userRoleFormValidationSchema = Yup.object().shape({
       (value) => value.toLowerCase() !== 'admin'
     ),
 });
+
+export const createPackagingSchema = Yup.object().shape({
+  name: Yup.string().required(),
+  depth: Yup.number().required().positive().min(0.01),
+  width: Yup.number().required().positive().min(0.01),
+  height: Yup.number().required().positive().min(0.01),
+  // price: Yup.number().required().positive().min(0.0),
+  weight_limit: Yup.number().optional().positive().min(0.0),
+});
+
+export const createPricingSchema = Yup.object().shape({
+  from_city_id: Yup.string().required(),
+  to_city_id: Yup.string().required(),
+  price: Yup.number().required().positive().min(0.0),
+  package_id: Yup.string().required(),
+});
+
+export const createOrderSchema = Yup.object().shape({
+  sender_name: Yup.string().required('Customer name is required'),
+  sender_email: Yup.string().email().optional(),
+  sender_phone: Yup.string().required('Customer phone number is required'),
+  sender_address: Yup.string().required('Customer address is required'),
+  receiver_name: Yup.string().required('Receiver name is required'),
+  receiver_email: Yup.string().email().optional(),
+  receiver_phone: Yup.string().required('Receiver phone number is required'),
+  receiver_address: Yup.string().required('Receiver address is required'),
+  payment_type: Yup.string().required('Payment type is required'),
+  sender_city_id: Yup.string().required('Please select city'),
+  receiver_city_id: Yup.string().required('Please select city'),
+  shipping_date: Yup.date().required('Shipping date is required'),
+  collection_time: Yup.date().required('Collection time is required'),
+  location_id: Yup.string().required('Please select branch'),
+  package_id: Yup.string().required('Please select package'),
+  total_amount: Yup.number()
+    .required('Total amount is required')
+    .min(0.01, 'Weight must be greater than or equal to 0.01'),
+
+  orderItems: Yup.array().of(
+    Yup.object().shape({
+      weight: Yup.number()
+        .required('Weight is required')
+        .min(0.01, 'Weight must be greater than or equal to 0.01'),
+      quantity: Yup.number()
+        .required('Quantity is required')
+        .min(1, 'Quantity must be greater than or equal to 1'),
+    })
+  ),
+});

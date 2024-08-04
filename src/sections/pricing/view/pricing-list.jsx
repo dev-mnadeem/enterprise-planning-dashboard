@@ -21,7 +21,7 @@ import {
   TableSearchHead,
   TableSortToolbar,
 } from 'src/components/common';
-import UsersTableRow from '../users-table-row';
+import PricingTableRow from '../pricing-table-row';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useMutation, useQuery } from 'src/api';
 import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
@@ -29,7 +29,7 @@ import { useAppSelector } from 'src/state/hooks';
 import { checkCurrentUserPermission } from 'src/utils';
 import toast from 'react-hot-toast';
 
-const UsersListPage = () => {
+const PricingListPage = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
@@ -37,18 +37,18 @@ const UsersListPage = () => {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const { data: users, loading, error, refetch: refetchUsers } = useQuery(ENDPOINTS.USERS);
-  const [deleteUserMutate, { error: deleteUserError }] = useMutation(ENDPOINTS.USERS);
+  const { data: pricings, loading, error, refetch: refetchPricings } = useQuery(ENDPOINTS.PRICING);
+  const [deletePricingMutate, { error: deletePricingError }] = useMutation(ENDPOINTS.PRICING);
   const { user } = useAppSelector((state) => state.userReducer);
   const { ADD } = PERMISSION_TYPE;
-  const { USER } = PERMISSION_ENTITIES;
+  const { PRICING } = PERMISSION_ENTITIES;
 
   if (loading) return <div>Loading...</div>;
   if (error) {
     toast.error(error || 'Something went wrong!');
     return <div>Something went wrong!</div>;
   }
-  if (deleteUserError) toast.error(deleteUserError || 'Something went wrong!');
+  if (deletePricingError) toast.error(deletePricingError || 'Something went wrong!');
 
   const handleFilterByName = (event) => {
     setPage(0);
@@ -64,8 +64,8 @@ const UsersListPage = () => {
   };
 
   const dataFiltered = applyFilter({
-    fieldToSearch: 'username',
-    inputData: users?.results,
+    fieldToSearch: 'name',
+    inputData: pricings,
     comparator: getComparator(order, orderBy),
     filterName,
   });
@@ -79,13 +79,13 @@ const UsersListPage = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const deleteUser = async (userId) => {
-    if (!userId) return;
+  const deletePricing = async (pricingId) => {
+    if (!pricingId) return;
 
-    const res = await deleteUserMutate({}, 'DELETE', userId);
+    const res = await deletePricingMutate({}, 'DELETE', pricingId);
     if (res) {
-      toast.success('User deleted successfully!');
-      refetchUsers();
+      toast.success('Pricing deleted successfully!');
+      refetchPricings();
     }
   };
 
@@ -94,16 +94,16 @@ const UsersListPage = () => {
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Manage System Users</Typography>
+        <Typography variant="h5">Manage Shipment Pricings</Typography>
 
-        {checkCurrentUserPermission(user?.permissions, USER, ADD) && (
+        {checkCurrentUserPermission(user?.permissions, PRICING, ADD, user?.user_role?.name) && (
           <Button
-            onClick={() => navigate(ROUTES.ADD_USER)}
+            onClick={() => navigate(ROUTES.ADD_PRICING)}
             variant="contained"
             color="inherit"
             startIcon={<Iconify icon="eva:plus-fill" />}
           >
-            New User
+            New Price
           </Button>
         )}
       </Stack>
@@ -121,27 +121,27 @@ const UsersListPage = () => {
                 orderBy={orderBy}
                 headLabel={TableHeadData}
                 onRequestSort={handleSort}
-                rowCount={users?.length}
+                rowCount={pricings?.length}
               />
               <TableBody>
                 {dataFiltered
                   ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
-                    <UsersTableRow
+                    <PricingTableRow
                       id={row.id}
                       key={row.id}
-                      username={row.name}
-                      user_role={row.user_role}
-                      email={row.email}
-                      mobile_number={row.phone_number}
-                      status={row.status}
-                      onDeleteUser={(userId) => deleteUser(userId)}
+                      fromCity={row.from_city}
+                      toCity={row.to_city}
+                      price={row.price}
+                      updatedAt={row.updated_at}
+                      shipmentRoute={row.route}
+                      onDeletePricing={(pricingId) => deletePricing(pricingId)}
                     />
                   ))}
 
                 <TableEmptyRows
                   height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, users?.length)}
+                  emptyRows={emptyRows(page, rowsPerPage, pricings?.length)}
                 />
 
                 {notFound && <TableNoData query={filterName} />}
@@ -152,7 +152,7 @@ const UsersListPage = () => {
         <TablePagination
           page={page}
           component="div"
-          count={users?.length || 0}
+          count={pricings?.length || 0}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}
@@ -163,4 +163,4 @@ const UsersListPage = () => {
   );
 };
 
-export default UsersListPage;
+export default PricingListPage;

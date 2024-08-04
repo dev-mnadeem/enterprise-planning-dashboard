@@ -5,36 +5,36 @@ import { ROUTES } from 'src/constants';
 import { useMutation } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import toast from 'react-hot-toast';
-import ShipmentForm from 'src/components/shipment/form';
+import OrderForm from 'src/components/orders/OrderForm';
 
-const AddShipmentPage = () => {
+const AddOrderPage = () => {
   const navigation = useNavigate();
-  const [mutate, { data, loading, error }] = useMutation(ENDPOINTS.USERS);
+  const [createOrder, { data, loading, error }] = useMutation(ENDPOINTS.ORDERS);
 
   useEffect(() => {
     if (data) {
-      toast.success('User added successfully!');
-      navigation(ROUTES.USERS);
+      toast.success('Shipment created successfully!');
+      navigation(ROUTES.ORDERS);
     }
   }, [data]);
 
   useEffect(() => {
     if (error) {
       toast.error(error || 'Something went wrong!');
-      navigation(ROUTES.USERS);
     }
   }, [error]);
 
-  const onAddShipment = (values) => {};
-
-  if (loading) return;
+  const onAddOrder = async (values) => {
+    console.log('🚀 ~ onAddOrder ~ values:', values);
+    await createOrder({ ...values });
+  };
 
   return (
     <Container>
       <Typography variant="h4">Add new Shipment</Typography>
-      <ShipmentForm onSubmit={onAddShipment} buttonText="Create Shipment" />
+      <OrderForm onSubmit={onAddOrder} buttonText="Create Shipment" />
     </Container>
   );
 };
 
-export default AddShipmentPage;
+export default AddOrderPage;

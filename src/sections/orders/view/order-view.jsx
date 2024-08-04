@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { applyFilter, getComparator } from 'src/utils';
-import { OrderTableHeadData, orders } from '../utils';
+import { OrderTableHeadData } from '../utils';
 import {
+  Button,
   Card,
   Container,
   Stack,
@@ -12,16 +13,32 @@ import {
   Typography,
 } from '@mui/material';
 import Scrollbar from 'src/components/scrollbar';
-import TableHeader from 'src/components/table-header/inde';
 import LocationTableToolbar from 'src/sections/locations/location-table-toolbar';
 import OrderTableRow from '../order-table-row';
+import TableHeader from 'src/components/table-header';
+import Iconify from 'src/components/iconify';
+import { ROUTES } from 'src/constants';
+import { useNavigate } from 'react-router-dom';
+import { ENDPOINTS } from 'src/api/Endpoints';
+import { useMutation, useQuery } from 'src/api';
 
 export default function OrdersPage() {
+  const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const { data: orders, loading, error, refetch: refetchOrders } = useQuery(ENDPOINTS.ORDERS);
+  const [cancelOrderMutate, { error: cancelOrderError }] = useMutation(ENDPOINTS.ORDERS);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) {
+    toast.error(error || 'Something went wrong!');
+    return <div>Something went wrong!</div>;
+  }
+
+  if (cancelOrderError) toast.error(cancelOrderError || 'Something went wrong!');
 
   const handleFilterByName = (event) => {
     setPage(0);
@@ -37,7 +54,7 @@ export default function OrdersPage() {
   };
 
   const dataFiltered = applyFilter({
-    fieldToSearch: 'toUser',
+    fieldToSearch: 'order_number',
     inputData: orders,
     comparator: getComparator(order, orderBy),
     filterName,
@@ -52,25 +69,35 @@ export default function OrdersPage() {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
+  const cancelOrder = async (orderId) => {
+    if (!orderId) return;
+
+    const res = await cancelOrderMutate({}, 'DELETE', orderId);
+    if (res) {
+      toast.success('Order canceled successfully!');
+      refetchOrders();
+    }
+  };
+
   const notFound = !orders?.length && !!filterName;
 
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Orders</Typography>
-        {/* <Button
-          onClick={() => navigate('/locations/add')}
+        <Typography variant="h4">Shipments</Typography>
+        <Button
+          onClick={() => navigate(ROUTES.ADD_ORDER)}
           variant="contained"
           color="inherit"
           startIcon={<Iconify icon="eva:plus-fill" />}
         >
-          New Order
-        </Button> */}
+          Create New Shipment
+        </Button>
       </Stack>
       <Card>
         <LocationTableToolbar
           numSelected={0}
-          placeholder="Search Orders"
+          placeholder="Search Shipment..."
           filterName={filterName}
           onFilterName={handleFilterByName}
         />
@@ -88,14 +115,14 @@ export default function OrdersPage() {
                   ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
                     <OrderTableRow
-                      id={row.id}
-                      to={row.to}
-                      from={row.from}
-                      toUser={row.toUser}
-                      status={row.status}
-                      fromUser={row.fromUser}
-                      orderNumber={row.orderNumber}
-                      trackingNumber={row.trackingNumber}
+                      id={row?.id}
+                      key={row.id}
+                      source={row?.sender_city?.name}
+                      destination={row?.receiver_city?.name}
+                      customer={row.sender_name}
+                      status={row?.history[row?.history?.length - 1]?.status}
+                      orderNumber={row?.order_number}
+                      onCancelOrder={(orderId) => cancelOrder(OrderId)}
                     />
                   ))}
               </TableBody>
@@ -105,7 +132,7 @@ export default function OrdersPage() {
         <TablePagination
           page={page}
           component="div"
-          count={orders?.length}
+          count={orders?.length || 0}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}

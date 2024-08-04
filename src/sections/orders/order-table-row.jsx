@@ -1,29 +1,39 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Iconify from 'src/components/iconify';
-import { Button, IconButton, MenuItem, Popover, TableCell, TableRow } from '@mui/material';
+import { Button, Chip, IconButton, MenuItem, Popover, TableCell, TableRow } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from 'src/constants';
+import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
+import { checkCurrentUserPermission } from 'src/utils';
+import { useAppSelector } from 'src/state/hooks';
 
 export default function OrderTableRow({
   id,
-  to,
-  from,
-  toUser,
+  source,
+  destination,
+  customer,
   status,
-  fromUser,
   orderNumber,
-  trackingNumber,
+  onCancelOrder,
 }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(null);
+  const { user } = useAppSelector((state) => state.userReducer);
+  const { REMOVE, UPDATE } = PERMISSION_TYPE;
+  const { ORDER } = PERMISSION_ENTITIES;
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
 
-  const handleDelte = (id) => {
+  const handleCancel = (id) => {
+    if (!id) return;
+
     handleCloseMenu();
+    const confirmed = window.confirm(`Are you sure to Cancel #"${id}" Shipment?`);
+    if (confirmed) {
+      onCancelOrder(id);
+    }
   };
 
   const handleEdit = () => {
@@ -37,14 +47,13 @@ export default function OrderTableRow({
   return (
     <>
       <TableRow hover tabIndex={-2}>
-        <TableCell>{id}</TableCell>
         <TableCell>{orderNumber}</TableCell>
-        <TableCell>{trackingNumber}</TableCell>
-        <TableCell>{from}</TableCell>
-        <TableCell>{to}</TableCell>
-        <TableCell>{fromUser}</TableCell>
-        <TableCell>{toUser}</TableCell>
-        <TableCell>{status}</TableCell>
+        <TableCell>{source}</TableCell>
+        <TableCell>{destination}</TableCell>
+        <TableCell>{customer}</TableCell>
+        <TableCell>
+          <Chip label={status} color="success" />
+        </TableCell>
         <Button className="mt-4" onClick={() => navigate(`${ROUTES.ORDERS}/${id}`)}>
           View
         </Button>
@@ -64,26 +73,20 @@ export default function OrderTableRow({
           sx: { width: 140 },
         }}
       >
-        <MenuItem onClick={handleEdit}>
-          <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
-        <MenuItem onClick={() => handleDelte(id)} sx={{ color: 'error.main' }}>
-          <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
-          Delete
-        </MenuItem>
+        {checkCurrentUserPermission(user?.permissions, ORDER, UPDATE) && (
+          <MenuItem onClick={handleEdit}>
+            <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
+            Edit
+          </MenuItem>
+        )}
+
+        {checkCurrentUserPermission(user?.permissions, ORDER, REMOVE) && (
+          <MenuItem onClick={() => handleCancel(id)} sx={{ color: 'error.main' }}>
+            <Iconify icon="eva:close-square-outline" sx={{ mr: 2 }} />
+            Cancel
+          </MenuItem>
+        )}
       </Popover>
     </>
   );
 }
-
-OrderTableRow.propTypes = {
-  id: PropTypes.number,
-  orderNumber: PropTypes.string,
-  trackingNumber: PropTypes.string,
-  from: PropTypes.string,
-  to: PropTypes.string,
-  fromUser: PropTypes.string,
-  toUser: PropTypes.string,
-  status: PropTypes.string,
-};
