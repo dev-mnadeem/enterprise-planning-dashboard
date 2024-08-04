@@ -11,25 +11,32 @@ export const UsersListPage = lazy(() => import('src/pages/users'));
 export const AddUserPage = lazy(() => import('src/pages/users/add-user'));
 export const EditUserPage = lazy(() => import('src/pages/users/edit-user'));
 export const LoginPage = lazy(() => import('src/pages/login'));
-export const OrdersPage = lazy(() => import('src/pages/orders'));
 export const LocationPage = lazy(() => import('src/pages/locations'));
 export const AddLocationPage = lazy(() => import('src/pages/add-location'));
 export const EditLocationPage = lazy(() => import('src/pages/edit-location'));
-export const OrdersDetailPage = lazy(() => import('src/pages/order-detail'));
 export const PermissionsPage = lazy(() => import('src/pages/permissions'));
 export const UserRolesPage = lazy(() => import('src/pages/roles'));
 export const AddUserRolePage = lazy(() => import('src/pages/roles/add-role'));
 export const EditUserRolePage = lazy(() => import('src/pages/roles/edit-role'));
-export const ShipmentsListPage = lazy(() => import('src/pages/shipments'));
-export const AddShipmentPage = lazy(() => import('src/pages/shipments/add-shipment'));
-export const EditShipmentPage = lazy(() => import('src/pages/shipments/edit-shipment'));
+export const PackagingsPage = lazy(() => import('src/pages/packaging'));
+export const AddPackagingPage = lazy(() => import('src/pages/packaging/add-packaging'));
+export const EditPackagingPage = lazy(() => import('src/pages/packaging/edit-packaging'));
+export const OrdersPage = lazy(() => import('src/pages/orders'));
+export const AddOrderPage = lazy(() => import('src/pages/orders/add-order'));
+export const EditOrderPage = lazy(() => import('src/pages/orders/edit-order'));
+export const OrdersDetailPage = lazy(() => import('src/pages/orders/order-detail'));
+export const OrderInvoiceView = lazy(() => import('src/sections/invoices/order-invoice-view'));
+export const PricingPage = lazy(() => import('src/pages/pricing'));
+export const AddPricingPage = lazy(() => import('src/pages/pricing/add-pricing'));
+export const EditPricingPage = lazy(() => import('src/pages/pricing/edit-pricing'));
+
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 // ----------------------------------------------------------------------
 
 const ProtectedRoutes = (props) => {
   const { ADD, VIEW, UPDATE, REMOVE } = PERMISSION_TYPE;
-  const { USER, LOCATION, USER_ROLE, PERMISSION } = PERMISSION_ENTITIES;
+  const { USER, LOCATION, USER_ROLE, PERMISSION, ORDER, PACKAGING, PRICING } = PERMISSION_ENTITIES;
 
   return useRoutes([
     {
@@ -58,16 +65,6 @@ const ProtectedRoutes = (props) => {
           path: ROUTES.LOCATION_DETIAL,
           element: (
             <PrivateRoute element={EditLocationPage} requiredPermission={LOCATION} type={UPDATE} />
-          ),
-        },
-        {
-          path: ROUTES.ORDERS,
-          element: <PrivateRoute element={OrdersPage} requiredPermission="Orders" type={VIEW} />,
-        },
-        {
-          path: ROUTES.ORDER_DETAIL,
-          element: (
-            <PrivateRoute element={OrdersDetailPage} requiredPermission="Orders" type={VIEW} />
           ),
         },
         {
@@ -106,22 +103,64 @@ const ProtectedRoutes = (props) => {
             <PrivateRoute element={EditUserRolePage} requiredPermission={USER_ROLE} type={UPDATE} />
           ),
         },
-        // {
-        //   path: ROUTES.SHIPMENTS,
-        //   element: (
-        //     <PrivateRoute element={ShipmentsListPage} requiredPermission="Shipment" type={VIEW} />
-        //   ),
-        // },
         {
-          path: ROUTES.ADD_SHIPMENT,
-          element: <AddShipmentPage />,
+          path: ROUTES.PACKAGINGS,
+          element: (
+            <PrivateRoute element={PackagingsPage} requiredPermission={PACKAGING} type={VIEW} />
+          ),
         },
-        // {
-        //   path: `${ROUTES.SHIPMENTS}/:id`,
-        //   element: (
-        //     <PrivateRoute element={EditUserRolePage} requiredPermission="UserRole" type={UPDATE} />
-        //   ),
-        // },
+        {
+          path: ROUTES.ADD_PACKAGING,
+          element: (
+            <PrivateRoute element={AddPackagingPage} requiredPermission={PACKAGING} type={ADD} />
+          ),
+        },
+        {
+          path: `${ROUTES.PACKAGINGS}/:id`,
+          element: (
+            <PrivateRoute
+              element={EditPackagingPage}
+              requiredPermission={PACKAGING}
+              type={UPDATE}
+            />
+          ),
+        },
+        {
+          path: ROUTES.PRICING,
+          element: <PrivateRoute element={PricingPage} requiredPermission={PRICING} type={VIEW} />,
+        },
+        {
+          path: ROUTES.ADD_PRICING,
+          element: (
+            <PrivateRoute element={AddPricingPage} requiredPermission={PRICING} type={ADD} />
+          ),
+        },
+        {
+          path: `${ROUTES.PRICING}/:id`,
+          element: (
+            <PrivateRoute element={EditPricingPage} requiredPermission={PRICING} type={UPDATE} />
+          ),
+        },
+        {
+          path: ROUTES.ADD_ORDER,
+          element: <PrivateRoute element={AddOrderPage} requiredPermission={ORDER} type={ADD} />,
+        },
+        {
+          path: ROUTES.ORDERS,
+          element: <PrivateRoute element={OrdersPage} requiredPermission={ORDER} type={VIEW} />,
+        },
+        {
+          path: ROUTES.ORDER_DETAIL,
+          element: (
+            <PrivateRoute element={OrdersDetailPage} requiredPermission={ORDER} type={VIEW} />
+          ),
+        },
+        {
+          path: ROUTES.ORDER_INVOICE,
+          element: (
+            <PrivateRoute element={OrderInvoiceView} requiredPermission={ORDER} type={VIEW} />
+          ),
+        },
       ],
     },
     {

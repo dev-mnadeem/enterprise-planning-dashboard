@@ -19,13 +19,15 @@ interceptedAxios.interceptors.request.use(
   async (config) => {
     const state = store.getState();
     const userSession = state.userReducer.userSession;
-    const accessToken = userSession?.accessToken;
+    const accessToken = userSession?.token;
     // change the token format if it is changed and also get refreshToken from redux
 
     if (accessToken?.length) {
       if (moment(new Date()).isBefore(moment().add(1, 'minute'))) {
         // Get updated Token here and add the updated token to the headers
         // waiting for the backend service
+
+        config.headers.Authorization = `Bearer ${accessToken}`;
       } else {
         config.headers.Authorization = `Bearer ${accessToken}`;
       }

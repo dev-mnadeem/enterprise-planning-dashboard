@@ -6,6 +6,8 @@ import LoadingOverlay from 'react-loading-overlay';
 LoadingOverlay.propTypes = undefined;
 import { useAppSelector } from 'src/state/hooks';
 import { useTheme } from '@mui/material/styles';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 const AppWrapper = ({ children }) => {
   const theme = useTheme();
@@ -32,7 +34,7 @@ const AppWrapper = ({ children }) => {
               }),
             }}
           >
-            {children}
+            <LocalizationProvider dateAdapter={AdapterDayjs}>{children}</LocalizationProvider>
           </LoadingOverlay>
         </Suspense>
       </BrowserRouter>
