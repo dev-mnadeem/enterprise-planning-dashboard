@@ -55,3 +55,17 @@ export const removeFalsePermissions = (permissions) => {
 };
 
 export const sleepForTesting = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+
+// Function to calculate the remaining weight limit
+export function calculateRemainingWeightLimit(values, index, totalLimit = 0) {
+  const currentWeight = values.orderItems?.reduce((acc, item, i) => {
+    if (i !== index) {
+      return acc + Number(item?.weight || 0);
+    }
+    return acc;
+  }, 0);
+
+  const remainingLimit = totalLimit - currentWeight;
+
+  return Math.max(remainingLimit, 0);
+}
