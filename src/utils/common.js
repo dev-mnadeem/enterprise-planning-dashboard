@@ -69,3 +69,8 @@ export function calculateRemainingWeightLimit(values, index, totalLimit = 0) {
 
   return Math.max(remainingLimit, 0);
 }
+
+// Function to add up all the values safely
+export const sumSafely = (num = 0, ...values) => {
+  return values?.reduce((acc, val) => acc + (Number(val) || 0), num) || 0;
+};
