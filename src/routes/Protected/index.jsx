@@ -29,6 +29,11 @@ export const OrderInvoiceView = lazy(() => import('src/sections/invoices/order-i
 export const PricingPage = lazy(() => import('src/pages/pricing'));
 export const AddPricingPage = lazy(() => import('src/pages/pricing/add-pricing'));
 export const EditPricingPage = lazy(() => import('src/pages/pricing/edit-pricing'));
+export const OrderInForm = lazy(() => import('src/components/orders/OrderInForm'));
+export const OrderOutForm = lazy(() => import('src/components/orders/OrderOutForm'));
+export const VehiclesPage = lazy(() => import('src/pages/vehicles'));
+export const AddVehiclePage = lazy(() => import('src/pages/vehicles/add-vehicle'));
+export const EditVehiclePage = lazy(() => import('src/pages/vehicles/edit-vehicle'));
 
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
@@ -36,7 +41,8 @@ export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 const ProtectedRoutes = (props) => {
   const { ADD, VIEW, UPDATE, REMOVE } = PERMISSION_TYPE;
-  const { USER, LOCATION, USER_ROLE, PERMISSION, ORDER, PACKAGING, PRICING } = PERMISSION_ENTITIES;
+  const { USER, LOCATION, USER_ROLE, PERMISSION, ORDER, PACKAGING, PRICING, VEHICLE } =
+    PERMISSION_ENTITIES;
 
   return useRoutes([
     {
@@ -159,6 +165,30 @@ const ProtectedRoutes = (props) => {
           path: ROUTES.ORDER_INVOICE,
           element: (
             <PrivateRoute element={OrderInvoiceView} requiredPermission={ORDER} type={VIEW} />
+          ),
+        },
+        {
+          path: `${ROUTES.ORDER_INTAKE}`,
+          element: <PrivateRoute element={OrderInForm} requiredPermission={ORDER} type={UPDATE} />,
+        },
+        {
+          path: `${ROUTES.ORDER_DISPATCH}`,
+          element: <PrivateRoute element={OrderOutForm} requiredPermission={ORDER} type={UPDATE} />,
+        },
+        {
+          path: ROUTES.VEHICLES,
+          element: <PrivateRoute element={VehiclesPage} requiredPermission={VEHICLE} type={VIEW} />,
+        },
+        {
+          path: ROUTES.ADD_VEHICLE,
+          element: (
+            <PrivateRoute element={AddVehiclePage} requiredPermission={VEHICLE} type={ADD} />
+          ),
+        },
+        {
+          path: `${ROUTES.VEHICLES}/:id`,
+          element: (
+            <PrivateRoute element={EditVehiclePage} requiredPermission={VEHICLE} type={UPDATE} />
           ),
         },
       ],

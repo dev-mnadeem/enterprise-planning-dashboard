@@ -6,13 +6,14 @@ import { useNavigate } from 'react-router-dom';
 import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
 import { checkCurrentUserPermission } from 'src/utils';
 import { useAppSelector } from 'src/state/hooks';
+import { CancelScheduleSend, FlightTakeoff } from '@mui/icons-material';
 
 export default function OrderTableRow({
   id,
   source,
   destination,
   customer,
-  status,
+  history,
   orderNumber,
   onCancelOrder,
 }) {
@@ -36,10 +37,6 @@ export default function OrderTableRow({
     }
   };
 
-  const handleEdit = () => {
-    handleCloseMenu();
-  };
-
   const handleCloseMenu = () => {
     setOpen(null);
   };
@@ -52,7 +49,10 @@ export default function OrderTableRow({
         <TableCell>{destination}</TableCell>
         <TableCell>{customer}</TableCell>
         <TableCell>
-          <Chip label={status} color="success" />
+          <Chip
+            label={`${history?.status?.toUpperCase() || '--'}, (${history?.name || '--'})`}
+            color="success"
+          />
         </TableCell>
         <Button className="mt-4" onClick={() => navigate(`${ROUTES.ORDERS}/${id}`)}>
           View
@@ -74,15 +74,22 @@ export default function OrderTableRow({
         }}
       >
         {checkCurrentUserPermission(user?.permissions, ORDER, UPDATE) && (
-          <MenuItem onClick={handleEdit}>
-            <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
-            Edit
+          <MenuItem onClick={() => navigate(`${ROUTES.ORDER_INTAKE}?orderId=${id}`)}>
+            <Iconify icon="eva:layers-outline" sx={{ mr: 2 }} />
+            Intake
+          </MenuItem>
+        )}
+
+        {checkCurrentUserPermission(user?.permissions, ORDER, UPDATE) && (
+          <MenuItem onClick={() => navigate(`${ROUTES.ORDER_DISPATCH}?orderId=${id}`)}>
+            <FlightTakeoff sx={{ mr: 2 }} />
+            Dispatch
           </MenuItem>
         )}
 
         {checkCurrentUserPermission(user?.permissions, ORDER, REMOVE) && (
           <MenuItem onClick={() => handleCancel(id)} sx={{ color: 'error.main' }}>
-            <Iconify icon="eva:close-square-outline" sx={{ mr: 2 }} />
+            <CancelScheduleSend sx={{ mr: 2 }} />
             Cancel
           </MenuItem>
         )}
