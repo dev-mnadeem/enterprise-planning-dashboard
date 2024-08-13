@@ -42,7 +42,11 @@ export default function OrdersDetailPage({ id }) {
           </Button>
         </Box>
         <Box className="flex flex-row gap-3 my-3 bg-transparent">
-          <CustomChip label={order?.history[order?.history?.length - 1]?.status} />
+          <CustomChip
+            label={`${order?.history[0]?.status?.toUpperCase() || '--'}, (${
+              order?.history[0]?.name || '--'
+            })`}
+          />
           <CustomChip
             label={`Placed On: ${new Date(order?.createdAt || new Date()).toLocaleString()}`}
             background="#e6eaed"

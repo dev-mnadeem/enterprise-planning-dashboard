@@ -1,0 +1,224 @@
+import { useEffect, useState } from 'react';
+import { Formik } from 'formik';
+import ErrorMsg from '../error-msg';
+import { Box, Button, Card, Divider, Typography } from '@mui/material';
+import { CustomDropdown, InputField } from '../common';
+import { SHIPMENT_DISPATCH, shipmentOutSchema } from 'src/constants';
+import _ from 'lodash';
+import Iconify from '../iconify/iconify';
+import useMemoized from 'src/hooks/useMemoized';
+import { useLazyQuery, useMutation, useQuery } from 'src/api';
+import { ENDPOINTS } from 'src/api/Endpoints';
+import { useLocation } from 'react-router-dom';
+import { useAppSelector } from 'src/state/hooks';
+import toast from 'react-hot-toast';
+
+export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText }) {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const orderId = queryParams.get('orderId');
+  const [initialValues, setInitialValues] = useState({ ...initials });
+  const { user } = useAppSelector((state) => state.userReducer);
+  const { OUT } = SHIPMENT_DISPATCH;
+  const orderEndPoint = ENDPOINTS.ORDERS;
+  const [outOrderMutate, { data: updatedOrder, error: orderOutError }] = useMutation(orderEndPoint);
+  const [getOrderById, { data: order, loading: queryLoading, error: orderError }] =
+    useLazyQuery(orderEndPoint);
+  const { error: locationError, data: locations } = useQuery(ENDPOINTS.LOCATIONS);
+  const { error: vehiclesError, data: vehicles } = useQuery(ENDPOINTS.VEHICLES);
+
+  useEffect(() => {
+    if (user?.locations?.length) {
+      setInitialValues((initials) => ({ ...initials, from_location_id: user?.locations[0]?.id }));
+    } else {
+      toast.error("You don't have any location assigned. Contact your manager!");
+    }
+  }, [user?.locations?.length]);
+
+  useEffect(() => {
+    if (orderId) {
+      getOrderById({}, `${orderId}`);
+    }
+  }, [orderId]);
+
+  useEffect(() => {
+    if (orderError) {
+      toast.error(orderError || 'Something went wrong!');
+      return;
+    }
+
+    if (order) {
+      setInitialValues((initials) => ({ ...initials, orderNo: order?.order_number }));
+    }
+  }, [order, orderError]);
+
+  useEffect(() => {
+    if (orderOutError) {
+      toast.error(orderOutError || 'Something went wrong!');
+    }
+  }, [orderOutError]);
+
+  const fromLocationOptions = useMemoized(
+    user?.locations?.map((location) => ({ value: location.id, label: location.name })),
+    [user?.locations]
+  );
+
+  const toLocationsOptions = useMemoized(
+    locations?.map((location) => ({ value: location.id, label: location.name })),
+    [locations]
+  );
+
+  const vehiclesOptions = useMemoized(
+    vehicles?.map((vehicle) => ({
+      value: vehicle.id,
+      label: `${vehicle?.name} (${vehicle?.registration_number})`,
+    })),
+    [vehicles]
+  );
+
+  useEffect(() => {
+    if (updatedOrder?.order_id) {
+      toast.success('Shipment Dispatch Successfull!');
+      const url = new URL(window.location.href);
+      url.search = '';
+      window.history.replaceState({}, '', url);
+      setInitialValues((initials) => ({ ...initials, orderNo: '' }));
+    }
+  }, [updatedOrder]);
+
+  const onSubmitForm = (values) => {
+    outOrderMutate(
+      {
+        from_location_id: values.from_location_id,
+        to_location_id: values.to_location_id,
+        vehicle_id: values.vehicle_id,
+      },
+      'patch',
+      `${values?.orderNo}/${OUT}`
+    );
+  };
+
+  return (
+    <Formik
+      enableReinitialize={true}
+      onSubmit={onSubmitForm}
+      validationSchema={shipmentOutSchema}
+      initialValues={initialValues}
+    >
+      {({
+        errors,
+        touched,
+        handleChange,
+        handleSubmit,
+        setFieldValue,
+        setFieldTouched,
+        values,
+      }) => (
+        <Card className="p-6">
+          <form onSubmit={handleSubmit}>
+            <fieldset disabled={viewOnly ?? false} className="border-none">
+              <Typography variant="h4" className="mb-4">
+                Shipment Dispatch:{' '}
+              </Typography>
+              <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
+                <Box>
+                  <InputField
+                    title="Shipment Number"
+                    name="orderNo"
+                    required
+                    value={values.orderNo}
+                    placeholder="172336..."
+                    onChange={handleChange}
+                  />
+
+                  {touched.orderNo && errors?.orderNo && <ErrorMsg error={errors.orderNo} />}
+                </Box>
+
+                <Box>
+                  <CustomDropdown
+                    title="From Branch/Frenchise"
+                    name="from_location_id"
+                    required
+                    placeholder="Select Location"
+                    options={fromLocationOptions}
+                    value={useMemoized(
+                      fromLocationOptions?.find((item) => item.value === values.from_location_id) ||
+                        null,
+                      [fromLocationOptions, values.from_location_id]
+                    )}
+                    onValueChange={async (value) => {
+                      setFieldTouched('from_location_id', true);
+                      setFieldValue('from_location_id', value.value);
+                    }}
+                  />
+                  {touched.from_location_id && errors?.from_location_id && (
+                    <ErrorMsg error={errors.from_location_id} />
+                  )}
+                </Box>
+
+                <Box>
+                  <CustomDropdown
+                    title="To Branch/Frenchise"
+                    name="to_location_id"
+                    required
+                    placeholder="Select Location"
+                    options={toLocationsOptions}
+                    value={useMemoized(
+                      toLocationsOptions?.find((item) => item.value === values.to_location_id) ||
+                        null,
+                      [toLocationsOptions, values.to_location_id]
+                    )}
+                    onValueChange={async (value) => {
+                      setFieldTouched('to_location_id', true);
+                      setFieldValue('to_location_id', value.value);
+                    }}
+                  />
+                  {touched.to_location_id && errors?.to_location_id && (
+                    <ErrorMsg error={errors.to_location_id} />
+                  )}
+                </Box>
+
+                <Box>
+                  <CustomDropdown
+                    title="From Transport Vehicle"
+                    name="vehicle_id"
+                    required
+                    placeholder="Select Vehicle"
+                    options={vehiclesOptions}
+                    value={useMemoized(
+                      vehiclesOptions?.find((item) => item.value === values.vehicle_id) || null,
+                      [vehiclesOptions, values.vehicle_id]
+                    )}
+                    onValueChange={async (value) => {
+                      setFieldTouched('vehicle_id', true);
+                      setFieldValue('vehicle_id', value.value);
+                    }}
+                  />
+                  {touched.vehicle_id && errors?.vehicle_id && (
+                    <ErrorMsg error={errors.vehicle_id} />
+                  )}
+                </Box>
+              </div>
+
+              <Divider className="my-4" />
+
+              <Button
+                type="submit"
+                variant="contained"
+                className="col-span-2 mt-6"
+                color="inherit"
+                sx={{
+                  padding: '12px 16px',
+                  float: 'right',
+                }}
+                startIcon={<Iconify icon="eva:navigation-2-outline" />}
+              >
+                DISPATCH SHIPMENT
+              </Button>
+            </fieldset>
+          </form>
+        </Card>
+      )}
+    </Formik>
+  );
+}

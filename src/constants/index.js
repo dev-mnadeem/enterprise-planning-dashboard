@@ -16,6 +16,10 @@ export const ROUTES = {
   ORDER_INVOICE: '/orders/invoice/:id',
   PRICING: '/pricing',
   ADD_PRICING: '/pricing/add',
+  ORDER_INTAKE: '/order-intake',
+  ORDER_DISPATCH: '/order-dispatch',
+  VEHICLES: '/vehicles',
+  ADD_VEHICLE: '/vehicles/add',
 };
 
 export const PERMISSION_TYPE = {
@@ -34,6 +38,7 @@ export const PERMISSION_ENTITIES = {
   ORDER: 'Order',
   PACKAGING: 'Package',
   PRICING: 'Pricing',
+  VEHICLE: 'Vehicle',
 };
 
 export * from './yupValidations';
@@ -60,4 +65,9 @@ export const SHIPMENT_ROUTE = {
 export const SHIPMENT_TYPE = {
   DOMESTIC: 'domestic',
   INTERNATIONAL: 'international',
+};
+
+export const SHIPMENT_DISPATCH = {
+  IN: 'in',
+  OUT: 'out',
 };

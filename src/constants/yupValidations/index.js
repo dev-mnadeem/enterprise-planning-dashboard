@@ -89,3 +89,23 @@ export const createOrderSchema = Yup.object().shape({
     })
   ),
 });
+
+export const shipmentInSchema = Yup.object().shape({
+  location_id: Yup.string().required('Please select branch'),
+  orderNo: Yup.string().required('Order number is required'),
+});
+
+export const shipmentOutSchema = Yup.object().shape({
+  from_location_id: Yup.string().required(),
+  to_location_id: Yup.string().required(),
+  vehicle_id: Yup.string().required(),
+});
+
+export const createVehicleSchema = Yup.object().shape({
+  name: Yup.string().required(),
+  model: Yup.string().required(),
+  registration_number: Yup.string().required(),
+  driver_id: Yup.string().required(),
+  vehicle_type_id: Yup.string().required(),
+  status: Yup.string().required(),
+});

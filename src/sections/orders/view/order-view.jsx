@@ -12,6 +12,7 @@ import {
   TablePagination,
   Typography,
 } from '@mui/material';
+import toast from 'react-hot-toast';
 import Scrollbar from 'src/components/scrollbar';
 import LocationTableToolbar from 'src/sections/locations/location-table-toolbar';
 import OrderTableRow from '../order-table-row';
@@ -120,9 +121,9 @@ export default function OrdersPage() {
                       source={row?.sender_city?.name}
                       destination={row?.receiver_city?.name}
                       customer={row.sender_name}
-                      status={row?.history[row?.history?.length - 1]?.status}
+                      history={row?.history[0]}
                       orderNumber={row?.order_number}
-                      onCancelOrder={(orderId) => cancelOrder(OrderId)}
+                      onCancelOrder={(orderId) => cancelOrder(orderId)}
                     />
                   ))}
               </TableBody>

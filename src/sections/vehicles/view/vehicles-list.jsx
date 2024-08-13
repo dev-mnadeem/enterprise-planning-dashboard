@@ -1,12 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TableHeadData } from '../utils';
 import Iconify from 'src/components/iconify';
 import { useNavigate } from 'react-router-dom';
 import Scrollbar from 'src/components/scrollbar';
-import LocationTableRow from '../location-table-row';
-import LocationTableHead from '../location-table-head';
-import LocationTableToolbar from '../location-table-toolbar';
-import { TableEmptyRows, TableNoData } from 'src/components/common';
 import { applyFilter, emptyRows, getComparator } from 'src/utils/table';
 import {
   Card,
@@ -19,26 +15,40 @@ import {
   TableContainer,
   TablePagination,
 } from '@mui/material';
+import {
+  TableEmptyRows,
+  TableNoData,
+  TableSearchHead,
+  TableSortToolbar,
+} from 'src/components/common';
+import PackagingsTableRow from '../vehicles-table-row';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useMutation, useQuery } from 'src/api';
+import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
+import { useAppSelector } from 'src/state/hooks';
+import { checkCurrentUserPermission } from 'src/utils';
+import toast from 'react-hot-toast';
 
-const LocationPage = () => {
+const VehiclesListPage = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
+  const [selected, setSelected] = useState([]);
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [selectedCity, setSelectedCity] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
-  const [deleteLocationMutate, { loading: deleteLoading }] = useMutation(ENDPOINTS.LOCATIONS);
-  const [selectedLocationType, setSelectedLocationType] = useState('');
-  const {
-    error,
-    loading,
-    data: locations,
-    refetch: refetchlocations,
-  } = useQuery(ENDPOINTS.LOCATIONS);
+  const { data: vehicles, loading, error, refetch: refetchVehicles } = useQuery(ENDPOINTS.VEHICLES);
+  const [deleteVehicleMutate, { error: deleteVehicleError }] = useMutation(ENDPOINTS.VEHICLES);
+  const { user } = useAppSelector((state) => state.userReducer);
+  const { ADD } = PERMISSION_TYPE;
+  const { VEHICLE } = PERMISSION_ENTITIES;
+
+  if (loading) return <div>Loading...</div>;
+  if (error) {
+    toast.error(error || 'Something went wrong!');
+    return <div>Something went wrong!</div>;
+  }
+  if (deleteVehicleError) toast.error(deleteVehicleError || 'Something went wrong!');
 
   const handleFilterByName = (event) => {
     setPage(0);
@@ -54,8 +64,8 @@ const LocationPage = () => {
   };
 
   const dataFiltered = applyFilter({
-    fieldToSearch: 'name',
-    inputData: locations,
+    fieldToSearch: 'registration_number',
+    inputData: vehicles,
     comparator: getComparator(order, orderBy),
     filterName,
   });
@@ -69,87 +79,68 @@ const LocationPage = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const notFound = !dataFiltered?.length && !!filterName;
+  const deleteVehicle = async (vehicleId) => {
+    if (!vehicleId) return;
 
-  const handleLocationTypeChange = (event) => {
-    setSelectedLocationType(event.target.value);
-  };
-  const handleStatusChange = (event) => {
-    setSelectedStatus(event.target.value);
-  };
-
-  const handleCityChange = (event) => {
-    setSelectedCity(event.target.value);
-  };
-
-  const deleteLocation = async (locationId) => {
-    if (!locationId) return;
-
-    const res = await deleteLocationMutate({}, 'DELETE', locationId);
+    const res = await deleteVehicleMutate({}, 'DELETE', vehicleId);
     if (res) {
-      refetchlocations();
+      toast.success('Vehicle deleted successfully!');
+      refetchVehicles();
     }
   };
 
-  if (loading || deleteLoading) return <div>Loading...</div>;
-  if (error) return <div>Error</div>;
+  const notFound = !dataFiltered?.length && !!filterName;
 
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Locations</Typography>
-        <Button
-          onClick={() => navigate('/locations/add')}
-          variant="contained"
-          color="inherit"
-          startIcon={<Iconify icon="eva:plus-fill" />}
-        >
-          New Location
-        </Button>
+        <Typography variant="h5">Manage Vehicles</Typography>
+
+        {checkCurrentUserPermission(user?.permissions, VEHICLE, ADD, user?.user_role?.name) && (
+          <Button
+            onClick={() => navigate(ROUTES.ADD_VEHICLE)}
+            variant="contained"
+            color="inherit"
+            startIcon={<Iconify icon="eva:plus-fill" />}
+          >
+            New Vehicle
+          </Button>
+        )}
       </Stack>
       <Card>
-        <LocationTableToolbar
-          numSelected={0}
+        <TableSortToolbar
+          numSelected={selected.length}
           filterName={filterName}
           onFilterName={handleFilterByName}
         />
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
-              <LocationTableHead
+              <TableSearchHead
                 order={order}
                 orderBy={orderBy}
                 headLabel={TableHeadData}
                 onRequestSort={handleSort}
-                rowCount={locations?.length}
-                selectedCity={selectedCity}
-                numSelected={0}
-                selectedStatus={selectedStatus}
-                onCityChange={handleCityChange}
-                onStatusChange={handleStatusChange}
-                selectedLocationType={selectedLocationType}
-                onLocationTypeChange={handleLocationTypeChange}
+                rowCount={vehicles?.length}
               />
               <TableBody>
                 {dataFiltered
                   ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
-                    <LocationTableRow
+                    <PackagingsTableRow
                       id={row.id}
                       key={row.id}
-                      name={row.name}
-                      city={row.city_id}
-                      status={row.status}
-                      country={row.country}
-                      address={row.address}
-                      locationType={row.location_type}
-                      onDeleteLocation={deleteLocation}
+                      name={row?.name}
+                      registration_number={row?.registration_number}
+                      driver={row?.driver?.name}
+                      category={row?.vehicle_type?.name}
+                      onDeleteVehicle={(vehicleId) => deleteVehicle(vehicleId)}
                     />
                   ))}
 
                 <TableEmptyRows
                   height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, locations?.length)}
+                  emptyRows={emptyRows(page, rowsPerPage, vehicles?.length)}
                 />
 
                 {notFound && <TableNoData query={filterName} />}
@@ -160,7 +151,7 @@ const LocationPage = () => {
         <TablePagination
           page={page}
           component="div"
-          count={locations?.length}
+          count={vehicles?.length || 0}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}
@@ -171,4 +162,4 @@ const LocationPage = () => {
   );
 };
 
-export default LocationPage;
+export default VehiclesListPage;
