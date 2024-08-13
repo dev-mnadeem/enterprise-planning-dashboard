@@ -1,14 +1,14 @@
-import { Icon } from '@iconify/react';
 import SvgColor from 'src/components/svg-color';
 import { ROUTES } from 'src/constants';
 import {
   ViewInAr,
-  LocalShipping,
   LocationOn,
   People,
   LockPerson,
   Security,
   PriceChange,
+  AirportShuttle,
+  AirplaneTicket,
 } from '@mui/icons-material';
 // ----------------------------------------------------------------------
 
@@ -47,7 +47,7 @@ const navConfig = [
   {
     title: 'Shipments',
     path: ROUTES.ORDERS,
-    icon: <LocalShipping />,
+    icon: <AirplaneTicket />,
   },
   {
     title: 'Packagings',
@@ -63,6 +63,11 @@ const navConfig = [
     title: 'Locations',
     path: ROUTES.LOCATIONS,
     icon: <LocationOn />,
+  },
+  {
+    title: 'Vehicles',
+    path: ROUTES.VEHICLES,
+    icon: <AirportShuttle />,
   },
   {
     title: 'Reports',

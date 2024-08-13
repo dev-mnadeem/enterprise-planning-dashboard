@@ -29,6 +29,7 @@ import useMemoized from 'src/hooks/useMemoized';
 import { ADD_ORDER_INITIALS } from 'src/sections/orders/utils';
 import { useAppSelector } from 'src/state/hooks';
 import NumberField from '../common/Input/BaseNumberField';
+import { calculateRemainingWeightLimit, sumSafely } from 'src/utils';
 
 export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) {
   const { user } = useAppSelector((state) => state.userReducer);
@@ -48,8 +49,6 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
   const [getRolePermissions, { data: role, loading: rpLoading, error: rpError }] = useLazyQuery(
     ENDPOINTS.USER_ROLES
   );
-  const [fetchCity, { data: city, error: cityError }] = useLazyQuery(ENDPOINTS.CITIES);
-  const [fetchState, { data: state, error: stateError }] = useLazyQuery(ENDPOINTS.STATES);
   const { data: branches, error: lcError } = useQuery(ENDPOINTS.LOCATIONS);
 
   const countriesOptions = useMemoized(
@@ -118,35 +117,42 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
       return;
     }
 
+    if (values?.sender_phone == values?.receiver_phone) {
+      toast.error('Customer and Receiver cannot be same!');
+      return;
+    }
+
     onSubmit({
       ...values,
       weight_type: 'kg',
       total_amount: Number(values?.total_amount || 0),
-      sub_total: Number(values?.total_amount || 0),
+      sub_total: Number(values?.sub_total || 0),
       status: 'pending',
       pricing: {
         from_city_id: values?.sender_city_id,
         to_city_id: values?.receiver_city_id,
-        price: Number(values?.total_amount || 0),
+        price: Number(values?.sub_total || 0),
         route: values?.shipment_route,
         package_id: values?.package_id,
       },
     });
   };
 
-  const searchUsers = async (phoneNo = '', setFieldValue) => {
+  const searchUsers = async (phoneNo = '', setFieldValue, fieldKey = '') => {
+    if (!fieldKey?.length) return;
+
     if (matchIsValidTel(phoneNo)) {
       const res = await searchUser({ phoneNumber: phoneNo });
       if (res?.results?.length) {
         const { email, name, address } = res?.results[0];
-        email && setFieldValue('sender_email', email);
-        name && setFieldValue('sender_name', name);
-        address && setFieldValue('sender_address', address);
+        email && setFieldValue(`${fieldKey}_email`, email);
+        name && setFieldValue(`${fieldKey}_name`, name);
+        address && setFieldValue(`${fieldKey}_address`, address);
       } else {
         toast.error('User not exist!');
-        setFieldValue('sender_email', '');
-        setFieldValue('sender_name', '');
-        setFieldValue('sender_address', '');
+        setFieldValue(`${fieldKey}_email`, '');
+        setFieldValue(`${fieldKey}_name`, '');
+        setFieldValue(`${fieldKey}_address`, '');
       }
     } else {
       toast.error('Please enter valid phone number!');
@@ -206,8 +212,25 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
         ]);
 
         useEffect(() => {
-          setFieldValue('total_amount', shipmentPricing?.[0]?.price || 0);
+          setFieldValue('sub_total', shipmentPricing?.[0]?.price || 0);
         }, [shipmentPricing?.[0]?.price]);
+
+        useEffect(() => {
+          if (values?.sender_phone?.length && values?.sender_phone == values?.receiver_phone) {
+            toast.error('Customer and Receiver cannot be same!');
+          }
+        }, [values?.sender_phone, values?.receiver_phone]);
+
+        useEffect(() => {
+          const _total = sumSafely(
+            0,
+            values?.sub_total,
+            values?.vat,
+            values?.other_taxes,
+            values?.service_charges
+          );
+          setFieldValue('total_amount', _total.toFixed(2));
+        }, [values?.sub_total, values?.vat, values?.other_taxes, values?.service_charges]);
 
         return (
           <Card className="p-6">
@@ -339,6 +362,8 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                     )}
                   </Box>
 
+                  <Divider className="col-span-2" />
+
                   <Box>
                     <Typography className="required">Customer Phone</Typography>
                     <MuiTelInput
@@ -354,12 +379,19 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                         setFieldTouched('sender_phone', true);
                         setFieldValue('sender_phone', value);
                       }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          searchUsers(values.sender_phone, setFieldValue, 'sender');
+                        }
+                      }}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="start">
                             <IconButton
                               aria-label="toggle password visibility"
-                              onClick={() => searchUsers(values.sender_phone, setFieldValue)}
+                              onClick={() =>
+                                searchUsers(values.sender_phone, setFieldValue, 'sender')
+                              }
                               edge="end"
                               style={{ backgroundColor: '#f0f0f0' }}
                             >
@@ -377,6 +409,72 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                   </Box>
 
                   <Box>
+                    <Typography className="required">Receiver Phone</Typography>
+                    <MuiTelInput
+                      name="receiver_phone"
+                      fullWidth
+                      value={values.receiver_phone}
+                      defaultCountry="US"
+                      forceCallingCode
+                      disableFormatting
+                      focusOnSelectCountry
+                      onlyCountries={countries?.map((country) => country.code)}
+                      onChange={(value) => {
+                        setFieldTouched('receiver_phone', true);
+                        setFieldValue('receiver_phone', value);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          searchUsers(values.receiver_phone, setFieldValue, 'receiver');
+                        }
+                      }}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="start">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={() =>
+                                searchUsers(values.receiver_phone, setFieldValue, 'receiver')
+                              }
+                              edge="end"
+                              style={{ backgroundColor: '#f0f0f0' }}
+                            >
+                              <PersonSearch />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                        style: { textAlign: 'center' },
+                      }}
+                    />
+
+                    {touched.receiver_phone && errors?.receiver_phone && (
+                      <ErrorMsg error={errors.receiver_phone} />
+                    )}
+                  </Box>
+
+                  {/* <Box>
+                    <Typography className="required">Receiver Phone</Typography>
+                    <MuiTelInput
+                      name="receiver_phone"
+                      fullWidth
+                      value={values.receiver_phone}
+                      defaultCountry="US"
+                      forceCallingCode
+                      disableFormatting
+                      focusOnSelectCountry
+                      onlyCountries={countries?.map((country) => country.code)}
+                      onChange={(value) => {
+                        setFieldTouched('receiver_phone', true);
+                        setFieldValue('receiver_phone', value);
+                      }}
+                    />
+
+                    {touched.receiver_phone && errors?.receiver_phone && (
+                      <ErrorMsg error={errors.receiver_phone} />
+                    )}
+                  </Box> */}
+
+                  <Box>
                     <InputField
                       title="Customer Email"
                       placeholder="jhon@example.com"
@@ -386,6 +484,19 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                     />
                     {touched.sender_email && errors?.sender_email && (
                       <ErrorMsg error={errors.sender_email} />
+                    )}
+                  </Box>
+
+                  <Box>
+                    <InputField
+                      title="Receiver Email"
+                      placeholder="mike@gmail.com"
+                      name="receiver_email"
+                      value={values.receiver_email}
+                      onChange={handleChange}
+                    />
+                    {touched.receiver_email && errors?.receiver_email && (
+                      <ErrorMsg error={errors.receiver_email} />
                     )}
                   </Box>
 
@@ -406,20 +517,6 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
 
                   <Box>
                     <InputField
-                      title="Customer Address"
-                      placeholder="H # 123, Street # 123"
-                      name="sender_address"
-                      required
-                      value={values.sender_address}
-                      onChange={handleChange}
-                    />
-                    {touched.sender_address && errors?.sender_address && (
-                      <ErrorMsg error={errors.sender_address} />
-                    )}
-                  </Box>
-
-                  <Box>
-                    <InputField
                       title="Receiver Name"
                       placeholder="Jhon Doe"
                       name="receiver_name"
@@ -433,41 +530,20 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                   </Box>
 
                   <Box>
-                    <Typography className="required">Receiver Phone</Typography>
-                    <MuiTelInput
-                      name="receiver_phone"
-                      fullWidth
-                      value={values.receiver_phone}
-                      defaultCountry="US"
-                      forceCallingCode
-                      disableFormatting
-                      focusOnSelectCountry
-                      onlyCountries={countries?.map((country) => country.code)}
-                      onChange={(value) => {
-                        setFieldTouched('receiver_phone', true);
-                        setFieldValue('receiver_phone', value);
-                      }}
+                    <InputField
+                      title="Customer Address"
+                      placeholder="H # 123, Street # 123"
+                      name="sender_address"
+                      required
+                      value={values.sender_address}
+                      onChange={handleChange}
                     />
-
-                    {touched.receiver_phone && errors?.receiver_phone && (
-                      <ErrorMsg error={errors.receiver_phone} />
+                    {touched.sender_address && errors?.sender_address && (
+                      <ErrorMsg error={errors.sender_address} />
                     )}
                   </Box>
 
                   <Box>
-                    <InputField
-                      title="Receiver Email"
-                      placeholder="mike@gmail.com"
-                      name="receiver_email"
-                      value={values.receiver_email}
-                      onChange={handleChange}
-                    />
-                    {touched.receiver_email && errors?.receiver_email && (
-                      <ErrorMsg error={errors.receiver_email} />
-                    )}
-                  </Box>
-
-                  <Box className="col-span-2">
                     <InputField
                       title="Receiver Address"
                       placeholder="H # 123, Street # 123"
@@ -733,10 +809,21 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                             <Box>
                               <NumberField
                                 name={`orderItems[${index}].weight`}
-                                title="Weight"
-                                max={Number(
-                                  packagings?.find((item) => item.id === values.package_id)
-                                    ?.weight_limit || 0
+                                title={`Weight (${calculateRemainingWeightLimit(
+                                  values,
+                                  index,
+                                  Number(
+                                    packagings?.find((item) => item.id === values.package_id)
+                                      ?.weight_limit || 0
+                                  )
+                                )}kg limit)`}
+                                max={calculateRemainingWeightLimit(
+                                  values,
+                                  index,
+                                  Number(
+                                    packagings?.find((item) => item.id === values.package_id)
+                                      ?.weight_limit || 0
+                                  )
                                 )}
                                 min={0}
                                 unit={NUMBER_FORMATS.KG}
@@ -812,24 +899,27 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
 
                   <Box>
                     <NumberField
-                      name="total_amount"
-                      title="Amount to be Collected"
+                      name="sub_total"
+                      title="Shipment Route Price"
                       required
                       min={0.01}
                       unit={NUMBER_FORMATS.DOLLAR}
-                      value={Number(values?.total_amount || 0)}
+                      value={Number(values?.sub_total || 0)}
+                      disabled={!!shipmentPricing?.[0]?.price}
                       onChange={(v) => {
-                        setFieldTouched(`total_amount`, true);
-                        setFieldValue(`total_amount`, v);
+                        if (!!shipmentPricing?.[0]?.price) return;
+                        setFieldTouched(`sub_total`, true);
+                        setFieldValue(`sub_total`, v);
                       }}
                     />
-                    {touched.total_amount && errors?.total_amount && (
-                      <ErrorMsg error={errors.total_amount} />
+                    {touched.sub_total && errors?.sub_total && (
+                      <ErrorMsg error={errors.sub_total} />
                     )}
-                    <Typography className="text-xs italic">
-                      Changing the total amount will update/create a price list for that shipment
-                      route
-                    </Typography>
+                    {!!!shipmentPricing?.[0]?.price && (
+                      <Typography className="text-xs italic">
+                        Price list not found for that shipment route. You can add price.
+                      </Typography>
+                    )}
                   </Box>
 
                   <Box>
@@ -844,9 +934,69 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       <ErrorMsg error={errors.total_weight} />
                     )}
                   </Box>
+
+                  <Box>
+                    <NumberField
+                      name="vat"
+                      title="VAT"
+                      unit={NUMBER_FORMATS.DOLLAR}
+                      value={Number(values?.vat || 0)}
+                      onChange={(v) => {
+                        setFieldTouched(`vat`, true);
+                        setFieldValue(`vat`, v);
+                      }}
+                    />
+                  </Box>
+
+                  <Box>
+                    <NumberField
+                      name="service_charges"
+                      title="Service Charges"
+                      unit={NUMBER_FORMATS.DOLLAR}
+                      value={Number(values?.service_charges || 0)}
+                      onChange={(v) => {
+                        setFieldTouched(`service_charges`, true);
+                        setFieldValue(`service_charges`, v);
+                      }}
+                    />
+                  </Box>
+
+                  <Box>
+                    <NumberField
+                      name="other_taxes"
+                      title="Other Taxes"
+                      unit={NUMBER_FORMATS.DOLLAR}
+                      value={Number(values?.other_taxes || 0)}
+                      onChange={(v) => {
+                        setFieldTouched(`other_taxes`, true);
+                        setFieldValue(`other_taxes`, v);
+                      }}
+                    />
+                  </Box>
                 </div>
 
                 <Divider className="my-4" />
+
+                <Box className="flex flex-col items-end">
+                  <Typography>
+                    VAT: <span className="font-light">${values?.vat || 0}</span>
+                  </Typography>
+                  <Typography>
+                    Other Taxes: <span className="font-light">${values?.other_taxes || 0}</span>
+                  </Typography>
+                  <Typography>
+                    Shipment Price: <span className="font-light">${values?.sub_total || 0}</span>
+                  </Typography>
+                  <Typography>
+                    Service Charges:{' '}
+                    <span className="font-light">${values?.service_charges || 0}</span>
+                  </Typography>
+                  <Divider className="my-4" />
+                  <Typography className="border border-solid p-2.5">
+                    Amount to be Collected:{' '}
+                    <span className="font-bold">${values?.total_amount || 0}</span>
+                  </Typography>
+                </Box>
 
                 {viewOnly ? null : (
                   <Button

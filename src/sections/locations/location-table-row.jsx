@@ -8,7 +8,6 @@ import MenuItem from '@mui/material/MenuItem';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import { useNavigate } from 'react-router-dom';
-import { LocationTypesResult } from './utils';
 import { useLazyQuery } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
 
@@ -24,7 +23,6 @@ export default function LocationTableRow({
 }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(null);
-  const currentLocationType = LocationTypesResult.find((type) => type.id == locationType);
   const [fetchCity, { data: cityData }] = useLazyQuery(ENDPOINTS.CITIES);
 
   useEffect(() => {
@@ -56,14 +54,14 @@ export default function LocationTableRow({
         <TableCell align="center">
           <Label
             color={
-              currentLocationType.name === 'warehouse'
+              locationType?.name === 'warehouse'
                 ? 'success'
-                : locationType === 'branch'
+                : locationType?.name === 'branch'
                 ? 'error'
                 : 'info'
             }
           >
-            {currentLocationType.name}
+            {locationType?.name}
           </Label>
         </TableCell>
         <TableCell>{address}</TableCell>

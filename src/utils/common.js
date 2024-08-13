@@ -55,3 +55,22 @@ export const removeFalsePermissions = (permissions) => {
 };
 
 export const sleepForTesting = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+
+// Function to calculate the remaining weight limit
+export function calculateRemainingWeightLimit(values, index, totalLimit = 0) {
+  const currentWeight = values.orderItems?.reduce((acc, item, i) => {
+    if (i !== index) {
+      return acc + Number(item?.weight || 0);
+    }
+    return acc;
+  }, 0);
+
+  const remainingLimit = totalLimit - currentWeight;
+
+  return Math.max(remainingLimit, 0);
+}
+
+// Function to add up all the values safely
+export const sumSafely = (num = 0, ...values) => {
+  return values?.reduce((acc, val) => acc + (Number(val) || 0), num) || 0;
+};

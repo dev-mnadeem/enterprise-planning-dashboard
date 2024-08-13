@@ -151,24 +151,3 @@ export const Cities = [
     value: 'Faisalabad',
   },
 ];
-
-export const LocationTypesResult = [
-  {
-    id: '01HYPG61EAVWERT2H43X3PJ2YK',
-    name: 'branch',
-    created_at: '2024-05-24T23:50:07.559Z',
-    updated_at: '2024-05-24T23:50:07.559Z',
-  },
-  {
-    id: '01HYPG61F0EAJZ0YJDGXXN6YCH',
-    name: 'franchise',
-    created_at: '2024-05-24T23:50:07.581Z',
-    updated_at: '2024-05-24T23:50:07.581Z',
-  },
-  {
-    id: '01HYPG61FH3R9WK5RFS15AEE4A',
-    name: 'warehouse',
-    created_at: '2024-05-24T23:50:07.598Z',
-    updated_at: '2024-05-24T23:50:07.598Z',
-  },
-];
