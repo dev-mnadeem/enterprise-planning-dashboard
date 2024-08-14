@@ -56,10 +56,14 @@ export default function LoginView() {
       router.replace('/');
     }
 
-    if (data?.token && data?.permissions) {
+    if (data?.token && data?.permissions && data?.locations) {
       try {
         const decoded = jwtDecode(data?.token);
-        const user = { ...JSON.parse(decoded.id), permissions: data?.permissions };
+        const user = {
+          ...JSON.parse(decoded.id),
+          permissions: data?.permissions,
+          locations: data?.locations,
+        };
 
         dispatch(
           storeUserSession({
