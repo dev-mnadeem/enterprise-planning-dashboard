@@ -10,5 +10,5 @@ export const TableHeadData = [
 export const ADD_PRICING_INITIALS = {
   from_city_id: '',
   to_city_id: '',
-  price: 0.0,
+  price: null,
 };
