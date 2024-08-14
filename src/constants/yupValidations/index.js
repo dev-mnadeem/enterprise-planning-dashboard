@@ -44,10 +44,9 @@ export const userRoleFormValidationSchema = Yup.object().shape({
 
 export const createPackagingSchema = Yup.object().shape({
   name: Yup.string().required(),
-  depth: Yup.number().required().positive().min(0.01),
-  width: Yup.number().required().positive().min(0.01),
-  height: Yup.number().required().positive().min(0.01),
-  // price: Yup.number().required().positive().min(0.0),
+  depth: Yup.number().optional().positive().min(0.01),
+  width: Yup.number().optional().positive().min(0.01),
+  height: Yup.number().optional().positive().min(0.01),
   weight_limit: Yup.number().optional().positive().min(0.0),
 });
 
