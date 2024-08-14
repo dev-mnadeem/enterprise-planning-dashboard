@@ -9,6 +9,8 @@ import {
   PriceChange,
   AirportShuttle,
   AirplaneTicket,
+  FlightTakeoff,
+  LibraryAdd,
 } from '@mui/icons-material';
 // ----------------------------------------------------------------------
 
@@ -48,6 +50,18 @@ const navConfig = [
     title: 'Shipments',
     path: ROUTES.ORDERS,
     icon: <AirplaneTicket />,
+    menuItems: [
+      {
+        title: 'Intake',
+        path: ROUTES.ORDER_INTAKE,
+        icon: <LibraryAdd />,
+      },
+      {
+        title: 'Dispatch',
+        path: ROUTES.ORDER_DISPATCH,
+        icon: <FlightTakeoff />,
+      },
+    ],
   },
   {
     title: 'Packagings',
