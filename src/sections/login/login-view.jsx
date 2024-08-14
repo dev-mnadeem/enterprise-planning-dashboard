@@ -52,10 +52,11 @@ export default function LoginView() {
       router.replace('/');
     }
 
-    if (data?.token) {
+    if (data?.token &&  data?.permissions) {
       try {
         const decoded = jwtDecode(data?.token);
-        const user = JSON.parse(decoded.id);
+        const user = { ...JSON.parse(decoded.id), permissions: data?.permissions };
+
         dispatch(
           storeUserSession({
             token: data?.token,
