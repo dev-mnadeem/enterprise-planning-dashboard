@@ -49,9 +49,9 @@ const EditPackagingPage = ({ id }) => {
         depth: Number(values?.depth),
         width: Number(values?.width),
         height: Number(values?.height),
-        price: Number(values?.price),
         weight_limit: Number(values?.weight_limit),
         weight_type: values?.weight_type || 'kg',
+        route: values?.shipment_path || 'road',
       },
       'patch'
     );
