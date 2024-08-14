@@ -15,7 +15,13 @@ import {
   Typography,
 } from '@mui/material';
 import { CustomDropdown, InputField } from '../common';
-import { NUMBER_FORMATS, SHIPMENT_ROUTE, SHIPMENT_TYPE, createOrderSchema } from 'src/constants';
+import {
+  NUMBER_FORMATS,
+  SHIPMENT_ROUTE,
+  SHIPMENT_TYPE,
+  createOrderSchema,
+  customNumberFormat,
+} from 'src/constants';
 import { useLazyQuery, useQuery } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import toast from 'react-hot-toast';
@@ -49,7 +55,6 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
   const [getRolePermissions, { data: role, loading: rpLoading, error: rpError }] = useLazyQuery(
     ENDPOINTS.USER_ROLES
   );
-  const { data: branches, error: lcError } = useQuery(ENDPOINTS.LOCATIONS);
 
   const countriesOptions = useMemoized(
     countries?.map((country) => ({ value: country.id, label: country.name })),
@@ -87,6 +92,10 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
     packagings?.map((packaging) => ({ value: packaging.id, label: packaging.name })),
     [packagings]
   );
+
+  useEffect(() => {
+    const _cityId = user?.city_id;
+  }, []);
   const shipmentRouteOptions = (type = '') =>
     useMemoized(
       [type === DOMESTIC ? [ROAD] : [SEA, AIR]]
@@ -101,7 +110,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
       [packagingOptions, id]
     );
 
-  if (lcError || rpError || cntError) return <div>Something went wrong</div>;
+  if (rpError || cntError) return <div>Something went wrong</div>;
 
   /** FIXED PAGE SCROLLING TOP ON API CALL, NEED TO OPTIMIZE IT */
   document.activeElement.scrollIntoView({ block: 'center' });
@@ -124,7 +133,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
 
     onSubmit({
       ...values,
-      weight_type: 'kg',
+      weight_type: values?.weight_type || 'kg',
       total_amount: Number(values?.total_amount || 0),
       sub_total: Number(values?.sub_total || 0),
       status: 'pending',
@@ -162,7 +171,10 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
   return (
     <Formik
       enableReinitialize={true}
-      onSubmit={onSubmitForm}
+      onSubmit={() => {
+        console.log(errors);
+        onSubmitForm();
+      }}
       validationSchema={createOrderSchema}
       initialValues={initials ? initialValues : ADD_ORDER_INITIALS}
     >
@@ -176,6 +188,41 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
         values,
         resetForm,
       }) => {
+        useEffect(() => {
+          /** PREFILL SENDER COUNTRY, STATE, CITY BASED ON CURRENT USER BRANCH LOCATION */
+          const prefillSenderData = async () => {
+            try {
+              if (user?.locations?.length) {
+                const _location = user.locations?.[0];
+                const {
+                  city: {
+                    id: _cityId,
+                    state: {
+                      id: _stateId,
+                      country: { id: _countryId },
+                    },
+                  },
+                } = _location;
+
+                await setFieldValue('location_id', _location.id);
+                await setFieldValue('sender_country', _countryId);
+
+                await senderCountryStates({}, `${_countryId}/${ENDPOINTS.STATES}`);
+                await setFieldValue('sender_state', _stateId);
+
+                await senderStateCities({}, `${_stateId}/${ENDPOINTS.CITIES}`);
+                await setFieldValue('sender_city_id', _cityId);
+              } else {
+                toast.error("You don't have any location assigned. Contact your manager!");
+              }
+            } catch (error) {
+              toast.error('Issue occurred while prefilling data.');
+            }
+          };
+
+          prefillSenderData();
+        }, [user?.locations]);
+
         useEffect(() => {
           const totalWeight = values.orderItems?.reduce(
             (acc, item) => acc + (parseFloat(item.weight) || 0),
@@ -280,6 +327,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                         setFieldTouched('shipment_route', true);
                         setFieldValue('shipment_route', shipment_route.value);
                         setFieldValue('package_id', '');
+                        setFieldValue('weight_type', shipment_route.value === SEA ? 'cbm' : 'kg');
                         await getRoutePackagings({ route: shipment_route.value });
                       }}
                     />
@@ -299,9 +347,10 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       )}
                       required
                       placeholder="Select Shipment Packaging"
-                      onValueChange={(package_id) => {
+                      onValueChange={async (package_id) => {
                         setFieldTouched('package_id', true);
                         setFieldValue('package_id', package_id.value);
+                        await setFieldValue('orderItems', ADD_ORDER_INITIALS.orderItems);
                       }}
                     />
                     {touched.package_id && errors?.package_id && (
@@ -321,8 +370,8 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                         [branchesOptions, values.location_id]
                       )}
                       onValueChange={async (value) => {
-                        setFieldTouched('location_id', true);
-                        setFieldValue('location_id', value.value);
+                        await setFieldTouched('location_id', true);
+                        await setFieldValue('location_id', value.value);
                       }}
                     />
                     {touched.location_id && errors?.location_id && (
@@ -809,14 +858,16 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                             <Box>
                               <NumberField
                                 name={`orderItems[${index}].weight`}
-                                title={`Weight (${calculateRemainingWeightLimit(
+                                title={`${
+                                  values?.weight_type == 'cbm' ? 'Volume' : 'Weight'
+                                } (${calculateRemainingWeightLimit(
                                   values,
                                   index,
                                   Number(
                                     packagings?.find((item) => item.id === values.package_id)
                                       ?.weight_limit || 0
                                   )
-                                )}kg limit)`}
+                                )} ${values?.weight_type || ''} limit)`}
                                 max={calculateRemainingWeightLimit(
                                   values,
                                   index,
@@ -826,13 +877,12 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                                   )
                                 )}
                                 min={0}
-                                unit={NUMBER_FORMATS.KG}
+                                unit={values?.weight_type == 'kg' ? NUMBER_FORMATS.KG : {}}
                                 value={Number(values?.orderItems?.[index]?.weight || 0)}
                                 required
                                 onChange={(v) => {
                                   setFieldTouched(`orderItems[${index}].weight`, true);
                                   setFieldValue(`orderItems[${index}].weight`, v);
-                                  setFieldValue('weight_type', 'kg');
                                 }}
                               />
                               {touched?.orderItems?.[index]?.weight &&
@@ -925,8 +975,9 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                   <Box>
                     <NumberField
                       name="total_weight"
-                      title="Total Weight"
-                      unit={NUMBER_FORMATS.KG}
+                      title={`Total ${values?.weight_type == 'cbm' ? 'Volume (cmb)' : 'Weight'}`}
+                      // unit={values?.weight_type == 'kg' && NUMBER_FORMATS.KG}
+                      unit={values?.weight_type == 'kg' ? NUMBER_FORMATS.KG : {}}
                       value={values.total_weight}
                       disabled
                     />

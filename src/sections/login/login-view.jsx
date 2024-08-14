@@ -40,11 +40,15 @@ export default function LoginView() {
       email: '',
       password: '',
     },
-    onSubmit: async () =>
+    onSubmit: async () => {
+      if (!values.email || !values.password) {
+        return;
+      }
       mutate({
         email: values.email,
         password: values.password,
-      }),
+      });
+    },
   });
 
   useEffect(() => {
@@ -82,6 +86,7 @@ export default function LoginView() {
           name="email"
           label="Email address"
           fullWidth
+          required
           margin="dense"
           value={values.email}
           onChange={handleChange}
@@ -92,6 +97,7 @@ export default function LoginView() {
         <TextField
           name="password"
           label="Password"
+          required
           type={showPassword ? 'text' : 'password'}
           value={values.password}
           onChange={handleChange}
