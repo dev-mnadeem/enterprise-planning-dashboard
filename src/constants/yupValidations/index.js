@@ -55,6 +55,7 @@ export const createPricingSchema = Yup.object().shape({
   to_city_id: Yup.string().required(),
   price: Yup.number().required().positive().min(0.0),
   package_id: Yup.string().required(),
+  is_fixed: Yup.boolean().required(),
 });
 
 export const createOrderSchema = Yup.object().shape({
