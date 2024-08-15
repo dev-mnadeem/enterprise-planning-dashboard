@@ -33,6 +33,7 @@ const AddPackagingPage = () => {
       price: values?.price,
       weight_limit: values?.weight_limit,
       weight_type: values?.weight_type || 'kg',
+      route: values?.shipment_path || 'road',
     });
   };
 

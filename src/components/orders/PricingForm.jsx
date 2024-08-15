@@ -50,6 +50,14 @@ export default function PricingForm({ onSubmit, initials, viewOnly, buttonText }
     []
   );
 
+  const priceVariationOptions = useMemoized(
+    [
+      { value: true, label: 'Fixed' },
+      { value: false, label: 'Per Kg/Volume' },
+    ].map((type) => ({ value: type.value, label: type.label })),
+    []
+  );
+
   const packagingOptions = useMemoized(
     packagings?.map((packaging) => ({ value: packaging.id, label: packaging.name })),
     [packagings]
@@ -331,6 +339,25 @@ export default function PricingForm({ onSubmit, initials, viewOnly, buttonText }
                       onChange={handleChange}
                     />
                     {touched.price && errors?.price && <ErrorMsg error={errors.price} />}
+                  </Box>
+
+                  <Box>
+                    <CustomDropdown
+                      name="is_fixed"
+                      title="Price Type"
+                      options={priceVariationOptions}
+                      value={useMemoized(
+                        priceVariationOptions?.find((item) => item.value === values.is_fixed),
+                        [priceVariationOptions, values.is_fixed]
+                      )}
+                      required
+                      placeholder="Select is price fixed"
+                      onValueChange={async (is_fixed) => {
+                        setFieldTouched('is_fixed', true);
+                        setFieldValue('is_fixed', is_fixed.value);
+                      }}
+                    />
+                    {touched.is_fixed && errors?.is_fixed && <ErrorMsg error={errors.is_fixed} />}
                   </Box>
                 </div>
 
