@@ -1,11 +1,11 @@
 export const ADD_ORDER_INITIALS = {
   sender_name: '',
-  sender_email: '',
+  sender_email: null,
   sender_phone: '',
   sender_address: '',
   sender_city_id: '',
   receiver_name: '',
-  receiver_email: '',
+  receiver_email: null,
   receiver_phone: '',
   receiver_address: '',
   receiver_city_id: '',
