@@ -8,9 +8,9 @@ export const TableHeadData = [
 
 export const ADD_PACKAGING_INITIALS = {
   name: '',
-  depth: '',
-  width: '',
-  height: '',
-  weight_limit: '',
-  price: '',
+  depth: 0,
+  width: 0,
+  height: 0,
+  weight_limit: 0,
+  shipment_path: 'road',
 };
