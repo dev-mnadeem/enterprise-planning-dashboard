@@ -42,7 +42,13 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
         values,
       }) => {
         const isSea = values.shipment_path === SEA;
-        const isAirOrRoad = values.shipment_path === AIR || values.shipment_path === ROAD;
+        const unit = isSea ? 'm' : 'in"';
+
+        useEffect(() => {
+          if (isSea && values?.width && values?.height && values?.depth) {
+            setFieldValue('weight_limit', values?.width * values?.height * values?.depth);
+          }
+        }, [isSea, values?.width, values?.height, values?.depth]);
 
         return (
           <Card className="p-6">
@@ -86,7 +92,7 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                   {isSea && (
                     <>
                       <Typography className="col-span-2 font-bold">
-                        Dimensions [Width x Height x Depth] (in) *
+                        Dimensions [Width x Height x Depth] *
                       </Typography>
                       <Box>
                         <NumberField
@@ -94,7 +100,7 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                           title="Width"
                           fullWidth
                           required
-                          unit={`in"`}
+                          unit={`${unit}`}
                           value={values.width}
                           onChange={handleChange}
                         />
@@ -106,7 +112,7 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                           name="height"
                           title="Height"
                           required
-                          unit={`in"`}
+                          unit={`${unit}`}
                           value={values.height}
                           onChange={handleChange}
                         />
@@ -118,7 +124,7 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                           name="depth"
                           title="Depth"
                           required
-                          unit={`in"`}
+                          unit={`${unit}`}
                           value={values.depth}
                           onChange={handleChange}
                         />
@@ -127,14 +133,15 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                     </>
                   )}
 
-                  {isAirOrRoad && (
+                  {true && (
                     <Box>
                       <NumberField
                         name="weight_limit"
-                        title="Weight Limit"
+                        title={`${isSea ? 'Volume' : 'Weight'} Limit`}
                         unit={values?.weight_type || 'kg'}
                         value={values.weight_limit}
-                        onChange={handleChange}
+                        disabled
+                        // onChange={handleChange}
                       />
                       {touched.weight_limit && errors?.weight_limit && (
                         <ErrorMsg error={errors.weight_limit} />

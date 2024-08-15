@@ -171,10 +171,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
   return (
     <Formik
       enableReinitialize={true}
-      onSubmit={() => {
-        console.log(errors);
-        onSubmitForm();
-      }}
+      onSubmit={onSubmitForm}
       validationSchema={createOrderSchema}
       initialValues={initials ? initialValues : ADD_ORDER_INITIALS}
     >
@@ -278,6 +275,16 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
           );
           setFieldValue('total_amount', _total.toFixed(2));
         }, [values?.sub_total, values?.vat, values?.other_taxes, values?.service_charges]);
+
+        useEffect(() => {
+          if (
+            !shipmentPricing?.[0]?.is_fixed &&
+            values.total_weight &&
+            shipmentPricing?.[0]?.price
+          ) {
+            setFieldValue('sub_total', shipmentPricing?.[0]?.price * values.total_weight);
+          }
+        }, [values.total_weight]);
 
         return (
           <Card className="p-6">

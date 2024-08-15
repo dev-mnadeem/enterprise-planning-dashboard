@@ -31,6 +31,7 @@ const AddPricingPage = () => {
       price: Number(values?.price || 0),
       package_id: values?.package_id,
       route: values?.shipment_route?.toLowerCase(),
+      is_fixed: values?.is_fixed || false,
     });
   };
 
