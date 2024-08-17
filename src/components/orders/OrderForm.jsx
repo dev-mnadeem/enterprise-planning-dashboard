@@ -34,7 +34,7 @@ import dayjs from 'dayjs';
 import useMemoized from 'src/hooks/useMemoized';
 import { ADD_ORDER_INITIALS } from 'src/sections/orders/utils';
 import { useAppSelector } from 'src/state/hooks';
-import NumberField from '../common/Input/BaseNumberField';
+import NumberField from '../common/Input/NumberField';
 import { calculateRemainingWeightLimit, sumSafely } from 'src/utils';
 
 export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) {
@@ -93,21 +93,12 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
     [packagings]
   );
 
-  useEffect(() => {
-    const _cityId = user?.city_id;
-  }, []);
   const shipmentRouteOptions = (type = '') =>
     useMemoized(
       [type === DOMESTIC ? [ROAD] : [SEA, AIR]]
         .flat()
         .map((type) => ({ value: type, label: type })),
       [type]
-    );
-
-  const packageValue = (id = '') =>
-    useMemoized(
-      packagingOptions?.find((item) => item.value === id),
-      [packagingOptions, id]
     );
 
   if (rpError || cntError) return <div>Something went wrong</div>;
@@ -168,6 +159,16 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
     }
   };
 
+  const weightLimit = (values = {}, index) => {
+    if (!values?.orderItems?.length || index == null) return 0;
+
+    return calculateRemainingWeightLimit(
+      values,
+      index,
+      Number(packagings?.find((item) => item.id === values.package_id)?.weight_limit || 0)
+    );
+  };
+
   return (
     <Formik
       enableReinitialize={true}
@@ -185,6 +186,8 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
         values,
         resetForm,
       }) => {
+        const isSeaRoute = values?.shipment_route == SEA;
+
         useEffect(() => {
           /** PREFILL SENDER COUNTRY, STATE, CITY BASED ON CURRENT USER BRANCH LOCATION */
           const prefillSenderData = async () => {
@@ -219,6 +222,12 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
 
           prefillSenderData();
         }, [user?.locations]);
+
+        useEffect(() => {
+          setFieldValue('courier_type', courierTypeOptions?.[0]?.value);
+          setFieldValue('payment_type', paymentTypeOptions?.[0]?.value);
+          setFieldValue('payment_date', new Date());
+        }, []);
 
         useEffect(() => {
           const totalWeight = values.orderItems?.reduce(
@@ -804,7 +813,6 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       onValueChange={async (payment_type) => {
                         await setFieldTouched('payment_type', true);
                         await setFieldValue('payment_type', payment_type.value);
-                        await setFieldValue('payment_date', new Date());
                       }}
                     />
                     {touched.payment_type && errors?.payment_type && (
@@ -862,34 +870,29 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                                 )}
                             </Box>
 
-                            <Box>
+                            <Box className="w-full">
                               <NumberField
                                 name={`orderItems[${index}].weight`}
-                                title={`${
-                                  values?.weight_type == 'cbm' ? 'Volume' : 'Weight'
-                                } (${calculateRemainingWeightLimit(
+                                title={`${isSeaRoute ? 'Volume' : 'Weight'} (${weightLimit(
                                   values,
-                                  index,
-                                  Number(
-                                    packagings?.find((item) => item.id === values.package_id)
-                                      ?.weight_limit || 0
-                                  )
+                                  index
                                 )} ${values?.weight_type || ''} limit)`}
-                                max={calculateRemainingWeightLimit(
-                                  values,
-                                  index,
-                                  Number(
-                                    packagings?.find((item) => item.id === values.package_id)
-                                      ?.weight_limit || 0
-                                  )
-                                )}
+                                max={weightLimit(values, index)}
                                 min={0}
-                                unit={values?.weight_type == 'kg' ? NUMBER_FORMATS.KG : {}}
+                                unit={isSeaRoute ? 'cbm' : 'kg'}
                                 value={Number(values?.orderItems?.[index]?.weight || 0)}
                                 required
                                 onChange={(v) => {
                                   setFieldTouched(`orderItems[${index}].weight`, true);
                                   setFieldValue(`orderItems[${index}].weight`, v);
+                                }}
+                                onBlur={(e) => {
+                                  if (e.target.value > weightLimit(values, index)) {
+                                    setFieldValue(
+                                      `orderItems[${index}].weight`,
+                                      weightLimit(values, index)
+                                    );
+                                  }
                                 }}
                               />
                               {touched?.orderItems?.[index]?.weight &&
@@ -960,7 +963,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       title="Shipment Route Price"
                       required
                       min={0.01}
-                      unit={NUMBER_FORMATS.DOLLAR}
+                      unit={'$'}
                       value={Number(values?.sub_total || 0)}
                       disabled={!!shipmentPricing?.[0]?.price}
                       onChange={(v) => {
@@ -982,9 +985,8 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                   <Box>
                     <NumberField
                       name="total_weight"
-                      title={`Total ${values?.weight_type == 'cbm' ? 'Volume (cmb)' : 'Weight'}`}
-                      // unit={values?.weight_type == 'kg' && NUMBER_FORMATS.KG}
-                      unit={values?.weight_type == 'kg' ? NUMBER_FORMATS.KG : {}}
+                      title={`Total ${isSeaRoute ? 'Volume (cmb)' : 'Weight'}`}
+                      unit={isSeaRoute ? 'cbm' : 'kg'}
                       value={values.total_weight}
                       disabled
                     />
@@ -997,7 +999,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                     <NumberField
                       name="vat"
                       title="VAT"
-                      unit={NUMBER_FORMATS.DOLLAR}
+                      unit={'$'}
                       value={Number(values?.vat || 0)}
                       onChange={(v) => {
                         setFieldTouched(`vat`, true);
@@ -1010,7 +1012,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                     <NumberField
                       name="service_charges"
                       title="Service Charges"
-                      unit={NUMBER_FORMATS.DOLLAR}
+                      unit={'$'}
                       value={Number(values?.service_charges || 0)}
                       onChange={(v) => {
                         setFieldTouched(`service_charges`, true);
@@ -1023,7 +1025,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                     <NumberField
                       name="other_taxes"
                       title="Other Taxes"
-                      unit={NUMBER_FORMATS.DOLLAR}
+                      unit={'$'}
                       value={Number(values?.other_taxes || 0)}
                       onChange={(v) => {
                         setFieldTouched(`other_taxes`, true);

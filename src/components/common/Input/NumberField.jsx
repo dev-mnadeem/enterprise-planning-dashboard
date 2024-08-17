@@ -3,7 +3,7 @@ import { InputField } from '..';
 
 export default function NumberField(props) {
   return (
-    <Box display="flex" alignItems="center" className="">
+    <Box display="flex" alignItems="center" className="w-full">
       <InputField
         {...props}
         type="number"
@@ -22,7 +22,12 @@ export default function NumberField(props) {
           style: { textAlign: 'center' },
         }}
         variant="outlined"
-        inputProps={{ min: 0, step: 0.01, style: { textAlign: 'center' } }}
+        inputProps={{
+          min: 0,
+          max: props?.max,
+          step: props?.step || 0.01,
+          style: { textAlign: 'center' },
+        }}
       />
     </Box>
   );

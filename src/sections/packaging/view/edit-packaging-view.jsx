@@ -46,10 +46,10 @@ const EditPackagingPage = ({ id }) => {
     mutate(
       {
         name: values?.name,
-        depth: Number(values?.depth),
-        width: Number(values?.width),
-        height: Number(values?.height),
-        weight_limit: Number(values?.weight_limit),
+        depth: Number(values?.depth || 0),
+        width: Number(values?.width || 0),
+        height: Number(values?.height || 0),
+        weight_limit: Number(values?.weight_limit || 0),
         weight_type: values?.weight_type || 'kg',
         route: values?.shipment_path || 'road',
       },

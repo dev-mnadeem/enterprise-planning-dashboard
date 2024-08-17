@@ -37,8 +37,8 @@ export const InputField = (props) => {
   }, []);
 
   return (
-    <Box>
-      <Box className="flex justify-between items-center">
+    <Box className="w-full">
+      <Box className="flex justify-between items-center w-full">
         <Typography className={props.required ? 'required' : ''}>{props.title}</Typography>
       </Box>
 
@@ -50,6 +50,10 @@ export const InputField = (props) => {
           {...props}
           onChange={context.handleChange}
           {...context?.getFieldProps(props.name)}
+          onBlur={(event) => {
+            context.handleBlur(event);
+            if (props.onBlur) props.onBlur(event);
+          }}
         />
       )}
     </Box>

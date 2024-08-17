@@ -58,7 +58,7 @@ export const sleepForTesting = (delay) => new Promise((resolve) => setTimeout(re
 
 // Function to calculate the remaining weight limit
 export function calculateRemainingWeightLimit(values, index, totalLimit = 0) {
-  const currentWeight = values.orderItems?.reduce((acc, item, i) => {
+  const currentWeight = values?.orderItems?.reduce((acc, item, i) => {
     if (i !== index) {
       return acc + Number(item?.weight || 0);
     }

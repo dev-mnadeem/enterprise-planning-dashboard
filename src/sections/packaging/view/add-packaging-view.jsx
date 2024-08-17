@@ -27,11 +27,11 @@ const AddPackagingPage = () => {
   const onAddPackaging = (values) => {
     createPackaging({
       name: values?.name,
-      depth: values?.depth,
-      width: values?.width,
-      height: values?.height,
-      price: values?.price,
-      weight_limit: values?.weight_limit,
+      depth: Number(values?.depth || 0),
+      width: Number(values?.width || 0),
+      height: Number(values?.height || 0),
+      price: Number(values?.price || 0),
+      weight_limit: values?.weight_limit || 0,
       weight_type: values?.weight_type || 'kg',
       route: values?.shipment_path || 'road',
     });
