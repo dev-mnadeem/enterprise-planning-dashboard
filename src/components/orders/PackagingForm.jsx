@@ -20,8 +20,6 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
   );
 
   const onSubmitForm = (values) => {
-    console.log({ values });
-
     onSubmit({ ...values });
   };
 
@@ -40,6 +38,7 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
         setFieldValue,
         setFieldTouched,
         values,
+        resetForm,
       }) => {
         const isSea = values.shipment_path === SEA;
         const unit = isSea ? 'm' : 'in"';
@@ -67,6 +66,7 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                       required
                       placeholder="Select Shipment By"
                       onValueChange={(shipment_path) => {
+                        resetForm();
                         setFieldTouched('shipment_path', true);
                         setFieldValue('shipment_path', shipment_path.value);
                         setFieldValue('weight_type', shipment_path.value === SEA ? 'cbm' : 'kg');
@@ -133,21 +133,19 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                     </>
                   )}
 
-                  {true && (
-                    <Box>
-                      <NumberField
-                        name="weight_limit"
-                        title={`${isSea ? 'Volume' : 'Weight'} Limit`}
-                        unit={values?.weight_type || 'kg'}
-                        value={values.weight_limit}
-                        disabled
-                        // onChange={handleChange}
-                      />
-                      {touched.weight_limit && errors?.weight_limit && (
-                        <ErrorMsg error={errors.weight_limit} />
-                      )}
-                    </Box>
-                  )}
+                  <Box>
+                    <NumberField
+                      name="weight_limit"
+                      title={`${isSea ? 'Volume' : 'Weight'} Limit`}
+                      unit={values?.weight_type || 'kg'}
+                      value={values.weight_limit}
+                      disabled={isSea ? true : false}
+                      onChange={isSea ? handleChange : () => {}}
+                    />
+                    {touched.weight_limit && errors?.weight_limit && (
+                      <ErrorMsg error={errors.weight_limit} />
+                    )}
+                  </Box>
                 </div>
 
                 <Divider className="my-4" />

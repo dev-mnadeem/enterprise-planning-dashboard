@@ -67,9 +67,9 @@ export const useMutation = (endpoint, intercepted = true, headers = {}, params =
       let formattedErr = err;
       const errorMessage = networkErrorHandler(err);
       if (isAxiosError(err)) {
-        formattedErr = err.response?.data?.Message;
+        formattedErr = err.response?.data?.Message || err.response?.data?.errors?.[0]?.message;
       }
-      setError(errorMessage || formattedErr);
+      setError(formattedErr || errorMessage || 'Something went wrong!');
       // throw errorMessage || formattedErr;
     } finally {
       dispatch(setLoadingActive({ active: false }));
