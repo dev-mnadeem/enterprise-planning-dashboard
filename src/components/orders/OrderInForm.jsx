@@ -1,7 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Formik } from 'formik';
 import ErrorMsg from '../error-msg';
-import { Box, Button, Card, Divider, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  Divider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from '@mui/material';
 import { CustomDropdown, InputField } from '../common';
 import { SHIPMENT_DISPATCH, shipmentInSchema } from 'src/constants';
 import _ from 'lodash';
@@ -12,9 +22,11 @@ import { ENDPOINTS } from 'src/api/Endpoints';
 import { useLocation } from 'react-router-dom';
 import { useAppSelector } from 'src/state/hooks';
 import toast from 'react-hot-toast';
+import { Delete, HighlightOff, Inventory } from '@mui/icons-material';
 
 export default function OrderInForm({ onSubmit, initials, viewOnly, buttonText }) {
   const location = useLocation();
+  const [orderNumbers, setOrderNumbers] = useState([]);
   const queryParams = new URLSearchParams(location.search);
   const orderId = queryParams.get('orderId');
   const [initialValues, setInitialValues] = useState({ ...initials });
@@ -72,21 +84,34 @@ export default function OrderInForm({ onSubmit, initials, viewOnly, buttonText }
     }
   }, [updatedOrder]);
 
+  const handleAddOrderNo = (orderNo) => {
+    if (orderNo.trim() !== '') {
+      setOrderNumbers((orderNumbers) => [...new Set([...orderNumbers, orderNo.trim()])]);
+    }
+  };
+
+  const handleRemoveOrder = (index) => {
+    const newList = orderNumbers?.filter((_, i) => i !== index);
+    setOrderNumbers(newList);
+  };
+
   const onSubmitForm = (values) => {
-    inOrderMutate(
-      {
-        location_id: values.location_id,
-      },
-      'patch',
-      `${values?.orderNo}/${IN}`
-    );
+    console.log('orderNumbers', orderNumbers);
+    console.log('Values', values);
+    // inOrderMutate(
+    //   {
+    //     location_id: values.location_id,
+    //   },
+    //   'patch',
+    //   `${values?.orderNo}/${IN}`
+    // );
   };
 
   return (
     <Formik
       enableReinitialize={true}
       onSubmit={onSubmitForm}
-      validationSchema={shipmentInSchema}
+      // validationSchema={shipmentInSchema}
       initialValues={initialValues}
     >
       {({
@@ -111,7 +136,13 @@ export default function OrderInForm({ onSubmit, initials, viewOnly, buttonText }
                     name="orderNo"
                     required
                     value={values.orderNo}
-                    placeholder="172336..."
+                    placeholder="17233546..."
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        handleAddOrderNo(event.target.value);
+                        setFieldValue('orderNo', '');
+                      }
+                    }}
                     onChange={handleChange}
                   />
 
@@ -140,10 +171,32 @@ export default function OrderInForm({ onSubmit, initials, viewOnly, buttonText }
                 </Box>
               </div>
 
+              <List style={{ marginTop: '20px', padding: '10px', width: '50%' }}>
+                {orderNumbers?.map((number, index) => (
+                  <ListItem
+                    key={index}
+                    className="mt-2"
+                    sx={{ backgroundColor: '#f5f5f5' }}
+                    secondaryAction={
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={() => handleRemoveOrder(index)}
+                      >
+                        <HighlightOff />
+                      </IconButton>
+                    }
+                  >
+                    <Inventory className="mr-4" />
+                    <ListItemText primary={number} />
+                  </ListItem>
+                ))}
+              </List>
+
               <Divider className="my-4" />
 
               <Button
-                type="submit"
+                onClick={handleSubmit}
                 variant="contained"
                 className="col-span-2 mt-6"
                 color="inherit"

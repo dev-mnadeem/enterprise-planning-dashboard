@@ -8,6 +8,7 @@ import { useQuery } from 'src/api';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Print } from '@mui/icons-material';
+import OrderHistory from 'src/components/orders/OrderHistory';
 
 export default function OrdersDetailPage({ id }) {
   const navigate = useNavigate();
@@ -67,6 +68,10 @@ export default function OrdersDetailPage({ id }) {
 
         <Container className="mt-3 p-0">
           <OrderCard label="Payment Details" data={orderPaymentDetails(order)} />
+        </Container>
+
+        <Container className="mt-3 p-0">
+          <OrderHistory order={order} />
         </Container>
 
         <Container className="flex w-full my-3 items-center justify-center">

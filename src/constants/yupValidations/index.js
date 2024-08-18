@@ -97,7 +97,7 @@ export const shipmentInSchema = Yup.object().shape({
 
 export const shipmentOutSchema = Yup.object().shape({
   from_location_id: Yup.string().required(),
-  to_location_id: Yup.string().required(),
+  to_location_id: Yup.string().optional(),
   vehicle_id: Yup.string().required(),
 });
 
