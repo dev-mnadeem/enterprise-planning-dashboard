@@ -172,6 +172,10 @@ export const shipmentDetails = (order) => [
   },
   ...(orderItemsInfo(order) || []),
   {
+    label: 'Total Weight',
+    value: `${order?.total_weight} ${order?.weight_type || ''}`,
+  },
+  {
     label: 'Shipping Date',
     value: `${new Date(order?.shipping_date || new Date()).toLocaleString()}`,
   },
@@ -195,8 +199,24 @@ export const orderPaymentDetails = (order) => [
     value: `${new Date(order?.payment_date || new Date()).toLocaleString()}` || 'N/A',
   },
   {
+    label: 'Shipment Charges',
+    value: `$${order?.sub_total}` || '0',
+  },
+  {
+    label: 'Service Charges',
+    value: `$${order?.service_charges}` || '0',
+  },
+  {
+    label: 'Other Taxes',
+    value: `$${order?.other_taxes}` || '0',
+  },
+  {
     label: 'Discount',
     value: `$${order?.discount}` || 'N/A',
+  },
+  {
+    label: 'VAT',
+    value: `$${order?.vat}` || '0',
   },
   {
     label: 'Total Amount',

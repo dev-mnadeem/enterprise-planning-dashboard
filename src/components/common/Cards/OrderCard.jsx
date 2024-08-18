@@ -12,7 +12,7 @@ export const OrderCard = ({ data, label }) => {
         return (
           <Container className="flex flex-row gap-12 p-0">
             {item.label && (
-              <Typography className="body1 w-full max-w-36 font-bold">{item.label}:</Typography>
+              <Typography className="body1 w-full max-w-40 font-bold">{item.label}:</Typography>
             )}
             <Typography variant="body2">{item.value}</Typography>
           </Container>

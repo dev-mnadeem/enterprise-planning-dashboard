@@ -1,7 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Formik } from 'formik';
 import ErrorMsg from '../error-msg';
-import { Box, Button, Card, Divider, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  Divider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from '@mui/material';
 import { CustomDropdown, InputField } from '../common';
 import { SHIPMENT_DISPATCH, shipmentOutSchema } from 'src/constants';
 import _ from 'lodash';
@@ -12,6 +22,7 @@ import { ENDPOINTS } from 'src/api/Endpoints';
 import { useLocation } from 'react-router-dom';
 import { useAppSelector } from 'src/state/hooks';
 import toast from 'react-hot-toast';
+import { HighlightOff, Inventory } from '@mui/icons-material';
 
 export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText }) {
   const location = useLocation();
@@ -19,6 +30,7 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
   const orderId = queryParams.get('orderId');
   const [initialValues, setInitialValues] = useState({ ...initials });
   const { user } = useAppSelector((state) => state.userReducer);
+  const [orderNumbers, setOrderNumbers] = useState([]);
   const { OUT } = SHIPMENT_DISPATCH;
   const orderEndPoint = ENDPOINTS.ORDERS;
   const [outOrderMutate, { data: updatedOrder, error: orderOutError }] = useMutation(orderEndPoint);
@@ -86,16 +98,29 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
     }
   }, [updatedOrder]);
 
+  const handleAddOrderNo = (orderNo) => {
+    if (orderNo.trim() !== '') {
+      setOrderNumbers((orderNumbers) => [...new Set([...orderNumbers, orderNo.trim()])]);
+    }
+  };
+
+  const handleRemoveOrder = (index) => {
+    const newList = orderNumbers?.filter((_, i) => i !== index);
+    setOrderNumbers(newList);
+  };
+
   const onSubmitForm = (values) => {
-    outOrderMutate(
-      {
-        from_location_id: values.from_location_id,
-        to_location_id: values.to_location_id,
-        vehicle_id: values.vehicle_id,
-      },
-      'patch',
-      `${values?.orderNo}/${OUT}`
-    );
+    console.log('orderNumbers', orderNumbers);
+    console.log('Values', values);
+    // outOrderMutate(
+    //   {
+    //     from_location_id: values.from_location_id,
+    //     to_location_id: values.to_location_id,
+    //     vehicle_id: values.vehicle_id,
+    //   },
+    //   'patch',
+    //   `${values?.orderNo}/${OUT}`
+    // );
   };
 
   return (
@@ -127,6 +152,12 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
                     name="orderNo"
                     required
                     value={values.orderNo}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        handleAddOrderNo(event.target.value);
+                        setFieldValue('orderNo', '');
+                      }
+                    }}
                     placeholder="172336..."
                     onChange={handleChange}
                   />
@@ -160,7 +191,6 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
                   <CustomDropdown
                     title="To Branch/Frenchise"
                     name="to_location_id"
-                    required
                     placeholder="Select Location"
                     options={toLocationsOptions}
                     value={useMemoized(
@@ -200,12 +230,34 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
                 </Box>
               </div>
 
+              <List style={{ marginTop: '20px', padding: '10px', width: '50%' }}>
+                {orderNumbers?.map((number, index) => (
+                  <ListItem
+                    key={index}
+                    className="mt-2"
+                    sx={{ backgroundColor: '#f5f5f5' }}
+                    secondaryAction={
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={() => handleRemoveOrder(index)}
+                      >
+                        <HighlightOff />
+                      </IconButton>
+                    }
+                  >
+                    <Inventory className="mr-4" />
+                    <ListItemText primary={number} />
+                  </ListItem>
+                ))}
+              </List>
+
               <Divider className="my-4" />
 
               <Button
-                type="submit"
                 variant="contained"
                 className="col-span-2 mt-6"
+                onClick={handleSubmit}
                 color="inherit"
                 sx={{
                   padding: '12px 16px',

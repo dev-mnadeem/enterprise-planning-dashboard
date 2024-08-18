@@ -197,8 +197,11 @@ const ShipmentReceipt = ({ order }) => (
         <Text style={styles.sectionHeader}>Billing Information</Text>
         <Text style={styles.text}>Payment Type: {order?.payment_type || 'N/A'}</Text>
         <Text style={styles.text}>Status: {order?.payment_status || 'N/A'}</Text>
+        <Text style={styles.text}>Shipment Charges: {order?.sub_total || '0'}</Text>
+        <Text style={styles.text}>Service Charges: {order?.service_charges || '0'}</Text>
+        <Text style={styles.text}>Other Taxes: {order?.other_taxes || '0'}</Text>
+        <Text style={styles.text}>VAT: {order?.vat || '0'}</Text>
         <Text style={styles.text}>Discount: {`$${order?.discount}` || 'N/A'}</Text>
-        <Text style={styles.text}>Duties&taxes acct: </Text>
         <Text style={styles.text}>
           Paid on: {`${new Date(order?.payment_date || new Date()).toLocaleString()}` || 'N/A'}
         </Text>
