@@ -98,13 +98,14 @@ export default function OrderInForm({ onSubmit, initials, viewOnly, buttonText }
   const onSubmitForm = (values) => {
     console.log('orderNumbers', orderNumbers);
     console.log('Values', values);
-    // inOrderMutate(
-    //   {
-    //     location_id: values.location_id,
-    //   },
-    //   'patch',
-    //   `${values?.orderNo}/${IN}`
-    // );
+    inOrderMutate(
+      {
+        order_numbers: orderNumbers,
+        location_id: values.location_id,
+      },
+      'post',
+      `${IN}`
+    );
   };
 
   return (
