@@ -112,15 +112,16 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
   const onSubmitForm = (values) => {
     console.log('orderNumbers', orderNumbers);
     console.log('Values', values);
-    // outOrderMutate(
-    //   {
-    //     from_location_id: values.from_location_id,
-    //     to_location_id: values.to_location_id,
-    //     vehicle_id: values.vehicle_id,
-    //   },
-    //   'patch',
-    //   `${values?.orderNo}/${OUT}`
-    // );
+    outOrderMutate(
+      {
+        order_numbers: orderNumbers,
+        from_location_id: values.from_location_id,
+        to_location_id: values.to_location_id,
+        vehicle_id: values.vehicle_id,
+      },
+      'post',
+      `${OUT}`
+    );
   };
 
   return (
