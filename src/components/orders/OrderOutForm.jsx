@@ -152,6 +152,8 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
                     title="Shipment Number"
                     name="orderNo"
                     required
+                    autoFocus
+                    autoComplete="off"
                     value={values.orderNo}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter') {
