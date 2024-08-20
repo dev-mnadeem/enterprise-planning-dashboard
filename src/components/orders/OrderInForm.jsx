@@ -92,7 +92,7 @@ export default function OrderInForm({ onSubmit, initials, viewOnly, buttonText }
   const handleAddOrderNo = async (orderNo) => {
     const _orderNumber = orderNo.trim();
     if (_orderNumber !== '') {
-      await validateOrder({}, `${orderNo}/is-valid`).then((res) => {
+      await validateOrder({}, `${orderNo}/in/is-valid`).then((res) => {
         if (res?.is_valid) {
           setOrderNumbers((orderNumbers) => [...new Set([...orderNumbers, _orderNumber])]);
         } else {
