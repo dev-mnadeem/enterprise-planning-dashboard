@@ -10,6 +10,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  ListSubheader,
   Typography,
 } from '@mui/material';
 import { CustomDropdown, InputField } from '../common';
@@ -22,7 +23,7 @@ import { ENDPOINTS } from 'src/api/Endpoints';
 import { useLocation } from 'react-router-dom';
 import { useAppSelector } from 'src/state/hooks';
 import toast from 'react-hot-toast';
-import { HighlightOff, Inventory } from '@mui/icons-material';
+import { Error, HighlightOff, Inventory } from '@mui/icons-material';
 
 export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText }) {
   const location = useLocation();
@@ -31,6 +32,7 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
   const [initialValues, setInitialValues] = useState({ ...initials });
   const { user } = useAppSelector((state) => state.userReducer);
   const [orderNumbers, setOrderNumbers] = useState([]);
+  const [invalidOrderNumbers, setInvalidOrderNumbers] = useState([]);
   const { OUT } = SHIPMENT_DISPATCH;
   const orderEndPoint = ENDPOINTS.ORDERS;
   const [outOrderMutate, { data: updatedOrder, error: orderOutError }] = useMutation(orderEndPoint);
@@ -38,6 +40,7 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
     useLazyQuery(orderEndPoint);
   const { error: locationError, data: locations } = useQuery(ENDPOINTS.LOCATIONS);
   const { error: vehiclesError, data: vehicles } = useQuery(ENDPOINTS.VEHICLES);
+  const [validateOrder] = useLazyQuery(orderEndPoint);
 
   useEffect(() => {
     if (user?.locations?.length) {
@@ -89,18 +92,30 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
   );
 
   useEffect(() => {
-    if (updatedOrder?.order_id) {
+    if (updatedOrder?.success?.length) {
       toast.success('Shipment Dispatch Successfull!');
       const url = new URL(window.location.href);
       url.search = '';
       window.history.replaceState({}, '', url);
       setInitialValues((initials) => ({ ...initials, orderNo: '' }));
+      setInvalidOrderNumbers([]);
+      setOrderNumbers([]);
     }
   }, [updatedOrder]);
 
-  const handleAddOrderNo = (orderNo) => {
-    if (orderNo.trim() !== '') {
-      setOrderNumbers((orderNumbers) => [...new Set([...orderNumbers, orderNo.trim()])]);
+  const handleAddOrderNo = async (orderNo) => {
+    const _orderNumber = orderNo.trim();
+    if (_orderNumber !== '') {
+      await validateOrder({}, `${orderNo}/is-valid`).then((res) => {
+        if (res?.is_valid) {
+          setOrderNumbers((orderNumbers) => [...new Set([...orderNumbers, _orderNumber])]);
+        } else {
+          const _invalidOrders = invalidOrderNumbers?.filter(
+            (item) => item.orderNo !== _orderNumber
+          );
+          setInvalidOrderNumbers([..._invalidOrders, { ...res, orderNo: _orderNumber }]);
+        }
+      });
     }
   };
 
@@ -110,8 +125,11 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
   };
 
   const onSubmitForm = (values) => {
-    console.log('orderNumbers', orderNumbers);
-    console.log('Values', values);
+    if (!orderNumbers?.length || !values.from_location_id || !values?.vehicle_id) {
+      toast.error('Please select required fields!');
+      return;
+    }
+
     outOrderMutate(
       {
         order_numbers: orderNumbers,
@@ -128,7 +146,7 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
     <Formik
       enableReinitialize={true}
       onSubmit={onSubmitForm}
-      validationSchema={shipmentOutSchema}
+      // validationSchema={shipmentOutSchema}
       initialValues={initialValues}
     >
       {({
@@ -233,27 +251,52 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
                 </Box>
               </div>
 
-              <List style={{ marginTop: '20px', padding: '10px', width: '50%' }}>
-                {orderNumbers?.map((number, index) => (
-                  <ListItem
-                    key={index}
-                    className="mt-2"
-                    sx={{ backgroundColor: '#f5f5f5' }}
-                    secondaryAction={
-                      <IconButton
-                        edge="end"
-                        aria-label="delete"
-                        onClick={() => handleRemoveOrder(index)}
-                      >
-                        <HighlightOff />
-                      </IconButton>
-                    }
-                  >
-                    <Inventory className="mr-4" />
-                    <ListItemText primary={number} />
-                  </ListItem>
-                ))}
-              </List>
+              <Box className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
+                <List
+                  style={{ marginTop: '20px', padding: '10px' }}
+                  subheader={
+                    <ListSubheader component="div" id="nested-list-subheader">
+                      Verified Shipments
+                    </ListSubheader>
+                  }
+                >
+                  {orderNumbers?.map((number, index) => (
+                    <ListItem
+                      key={index}
+                      className="mt-2"
+                      sx={{ backgroundColor: '#f5f5f5' }}
+                      secondaryAction={
+                        <IconButton
+                          edge="end"
+                          aria-label="delete"
+                          onClick={() => handleRemoveOrder(index)}
+                        >
+                          <HighlightOff />
+                        </IconButton>
+                      }
+                    >
+                      <Inventory className="mr-4" />
+                      <ListItemText primary={number} />
+                    </ListItem>
+                  ))}
+                </List>
+
+                <List
+                  style={{ marginTop: '20px', padding: '10px' }}
+                  subheader={
+                    <ListSubheader component="div" id="nested-list-subheader">
+                      Invalid Shipments
+                    </ListSubheader>
+                  }
+                >
+                  {invalidOrderNumbers?.map((item, index) => (
+                    <ListItem key={index} className="mt-2" sx={{ backgroundColor: '#f5f5f5' }}>
+                      <Error className="mr-4" />
+                      <ListItemText primary={item?.orderNo} secondary={item?.message} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
 
               <Divider className="my-4" />
 

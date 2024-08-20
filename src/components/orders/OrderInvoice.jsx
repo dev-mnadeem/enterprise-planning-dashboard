@@ -3,7 +3,7 @@ import { Page, Text, View, Document, StyleSheet, Font, Image } from '@react-pdf/
 Font.register({
   family: 'Poppins',
   fontWeight: 900,
-  src: 'http://fonts.gstatic.com/s/poppins/v1/TDTjCH39JjVycIF24TlO-Q.ttf',
+  src: 'https://fonts.gstatic.com/s/poppins/v1/TDTjCH39JjVycIF24TlO-Q.ttf',
 });
 
 const styles = StyleSheet.create({

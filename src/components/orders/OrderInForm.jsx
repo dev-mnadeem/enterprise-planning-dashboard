@@ -111,6 +111,8 @@ export default function OrderInForm({ onSubmit, initials, viewOnly, buttonText }
   };
 
   const onSubmitForm = (values) => {
+    if (!orderNumbers?.length || !values.location_id) return;
+
     inOrderMutate(
       {
         order_numbers: orderNumbers,
