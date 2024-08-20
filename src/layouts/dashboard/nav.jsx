@@ -25,12 +25,14 @@ import Scrollbar from 'src/components/scrollbar';
 import { NAV } from './config-layout';
 import navConfig from './config-navigation';
 import { Collapse, List, ListItemIcon, ListItemText } from '@mui/material';
+import { useAppSelector } from 'src/state/hooks';
 
 // ----------------------------------------------------------------------
 
 export default function Nav({ openNav, onCloseNav }) {
   const pathname = usePathname();
-
+  const { user } = useAppSelector((state) => state.userReducer);
+  const permissions = user?.permissions || [];
   const upLg = useResponsive('up', 'lg');
 
   useEffect(() => {
@@ -66,7 +68,7 @@ export default function Nav({ openNav, onCloseNav }) {
 
   const renderMenu = (
     <Stack component="nav" spacing={0.5} sx={{ px: 2 }}>
-      {navConfig.map((item) => (
+      {navConfig(permissions)?.map((item) => (
         <NavItem key={item.title} item={item} />
       ))}
     </Stack>

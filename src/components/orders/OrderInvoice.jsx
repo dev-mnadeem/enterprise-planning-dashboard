@@ -104,15 +104,19 @@ const styles = StyleSheet.create({
     padding: 5,
     fontSize: 10,
   },
+  barcode: {
+    width: '100%',
+    height: 50,
+  },
 });
 
-const ShipmentReceipt = ({ order }) => (
+const ShipmentReceipt = ({ order, barcodeImageUrl }) => (
   <Document>
     <Page style={styles.page}>
       <View style={styles.header}>
         <Image style={styles.logo} src="/assets/adinkra-logo.png" />
         <View>
-          <Text style={{ fontFamily: 'Poppins', fontSize: 26 }}>Shipment Receipt</Text>
+          <Image src={barcodeImageUrl} style={styles.barcode} />
           <Text style={styles.text}>Tracking #{order?.order_number}</Text>
         </View>
       </View>

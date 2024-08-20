@@ -187,6 +187,21 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
         resetForm,
       }) => {
         const isSeaRoute = values?.shipment_route == SEA;
+        const isInternationalShipment = values?.type == INTERNATIONAL;
+
+        /** IN INTERNATIONAL SHIPMENT, SENDER AND RECEIVER COUNTRY CANNOT BE SAME */
+        const receiverCountryOptions = useMemoized(
+          countriesOptions?.filter((option) =>
+            isInternationalShipment ? option.value !== values?.sender_country : true
+          ),
+          [countriesOptions, values?.sender_country, isInternationalShipment]
+        );
+        const senderCountryOptions = useMemoized(
+          countriesOptions?.filter((option) =>
+            isInternationalShipment ? option.value !== values?.receiver_country : true
+          ),
+          [countriesOptions, values?.receiver_country, isInternationalShipment]
+        );
 
         useEffect(() => {
           /** PREFILL SENDER COUNTRY, STATE, CITY BASED ON CURRENT USER BRANCH LOCATION */
@@ -305,19 +320,19 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                     <RadioGroup
                       row={true}
                       name="type"
-                      value={values?.type || 'international'}
+                      value={values?.type}
                       onChange={async (e) => {
                         resetForm();
                         await setFieldValue('type', e.target.value);
                       }}
                     >
                       <FormControlLabel
-                        value="domestic"
+                        value={DOMESTIC}
                         control={<Radio required={true} />}
                         label="Domestic"
                       />
                       <FormControlLabel
-                        value="international"
+                        value={INTERNATIONAL}
                         control={<Radio required={true} />}
                         label="International"
                       />
@@ -517,28 +532,6 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                     )}
                   </Box>
 
-                  {/* <Box>
-                    <Typography className="required">Receiver Phone</Typography>
-                    <MuiTelInput
-                      name="receiver_phone"
-                      fullWidth
-                      value={values.receiver_phone}
-                      defaultCountry="US"
-                      forceCallingCode
-                      disableFormatting
-                      focusOnSelectCountry
-                      onlyCountries={countries?.map((country) => country.code)}
-                      onChange={(value) => {
-                        setFieldTouched('receiver_phone', true);
-                        setFieldValue('receiver_phone', value);
-                      }}
-                    />
-
-                    {touched.receiver_phone && errors?.receiver_phone && (
-                      <ErrorMsg error={errors.receiver_phone} />
-                    )}
-                  </Box> */}
-
                   <Box>
                     <InputField
                       title="Customer Email"
@@ -628,7 +621,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       name="sender_country"
                       required
                       placeholder="Select Country"
-                      options={countriesOptions}
+                      options={senderCountryOptions}
                       value={useMemoized(
                         countriesOptions?.find((item) => item.value === values.sender_country) ||
                           null,
@@ -654,7 +647,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       name="receiver_country"
                       required
                       placeholder="Select Country"
-                      options={countriesOptions}
+                      options={receiverCountryOptions}
                       value={useMemoized(
                         countriesOptions?.find((item) => item.value === values.receiver_country) ||
                           null,
