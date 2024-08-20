@@ -1,4 +1,7 @@
+import { SHIPMENT_TYPE } from 'src/constants';
+
 export const ADD_ORDER_INITIALS = {
+  type: SHIPMENT_TYPE.INTERNATIONAL,
   sender_name: '',
   sender_email: null,
   sender_phone: '',

@@ -148,7 +148,7 @@ export default function OrderInForm({ onSubmit, initials, viewOnly, buttonText }
               <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
                 <Box>
                   <InputField
-                    title="Shipment Number"
+                    title="Tracking Number"
                     name="orderNo"
                     required
                     autoFocus
@@ -189,52 +189,56 @@ export default function OrderInForm({ onSubmit, initials, viewOnly, buttonText }
                 </Box>
               </div>
 
-              <Box className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
-                <List
-                  style={{ marginTop: '20px', padding: '10px' }}
-                  subheader={
-                    <ListSubheader component="div" id="nested-list-subheader">
-                      Verified Shipments
-                    </ListSubheader>
-                  }
-                >
-                  {orderNumbers?.map((number, index) => (
-                    <ListItem
-                      key={index}
-                      className="mt-2"
-                      sx={{ backgroundColor: '#f5f5f5' }}
-                      secondaryAction={
-                        <IconButton
-                          edge="end"
-                          aria-label="delete"
-                          onClick={() => handleRemoveOrder(index)}
-                        >
-                          <HighlightOff />
-                        </IconButton>
-                      }
-                    >
-                      <Inventory className="mr-4" />
-                      <ListItemText primary={number} />
-                    </ListItem>
-                  ))}
-                </List>
+              {orderNumbers?.length || invalidOrderNumbers?.length ? (
+                <Box className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 max-h-[35vh] overflow-y-scroll">
+                  <List
+                    style={{ marginTop: '20px', padding: '10px' }}
+                    subheader={
+                      <ListSubheader component="div" id="nested-list-subheader">
+                        Verified Shipments
+                      </ListSubheader>
+                    }
+                  >
+                    {orderNumbers?.map((number, index) => (
+                      <ListItem
+                        key={index}
+                        className="mt-2"
+                        sx={{ backgroundColor: '#f5f5f5' }}
+                        secondaryAction={
+                          <IconButton
+                            edge="end"
+                            aria-label="delete"
+                            onClick={() => handleRemoveOrder(index)}
+                          >
+                            <HighlightOff />
+                          </IconButton>
+                        }
+                      >
+                        <Inventory className="mr-4" color="primary" />
+                        <ListItemText primary={number} />
+                      </ListItem>
+                    ))}
+                  </List>
 
-                <List
-                  style={{ marginTop: '20px', padding: '10px' }}
-                  subheader={
-                    <ListSubheader component="div" id="nested-list-subheader">
-                      Invalid Shipments
-                    </ListSubheader>
-                  }
-                >
-                  {invalidOrderNumbers?.map((item, index) => (
-                    <ListItem key={index} className="mt-2" sx={{ backgroundColor: '#f5f5f5' }}>
-                      <Error className="mr-4" />
-                      <ListItemText primary={item?.orderNo} secondary={item?.message} />
-                    </ListItem>
-                  ))}
-                </List>
-              </Box>
+                  <List
+                    style={{ marginTop: '20px', padding: '10px' }}
+                    subheader={
+                      <ListSubheader component="div" id="nested-list-subheader">
+                        Invalid Shipments
+                      </ListSubheader>
+                    }
+                  >
+                    {invalidOrderNumbers?.map((item, index) => (
+                      <ListItem key={index} className="mt-2" sx={{ backgroundColor: '#f5f5f5' }}>
+                        <Error className="mr-4" color="error" />
+                        <ListItemText primary={item?.orderNo} secondary={item?.message} />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              ) : (
+                <></>
+              )}
 
               <Divider className="my-4" />
 

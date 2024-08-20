@@ -24,6 +24,14 @@ const OrderInvoice = () => {
 
   if (queryLoading) return;
 
+  const generateBarcodeImage = (value) => {
+    const canvas = document.createElement('canvas');
+    JsBarcode(canvas, value, { format: 'CODE128' });
+    return canvas.toDataURL('image/png');
+  };
+
+  const barcodeImageUrl = generateBarcodeImage(order?.order_number);
+
   return (
     <div>
       <Button
@@ -34,7 +42,7 @@ const OrderInvoice = () => {
         Back to Orders
       </Button>
       <PDFViewer style={{ width: '100%', height: '90vh' }}>
-        <InvoiceDocument order={order} />
+        <InvoiceDocument order={order} barcodeImageUrl={barcodeImageUrl} />
       </PDFViewer>
     </div>
   );

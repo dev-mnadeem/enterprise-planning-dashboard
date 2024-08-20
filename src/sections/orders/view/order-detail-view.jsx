@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Print } from '@mui/icons-material';
 import OrderHistory from 'src/components/orders/OrderHistory';
+import Barcode from 'react-barcode';
 
 export default function OrdersDetailPage({ id }) {
   const navigate = useNavigate();
@@ -27,7 +28,12 @@ export default function OrdersDetailPage({ id }) {
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Shipment Details</Typography>
+        <Typography variant="h4" className="underline">
+          Shipment Details:
+        </Typography>
+        <Box sx={{ float: 'right' }}>
+          <Barcode value={order?.order_number} />
+        </Box>
       </Stack>
       <Container>
         <Box className="flex justify-between">
