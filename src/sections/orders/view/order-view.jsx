@@ -56,7 +56,7 @@ export default function OrdersPage() {
 
   const dataFiltered = applyFilter({
     fieldToSearch: 'order_number',
-    inputData: orders,
+    inputData: orders?.results,
     comparator: getComparator(order, orderBy),
     filterName,
   });
