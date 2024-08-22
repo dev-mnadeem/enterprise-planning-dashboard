@@ -37,7 +37,12 @@ const UsersListPage = () => {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const { data: users, loading, error, refetch: refetchUsers } = useQuery(ENDPOINTS.USERS);
+  const {
+    data: { results: users = [] } = {},
+    loading,
+    error,
+    refetch: refetchUsers,
+  } = useQuery(ENDPOINTS.USERS);
   const [deleteUserMutate, { error: deleteUserError }] = useMutation(ENDPOINTS.USERS);
   const { user } = useAppSelector((state) => state.userReducer);
   const { ADD } = PERMISSION_TYPE;
@@ -65,7 +70,7 @@ const UsersListPage = () => {
 
   const dataFiltered = applyFilter({
     fieldToSearch: 'username',
-    inputData: users?.results,
+    inputData: users,
     comparator: getComparator(order, orderBy),
     filterName,
   });

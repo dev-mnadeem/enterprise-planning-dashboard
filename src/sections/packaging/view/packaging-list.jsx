@@ -97,6 +97,7 @@ const PackagingListPage = () => {
   };
 
   const notFound = !dataFiltered?.length && !!filterName;
+  console.log('🚀 ~ PackagingListPage ~ dataFiltered:', dataFiltered);
 
   return (
     <Container>
@@ -138,6 +139,8 @@ const PackagingListPage = () => {
                       id={row.id}
                       key={row.id}
                       name={row.name}
+                      weight_limit={row.weight_limit}
+                      weight_type={row.weight_type}
                       width={row.width}
                       height={row.height}
                       depth={row.depth}

@@ -5,7 +5,6 @@ import { ROUTES } from 'src/constants';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useMutation, useQuery } from 'src/api';
 import toast from 'react-hot-toast';
-import PackagingForm from 'src/components/orders/PackagingForm';
 import PricingForm from 'src/components/orders/PricingForm';
 
 const EditPricingPage = ({ id }) => {

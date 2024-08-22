@@ -10,7 +10,16 @@ import { useNavigate } from 'react-router-dom';
 import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
 import { checkCurrentUserPermission } from 'src/utils';
 
-export default function PackagingsTableRow({ id, name, width, height, depth, onDeletePackaging }) {
+export default function PackagingsTableRow({
+  id,
+  name,
+  weight_limit,
+  weight_type,
+  width,
+  height,
+  depth,
+  onDeletePackaging,
+}) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(null);
   const { user } = useAppSelector((state) => state.userReducer);
@@ -49,6 +58,7 @@ export default function PackagingsTableRow({ id, name, width, height, depth, onD
     <>
       <TableRow hover tabIndex={-1}>
         <TableCell>{name}</TableCell>
+        <TableCell>{`${weight_limit}${weight_type}`}</TableCell>
         <TableCell>{width}</TableCell>
         <TableCell>{height}</TableCell>
         <TableCell>{depth || ' -- '}</TableCell>
