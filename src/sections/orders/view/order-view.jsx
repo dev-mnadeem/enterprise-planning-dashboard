@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { applyFilter, getComparator } from 'src/utils';
+import { applyFilter, emptyRows, getComparator } from 'src/utils';
 import { OrderTableHeadData } from '../utils';
 import {
   Button,
@@ -22,6 +22,7 @@ import { ROUTES } from 'src/constants';
 import { useNavigate } from 'react-router-dom';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useMutation, useQuery } from 'src/api';
+import { TableEmptyRows, TableNoData } from 'src/components/common';
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -30,7 +31,12 @@ export default function OrdersPage() {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const { data: orders, loading, error, refetch: refetchOrders } = useQuery(ENDPOINTS.ORDERS);
+  const {
+    data: { results: orders = [] } = {},
+    loading,
+    error,
+    refetch: refetchOrders,
+  } = useQuery(ENDPOINTS.ORDERS);
   const [cancelOrderMutate, { error: cancelOrderError }] = useMutation(ENDPOINTS.ORDERS);
 
   if (loading) return <div>Loading...</div>;
@@ -56,7 +62,7 @@ export default function OrdersPage() {
 
   const dataFiltered = applyFilter({
     fieldToSearch: 'order_number',
-    inputData: orders?.results,
+    inputData: orders,
     comparator: getComparator(order, orderBy),
     filterName,
   });
@@ -80,7 +86,7 @@ export default function OrdersPage() {
     }
   };
 
-  const notFound = !orders?.length && !!filterName;
+  const notFound = !dataFiltered?.length && !!filterName;
 
   return (
     <Container>
@@ -126,6 +132,12 @@ export default function OrdersPage() {
                       onCancelOrder={(orderId) => cancelOrder(orderId)}
                     />
                   ))}
+                <TableEmptyRows
+                  height={77}
+                  emptyRows={emptyRows(page, rowsPerPage, orders?.length)}
+                />
+
+                {notFound && <TableNoData query={filterName} />}
               </TableBody>
             </Table>
           </TableContainer>

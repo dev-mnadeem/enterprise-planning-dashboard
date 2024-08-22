@@ -51,7 +51,7 @@ const EditPackagingPage = ({ id }) => {
         height: Number(values?.height || 0),
         weight_limit: Number(values?.weight_limit || 0),
         weight_type: values?.weight_type || 'kg',
-        route: values?.shipment_path || 'road',
+        route: values?.route || 'road',
       },
       'patch'
     );

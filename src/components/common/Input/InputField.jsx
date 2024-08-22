@@ -48,11 +48,14 @@ export const InputField = (props) => {
         <TextField
           fullWidth
           {...props}
-          onChange={context.handleChange}
           {...context?.getFieldProps(props.name)}
           onBlur={(event) => {
             context.handleBlur(event);
             if (props.onBlur) props.onBlur(event);
+          }}
+          onChange={(event) => {
+            context.handleChange(event);
+            if (props.onChange) props.onChange(event);
           }}
         />
       )}

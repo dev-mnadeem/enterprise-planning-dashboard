@@ -31,9 +31,9 @@ const AddPackagingPage = () => {
       width: Number(values?.width || 0),
       height: Number(values?.height || 0),
       price: Number(values?.price || 0),
-      weight_limit: values?.weight_limit || 0,
+      weight_limit: Number(values?.weight_limit || 0),
       weight_type: values?.weight_type || 'kg',
-      route: values?.shipment_path || 'road',
+      route: values?.route || 'road',
     });
   };
 

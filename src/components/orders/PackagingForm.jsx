@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Formik } from 'formik';
 import ErrorMsg from '../error-msg';
 import { Box, Button, Card, Divider, Typography } from '@mui/material';
@@ -40,14 +40,26 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
         values,
         resetForm,
       }) => {
-        const isSea = values.shipment_path === SEA;
+        const isSea = values.route === SEA;
         const unit = isSea ? 'm' : 'in"';
 
-        useEffect(() => {
-          if (isSea && values?.width && values?.height && values?.depth) {
-            setFieldValue('weight_limit', values?.width * values?.height * values?.depth);
+        const onChangeDimensions = (dimension) => {
+          if (isSea && dimension?.width && dimension?.height && dimension?.depth) {
+            setFieldValue(
+              'weight_limit',
+              (+dimension?.width * +dimension?.height * +dimension?.depth).toFixed(2)
+            );
           }
-        }, [isSea, values?.width, values?.height, values?.depth]);
+        };
+
+        const onChangeWeightLimit = (value) => {
+          setFieldValue('weight_limit', value);
+          if (isSea && value >= 0.0) {
+            setFieldValue('width', Math.cbrt(value)?.toFixed(2));
+            setFieldValue('height', Math.cbrt(value)?.toFixed(2));
+            setFieldValue('depth', Math.cbrt(value)?.toFixed(2));
+          }
+        };
 
         return (
           <Card className="p-6">
@@ -56,25 +68,23 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                 <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
                   <Box>
                     <CustomDropdown
-                      name="shipment_path"
+                      name="route"
                       title="Shipment Route"
                       options={shipmentByOptions}
                       value={useMemoized(
-                        shipmentByOptions?.find((item) => item.value === values.shipment_path),
-                        [shipmentByOptions, values.shipment_path]
+                        shipmentByOptions?.find((item) => item.value === values.route),
+                        [shipmentByOptions, values.route]
                       )}
                       required
                       placeholder="Select Shipment By"
-                      onValueChange={(shipment_path) => {
+                      onValueChange={(route) => {
                         resetForm();
-                        setFieldTouched('shipment_path', true);
-                        setFieldValue('shipment_path', shipment_path.value);
-                        setFieldValue('weight_type', shipment_path.value === SEA ? 'cbm' : 'kg');
+                        setFieldTouched('route', true);
+                        setFieldValue('route', route.value);
+                        setFieldValue('weight_type', route.value === SEA ? 'cbm' : 'kg');
                       }}
                     />
-                    {touched.shipment_path && errors?.shipment_path && (
-                      <ErrorMsg error={errors.shipment_path} />
-                    )}
+                    {touched.route && errors?.route && <ErrorMsg error={errors.route} />}
                   </Box>
 
                   <Box className="col-span-1">
@@ -102,7 +112,13 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                           required
                           unit={`${unit}`}
                           value={values.width}
-                          onChange={handleChange}
+                          onChange={async (event) => {
+                            await setFieldValue('width', event.target.value);
+                            onChangeDimensions({
+                              ...values,
+                              width: event.target.value,
+                            });
+                          }}
                         />
                         {touched.width && errors?.width && <ErrorMsg error={errors.width} />}
                       </Box>
@@ -114,7 +130,13 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                           required
                           unit={`${unit}`}
                           value={values.height}
-                          onChange={handleChange}
+                          onChange={async (event) => {
+                            await setFieldValue('height', event.target.value);
+                            onChangeDimensions({
+                              ...values,
+                              height: event.target.value,
+                            });
+                          }}
                         />
                         {touched.height && errors?.height && <ErrorMsg error={errors.height} />}
                       </Box>
@@ -126,7 +148,13 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                           required
                           unit={`${unit}`}
                           value={values.depth}
-                          onChange={handleChange}
+                          onChange={async (event) => {
+                            await setFieldValue('depth', event.target.value);
+                            onChangeDimensions({
+                              ...values,
+                              depth: event.target.value,
+                            });
+                          }}
                         />
                         {touched.depth && errors?.depth && <ErrorMsg error={errors.depth} />}
                       </Box>
@@ -139,8 +167,7 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                       title={`${isSea ? 'Volume' : 'Weight'} Limit`}
                       unit={values?.weight_type || 'kg'}
                       value={values.weight_limit}
-                      disabled={isSea ? true : false}
-                      onChange={isSea ? handleChange : () => {}}
+                      onChange={(e) => onChangeWeightLimit(e.target.value)}
                     />
                     {touched.weight_limit && errors?.weight_limit && (
                       <ErrorMsg error={errors.weight_limit} />
