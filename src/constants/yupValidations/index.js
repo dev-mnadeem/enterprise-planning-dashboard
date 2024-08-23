@@ -58,6 +58,11 @@ export const createPricingSchema = Yup.object().shape({
   is_fixed: Yup.boolean().required(),
 });
 
+export const createContainerSchema = Yup.object().shape({
+  from_country_id: Yup.string().required(),
+  to_country_id: Yup.string().required(),
+});
+
 export const createOrderSchema = Yup.object().shape({
   sender_name: Yup.string().required('Customer name is required'),
   sender_email: Yup.string().email().optional(),

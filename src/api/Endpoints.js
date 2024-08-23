@@ -13,4 +13,5 @@ export const ENDPOINTS = {
   PRICING: 'pricings',
   VEHICLES: 'vehicles',
   VEHICLE_TYPES: 'vehicle-types',
+  CONTAINERS: 'containers',
 };

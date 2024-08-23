@@ -20,6 +20,8 @@ export const ROUTES = {
   ORDER_DISPATCH: '/order-dispatch',
   VEHICLES: '/vehicles',
   ADD_VEHICLE: '/vehicles/add',
+  CONTAINERS: '/containers',
+  ADD_CONTAINER: '/containers/add',
 };
 
 export const PERMISSION_TYPE = {
@@ -39,6 +41,7 @@ export const PERMISSION_ENTITIES = {
   PACKAGING: 'Package',
   PRICING: 'Pricing',
   VEHICLE: 'Vehicle',
+  CONTAINER: 'Container',
 };
 
 export * from './yupValidations';
