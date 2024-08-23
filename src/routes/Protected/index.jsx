@@ -34,6 +34,9 @@ export const OrderOutForm = lazy(() => import('src/components/orders/OrderOutFor
 export const VehiclesPage = lazy(() => import('src/pages/vehicles'));
 export const AddVehiclePage = lazy(() => import('src/pages/vehicles/add-vehicle'));
 export const EditVehiclePage = lazy(() => import('src/pages/vehicles/edit-vehicle'));
+export const ContainersPage = lazy(() => import('src/pages/containers'));
+export const AddContainersPage = lazy(() => import('src/pages/containers/add-container'));
+export const EditContainersPage = lazy(() => import('src/pages/containers/edit-container'));
 
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
@@ -41,7 +44,7 @@ export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 const ProtectedRoutes = (props) => {
   const { ADD, VIEW, UPDATE, REMOVE } = PERMISSION_TYPE;
-  const { USER, LOCATION, USER_ROLE, PERMISSION, ORDER, PACKAGING, PRICING, VEHICLE } =
+  const { USER, LOCATION, USER_ROLE, PERMISSION, ORDER, PACKAGING, PRICING, VEHICLE, CONTAINER } =
     PERMISSION_ENTITIES;
 
   return useRoutes([
@@ -189,6 +192,28 @@ const ProtectedRoutes = (props) => {
           path: `${ROUTES.VEHICLES}/:id`,
           element: (
             <PrivateRoute element={EditVehiclePage} requiredPermission={VEHICLE} type={UPDATE} />
+          ),
+        },
+        {
+          path: ROUTES.CONTAINERS,
+          element: (
+            <PrivateRoute element={ContainersPage} requiredPermission={CONTAINER} type={VIEW} />
+          ),
+        },
+        {
+          path: ROUTES.ADD_CONTAINER,
+          element: (
+            <PrivateRoute element={AddContainersPage} requiredPermission={CONTAINER} type={ADD} />
+          ),
+        },
+        {
+          path: `${ROUTES.CONTAINERS}/:id`,
+          element: (
+            <PrivateRoute
+              element={EditContainersPage}
+              requiredPermission={CONTAINER}
+              type={UPDATE}
+            />
           ),
         },
       ],

@@ -154,7 +154,7 @@ export default function OrderInForm({ onSubmit, initials, viewOnly, buttonText }
                     autoFocus
                     autoComplete="off"
                     value={values?.orderNo}
-                    placeholder="17233546..."
+                    placeholder="Type tracking number and press enter"
                     onKeyDown={(event) => {
                       if (event.key === 'Enter') {
                         handleAddOrderNo(event.target.value);
@@ -241,6 +241,14 @@ export default function OrderInForm({ onSubmit, initials, viewOnly, buttonText }
               )}
 
               <Divider className="my-4" />
+
+              <Typography variant="body1" className="mb-4">
+                Total Verified Shipments: {orderNumbers?.length || 0}
+              </Typography>
+
+              <Typography variant="body1" className="mb-4">
+                Total Invalid Shipments: {invalidOrderNumbers?.length || 0}
+              </Typography>
 
               <Button
                 onClick={handleSubmit}

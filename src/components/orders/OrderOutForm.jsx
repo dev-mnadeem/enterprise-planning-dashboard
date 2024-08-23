@@ -91,6 +91,11 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
     [vehicles]
   );
 
+  const conveyanceByOptions = useMemoized(
+    ['Container', 'Vehicle'].map((type) => ({ value: type, label: type })),
+    []
+  );
+
   useEffect(() => {
     if (updatedOrder?.success?.length) {
       toast.success('Shipment Dispatch Successfull!');
@@ -165,7 +170,7 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
                 Shipment Dispatch:{' '}
               </Typography>
               <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
-                <Box>
+                <Box className="col-span-2 w-1/2">
                   <InputField
                     title="Tracking Number"
                     name="orderNo"
@@ -179,7 +184,7 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
                         setFieldValue('orderNo', '');
                       }
                     }}
-                    placeholder="172336..."
+                    placeholder="Type tracking number and press enter"
                     onChange={handleChange}
                   />
 
@@ -231,24 +236,66 @@ export default function OrderOutForm({ onSubmit, initials, viewOnly, buttonText 
 
                 <Box>
                   <CustomDropdown
-                    title="From Transport Vehicle"
-                    name="vehicle_id"
-                    required
-                    placeholder="Select Vehicle"
-                    options={vehiclesOptions}
+                    name="conveyanceType"
+                    title="Conveyance Type"
+                    options={conveyanceByOptions}
                     value={useMemoized(
-                      vehiclesOptions?.find((item) => item.value === values.vehicle_id) || null,
-                      [vehiclesOptions, values.vehicle_id]
+                      conveyanceByOptions?.find((item) => item.value === values.conveyanceType),
+                      [conveyanceByOptions, values.conveyanceType]
                     )}
-                    onValueChange={async (value) => {
-                      setFieldTouched('vehicle_id', true);
-                      setFieldValue('vehicle_id', value.value);
+                    required
+                    placeholder="Select Conveyance through"
+                    onValueChange={(conveyanceType) => {
+                      setFieldTouched('conveyanceType', true);
+                      setFieldValue('conveyanceType', conveyanceType.value);
                     }}
                   />
-                  {touched.vehicle_id && errors?.vehicle_id && (
-                    <ErrorMsg error={errors.vehicle_id} />
+                  {touched.conveyanceType && errors?.conveyanceType && (
+                    <ErrorMsg error={errors.conveyanceType} />
                   )}
                 </Box>
+
+                {values?.conveyanceType == 'Vehicle' ? (
+                  <Box>
+                    <CustomDropdown
+                      title="From Transport Vehicle"
+                      name="vehicle_id"
+                      required
+                      placeholder="Select Vehicle"
+                      options={vehiclesOptions}
+                      value={
+                        vehiclesOptions?.find((item) => item.value === values.vehicle_id) || null
+                      }
+                      onValueChange={async (value) => {
+                        setFieldTouched('vehicle_id', true);
+                        setFieldValue('vehicle_id', value.value);
+                      }}
+                    />
+                    {touched.vehicle_id && errors?.vehicle_id && (
+                      <ErrorMsg error={errors.vehicle_id} />
+                    )}
+                  </Box>
+                ) : (
+                  <Box>
+                    <CustomDropdown
+                      title="From Container"
+                      name="vehicle_id"
+                      required
+                      placeholder="Select Container"
+                      options={vehiclesOptions}
+                      value={
+                        vehiclesOptions?.find((item) => item.value === values.vehicle_id) || null
+                      }
+                      onValueChange={async (value) => {
+                        setFieldTouched('vehicle_id', true);
+                        setFieldValue('vehicle_id', value.value);
+                      }}
+                    />
+                    {touched.vehicle_id && errors?.vehicle_id && (
+                      <ErrorMsg error={errors.vehicle_id} />
+                    )}
+                  </Box>
+                )}
               </div>
 
               {orderNumbers?.length || invalidOrderNumbers?.length ? (

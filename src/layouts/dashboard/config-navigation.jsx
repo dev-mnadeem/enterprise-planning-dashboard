@@ -2,18 +2,16 @@ import SvgColor from 'src/components/svg-color';
 import { PERMISSION_ENTITIES, PERMISSION_TYPE, ROUTES } from 'src/constants';
 import {
   ViewInAr,
-  LocationOn,
   People,
   LockPerson,
   Security,
   PriceChange,
-  AirportShuttle,
-  AirplaneTicket,
   FlightTakeoff,
   LibraryAdd,
   AddBusiness,
 } from '@mui/icons-material';
 import { checkCurrentUserPermission } from 'src/utils';
+import { Icon } from '@iconify/react';
 // ----------------------------------------------------------------------
 
 const icon = (name) => (
@@ -22,7 +20,7 @@ const icon = (name) => (
 
 const navConfig = (permissions = []) => {
   const { REMOVE, UPDATE, VIEW } = PERMISSION_TYPE;
-  const { USER, ORDER, PACKAGING, PRICING, LOCATION, VEHICLE } = PERMISSION_ENTITIES;
+  const { USER, ORDER, PACKAGING, PRICING, LOCATION, VEHICLE, CONTAINER } = PERMISSION_ENTITIES;
   const _currentUserNav = [];
 
   _currentUserNav.push({
@@ -67,11 +65,19 @@ const navConfig = (permissions = []) => {
     });
   }
 
+  if (checkCurrentUserPermission(permissions, CONTAINER, VIEW)) {
+    _currentUserNav.push({
+      title: 'Containers',
+      path: ROUTES.CONTAINERS,
+      icon: <Icon icon="charm:container" width={25} height={25} />,
+    });
+  }
+
   if (checkCurrentUserPermission(permissions, ORDER, VIEW)) {
     _currentUserNav.push({
       title: 'Shipments',
       path: '#',
-      icon: <AirplaneTicket />,
+      icon: <Icon icon="game-icons:cargo-ship" width="25" height="25" />,
       menuItems: [
         {
           title: 'Catalogue',
@@ -96,7 +102,7 @@ const navConfig = (permissions = []) => {
     _currentUserNav.push({
       title: 'Locations',
       path: ROUTES.LOCATIONS,
-      icon: <LocationOn />,
+      icon: <Icon icon="fluent:globe-location-24-regular" width="25" height="25" />,
     });
   }
 
@@ -104,7 +110,7 @@ const navConfig = (permissions = []) => {
     _currentUserNav.push({
       title: 'Vehicles',
       path: ROUTES.VEHICLES,
-      icon: <AirportShuttle />,
+      icon: <Icon icon="fa6-solid:truck-fast" width="25" height="25" />,
     });
   }
 
