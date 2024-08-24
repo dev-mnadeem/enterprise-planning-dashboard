@@ -242,7 +242,7 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
           setFieldValue('courier_type', courierTypeOptions?.[0]?.value);
           setFieldValue('payment_type', paymentTypeOptions?.[0]?.value);
           setFieldValue('payment_date', new Date());
-        }, []);
+        }, [values?.type]);
 
         useEffect(() => {
           const totalWeight = values.orderItems?.reduce(
