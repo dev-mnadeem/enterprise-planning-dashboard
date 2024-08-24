@@ -54,8 +54,9 @@ export const InputField = (props) => {
             if (props.onBlur) props.onBlur(event);
           }}
           onChange={(event) => {
-            context.handleChange(event);
-            if (props.onChange) props.onChange(event);
+            /** HANDLE CUSTOM ON CHANGE OVER FORMIK  */
+            if (props.isCustomOnChange) props.onChange(event);
+            else context.handleChange(event);
           }}
         />
       )}

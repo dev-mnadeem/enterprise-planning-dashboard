@@ -112,6 +112,7 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                           required
                           unit={`${unit}`}
                           value={values.width}
+                          isCustomOnChange={true}
                           onChange={async (event) => {
                             await setFieldValue('width', event.target.value);
                             onChangeDimensions({
@@ -130,6 +131,7 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                           required
                           unit={`${unit}`}
                           value={values.height}
+                          isCustomOnChange={true}
                           onChange={async (event) => {
                             await setFieldValue('height', event.target.value);
                             onChangeDimensions({
@@ -148,6 +150,7 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                           required
                           unit={`${unit}`}
                           value={values.depth}
+                          isCustomOnChange={true}
                           onChange={async (event) => {
                             await setFieldValue('depth', event.target.value);
                             onChangeDimensions({
@@ -167,6 +170,7 @@ export default function PackagingForm({ onSubmit, initials, viewOnly, buttonText
                       title={`${isSea ? 'Volume' : 'Weight'} Limit`}
                       unit={values?.weight_type || 'kg'}
                       value={values.weight_limit}
+                      isCustomOnChange={true}
                       onChange={(e) => onChangeWeightLimit(e.target.value)}
                     />
                     {touched.weight_limit && errors?.weight_limit && (
