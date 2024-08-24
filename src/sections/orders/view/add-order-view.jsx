@@ -14,7 +14,7 @@ const AddOrderPage = () => {
   useEffect(() => {
     if (data) {
       toast.success('Shipment created successfully!');
-      navigation(ROUTES.ORDERS);
+      navigation(`${ROUTES.ORDERS}/${data?.id}`);
     }
   }, [data]);
 
