@@ -172,6 +172,7 @@ export default function ContainerForm({ onSubmit, initials, viewOnly, buttonText
                       fullWidth
                       unit={'m'}
                       value={values.width}
+                      isCustomOnChange={true}
                       onChange={async (event) => {
                         await setFieldValue('width', event.target.value);
                         onChangeDimensions({
@@ -189,6 +190,7 @@ export default function ContainerForm({ onSubmit, initials, viewOnly, buttonText
                       title="Height"
                       unit={'m'}
                       value={values.height}
+                      isCustomOnChange={true}
                       onChange={async (event) => {
                         await setFieldValue('height', event.target.value);
                         onChangeDimensions({
@@ -206,6 +208,7 @@ export default function ContainerForm({ onSubmit, initials, viewOnly, buttonText
                       title="Depth"
                       unit={'m'}
                       value={values.depth}
+                      isCustomOnChange={true}
                       onChange={async (event) => {
                         await setFieldValue('depth', event.target.value);
                         onChangeDimensions({
@@ -223,6 +226,7 @@ export default function ContainerForm({ onSubmit, initials, viewOnly, buttonText
                       title={'Volume Limit'}
                       unit={'cbm'}
                       value={values.volume}
+                      isCustomOnChange={true}
                       onChange={(e) => onChangeWeightLimit(e.target.value)}
                     />
                     {touched.volume && errors?.volume && <ErrorMsg error={errors.volume} />}

@@ -242,27 +242,31 @@ export default function OrderInForm({ onSubmit, initials, viewOnly, buttonText }
 
               <Divider className="my-4" />
 
-              <Typography variant="body1" className="mb-4">
-                Total Verified Shipments: {orderNumbers?.length || 0}
-              </Typography>
+              <Box className="flex justify-between items-center">
+                <Box>
+                  <Typography variant="body1" className="mb-4" color="success">
+                    Total Verified Shipments: {orderNumbers?.length || 0}
+                  </Typography>
 
-              <Typography variant="body1" className="mb-4">
-                Total Invalid Shipments: {invalidOrderNumbers?.length || 0}
-              </Typography>
+                  <Typography variant="body1" className="mb-4" color="error">
+                    Total Invalid Shipments: {invalidOrderNumbers?.length || 0}
+                  </Typography>
+                </Box>
 
-              <Button
-                onClick={handleSubmit}
-                variant="contained"
-                className="col-span-2 mt-6"
-                color="inherit"
-                sx={{
-                  padding: '12px 16px',
-                  float: 'right',
-                }}
-                startIcon={<Iconify icon="eva:navigation-2-outline" />}
-              >
-                INTAKE SHIPMENT
-              </Button>
+                <Button
+                  onClick={handleSubmit}
+                  variant="contained"
+                  className="col-span-2"
+                  color="inherit"
+                  sx={{
+                    padding: '12px 16px',
+                    float: 'right',
+                  }}
+                  startIcon={<Iconify icon="eva:navigation-2-outline" />}
+                >
+                  INTAKE SHIPMENT
+                </Button>
+              </Box>
             </fieldset>
           </form>
         </Card>

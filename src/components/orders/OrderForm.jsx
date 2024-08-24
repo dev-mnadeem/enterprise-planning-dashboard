@@ -959,10 +959,11 @@ export default function OrderForm({ onSubmit, initials, viewOnly, buttonText }) 
                       unit={'$'}
                       value={Number(values?.sub_total || 0)}
                       disabled={!!shipmentPricing?.[0]?.price}
-                      onChange={(v) => {
+                      isCustomOnChange={true}
+                      onChange={(e) => {
                         if (!!shipmentPricing?.[0]?.price) return;
                         setFieldTouched(`sub_total`, true);
-                        setFieldValue(`sub_total`, v);
+                        setFieldValue(`sub_total`, e.target.value);
                       }}
                     />
                     {touched.sub_total && errors?.sub_total && (
