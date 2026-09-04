@@ -19,6 +19,7 @@ import { useFormik } from 'formik';
 import { useMutation } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';
 import { useAppDispatch, useAppSelector } from 'src/state/hooks';
+import { persistor } from 'src/state/store';
 import { storeUser, storeUserSession } from 'src/state/reducers/userReducer';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
@@ -71,8 +72,12 @@ export default function LoginView() {
           })
         );
         dispatch(storeUser(user));
-        // router.replace('/');
-        window.location.replace('/');
+        // redux-persist writes asynchronously. Reloading the page immediately
+        // after dispatching threw the session away before it reached storage,
+        // which sent the user straight back here. Flush, then navigate.
+        persistor.flush().then(() => {
+          window.location.replace('/');
+        });
       } catch (error) {
         dispatch(logoutUser());
       }
