@@ -132,3 +132,7 @@ a real disposable PostgreSQL-backed API. Login survives reload and the roles
 list displays stored records. The dashboard's sales/visits widgets remain
 starter-template examples. Existing lint warnings and large bundle size remain;
 CI verifies the tests and production compilation without claiming clean lint.
+
+## Author
+
+[**Muhammad Nadeem**](https://github.com/dev-mnadeem)

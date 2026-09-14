@@ -1,6 +1,6 @@
 {
   "name": "adinkra",
-  "author": "adinkra",
+  "author": "Muhammad Nadeem",
   "licence": "MIT",
   "version": "1.0.0",
   "private": true,
@@ -92,5 +92,16 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "homepage": "https://github.com/dev-mnadeem/enterprise-planning-dashboard",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dev-mnadeem/enterprise-planning-dashboard.git"
+  },
+  "maintainers": [
+    {
+      "name": "Muhammad Nadeem",
+      "url": "https://github.com/dev-mnadeem"
+    }
+  ]
 }

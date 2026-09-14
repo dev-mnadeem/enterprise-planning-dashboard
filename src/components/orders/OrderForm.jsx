@@ -20,7 +20,6 @@ import {
   SHIPMENT_ROUTE,
   SHIPMENT_TYPE,
   createOrderSchema,
-  customNumberFormat,
 } from 'src/constants';
 import { useLazyQuery, useQuery } from 'src/api';
 import { ENDPOINTS } from 'src/api/Endpoints';

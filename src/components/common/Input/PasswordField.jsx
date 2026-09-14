@@ -1,9 +1,9 @@
-import { ChangeEvent, Fragment, useState } from 'react';
+import { Fragment, useState } from 'react';
 import { VisibilityRounded, VisibilityOffRounded } from '@mui/icons-material';
 import { Box, Typography, IconButton, TextField } from '@mui/material';
 
 const PasswordField = (props) => {
-  const [showPassword, setShowPassword] = useState < Boolean > false;
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <Fragment>
