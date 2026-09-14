@@ -4,7 +4,7 @@ The operator console for a cargo and logistics business — shipments, parcels,
 packagings, pricing, vehicles, locations and user administration. React 18 with
 MUI, Redux Toolkit, Formik. About 15,500 lines.
 
-It talks to [the Adinkra API](../Adinkra-BE).
+It talks to [the Adinkra API](https://github.com/dev-mnadeem/enterprise-planning-api).
 
 ![Signing in](docs/01-login.png)
 
@@ -93,8 +93,9 @@ Every other screen is real: the tables below are the API's own records.
 
 ![Roles](docs/04-roles.png)
 
-The screens that read live data — users, roles, locations, vehicles, pricing,
-shipments — all work against the API.
+The users, roles, locations, vehicles, pricing and shipment screens read API
+records. The latest native browser check covers login, reload persistence and
+the roles list.
 
 ## Layout
 
@@ -107,3 +108,27 @@ src/
   state/          Redux Toolkit slices and the persisted store
   components/     shared UI
 ```
+
+## Native setup and permission checks
+
+With Node 22 and the API running:
+
+```bash
+yarn install --frozen-lockfile --ignore-scripts
+REACT_APP_API_URL=http://localhost:3006/api yarn start
+yarn test --watchAll=false --runInBand
+```
+
+Four regression tests cover denied/missing permissions, allowed operations,
+admin access, form defaults, and parcel capacity while editing a row. The
+permission helper now imports its Lodash accessor explicitly; non-admin checks
+previously reached an undefined `_`. Google Maps loads only when its optional
+key is configured, and no longer references an undefined `initMap` callback.
+
+![Native role management](docs/native-roles-desktop.png)
+
+[Mobile capture](docs/native-roles-mobile.png). These use the built console with
+a real disposable PostgreSQL-backed API. Login survives reload and the roles
+list displays stored records. The dashboard's sales/visits widgets remain
+starter-template examples. Existing lint warnings and large bundle size remain;
+CI verifies the tests and production compilation without claiming clean lint.
